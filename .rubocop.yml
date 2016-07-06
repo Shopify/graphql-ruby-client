@@ -1,0 +1,24 @@
+# This file strictly follows the rules defined in the Ruby style guide:
+#   http://shopify.github.io/ruby-style-guide/
+# Before updating anything please sync-up with #ruby-style-guide on Slack.
+inherit_from:
+  - http://shopify.github.io/ruby-style-guide/rubocop.yml
+
+AllCops:
+  TargetRubyVersion: 2.3
+
+Style/WordArray:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Exclude:
+    - test/**/*
+
+Style/ClassAndModuleChildren:
+  Exclude:
+    - test/**/*
+
+Metrics/LineLength:
+  Max: 120
+  Exclude:
+    - test/integration/checkout_externals_test/**/*

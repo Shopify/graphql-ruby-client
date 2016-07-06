@@ -1,0 +1,7 @@
+name: graphql-ruby-client
+up:
+ - ruby: 2.4.0
+ - bundler
+commands:
+ test: 'bin/rake test'
+ build: 'gem build graphql_ruby_client.gemspec'
