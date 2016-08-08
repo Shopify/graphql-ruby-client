@@ -2,6 +2,9 @@ require_relative '../test_helper'
 require 'minitest/autorun'
 
 class StorefrontClientTest < Minitest::Test
+  URL = 'https://big-and-tall-for-pets.myshopify.com/api/graph'
+  USERNAME = '692d1d26c49c56f4a217d0fbd8014768'
+
   def setup
     schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/storefront_schema.json')
     schema_string = File.read(schema_path)

@@ -26,6 +26,7 @@ module GraphQL
         req.basic_auth(@client.username, @client.password)
         req['Accept'] = 'application/json'
         req['Content-Type'] = 'application/json'
+
         body = { query: query, variables: {} }.to_json
         req.body = body
 
