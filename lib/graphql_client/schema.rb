@@ -7,6 +7,10 @@ module GraphQL
         @types = build_type_map(schema_text)
       end
 
+      def query_root
+        @types['QueryRoot']
+      end
+
       private
 
       def build_type_map(schema_text)

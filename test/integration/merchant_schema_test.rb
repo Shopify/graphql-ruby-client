@@ -9,7 +9,7 @@ class MerchantSchemaTest < Minitest::Test
     schema = GraphQL::Client::Schema.new(schema_string)
     assert !schema.types.empty?
 
-    product_type = schema.types["Product"]
+    product_type = schema.types['Product']
 
     expected_fields = %w(bodyHtml
                          createdAt

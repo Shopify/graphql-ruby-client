@@ -1,7 +1,15 @@
 module GraphQL
   module Client
     class Type
-      attr_reader :fields, :lists, :objects, :connections, :name
+      PRIMITIVES = %w(
+        Boolean
+        DateTime
+        ID
+        Int
+        String
+      )
+
+      attr_reader :fields, :lists, :objects, :connections, :name, :field_arguments
 
       def determine_type(type)
         return type if type.is_a? String
@@ -20,13 +28,16 @@ module GraphQL
         @objects = {}
         @connections = {}
         @lists = {}
+        @field_arguments = {}
 
         if @type[:fields] != nil
           @type[:fields].each do |field|
-            next if field[:type][:kind] == 'OBJECT'
-
             if field.key?(:args)
               if field[:args].length > 0
+                @field_arguments[field[:name]] = []
+                field[:args].each do |argument|
+                  @field_arguments[field[:name]] << GraphQL::Client::Argument.new(argument['name'], argument['description'])
+                end
                 if field.fetch('type', {}).fetch('ofType', nil).nil?
                   # puts "Node detected for #{field[:name]}"
                   next
@@ -61,6 +72,10 @@ module GraphQL
             end
           end
         end
+      end
+
+      def primitive_fields
+        @fields.select{|name,field| PRIMITIVES.include? field.type_name}
       end
     end
   end
