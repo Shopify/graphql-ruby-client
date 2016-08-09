@@ -1,7 +1,7 @@
 module GraphQL
   module Client
     class ObjectProxy
-      attr_reader :id, :type
+      attr_reader :id, :type, :properties
 
       def initialize(properties:, client:, type:)
         @id = properties['id']
@@ -26,13 +26,13 @@ module GraphQL
         connection_type = @type.connections[field]
         return_type_name = connection_type.gsub('Connection', '')
         return_type = @client.schema.types[return_type_name]
-        ConnectionProxy.new(parent: self, client: @client, return_type: return_type, field: field)
+        ConnectionProxy.new(parent: self, client: @client, type: return_type, field: field)
       end
 
       def all_from_list(field)
         return_type_name = @type.lists[field]
         return_type = @client.schema.types[return_type_name]
-        ListProxy.new(parent: self, client: @client, return_type: return_type, field: field)
+        ListProxy.new(parent: self, client: @client, type: return_type, field: field)
       end
     end
   end

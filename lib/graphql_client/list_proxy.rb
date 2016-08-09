@@ -3,14 +3,14 @@ module GraphQL
     class ListProxy
       include Enumerable
 
-      def initialize(parent:, client:, return_type:, field:)
+      def initialize(parent:, client:, type:, field:)
         @parent = parent
         @client = client
-        @return_type = return_type
+        @type = type
         @field = field
         @objects = []
 
-        @query = ListQuery.new(parent: @parent, field: @field, return_type: @return_type)
+        @query = ListQuery.new(parent: @parent, field: @field, return_type: @type)
         fetch_results
       end
 

@@ -27,6 +27,10 @@ module GraphQL
         req['Accept'] = 'application/json'
         req['Content-Type'] = 'application/json'
 
+        @client.headers.each do |key, value|
+          req[key] = value
+        end
+
         body = { query: query, variables: {} }.to_json
         req.body = body
 

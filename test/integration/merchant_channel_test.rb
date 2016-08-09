@@ -1,8 +1,9 @@
 require_relative '../test_helper'
 require 'minitest/autorun'
 
-class MerchantClientTest < Minitest::Test
+class MerchantChannelTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/admin/api/graphql.json'
+  SECRET = '5d62605439df48d903dcd6b3a2cadebf'
 
   def setup
     schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/merchant_schema.json')
@@ -12,17 +13,16 @@ class MerchantClientTest < Minitest::Test
     @client = GraphQL::Client::Base.new(
       schema: @schema,
       url: URL,
-      username: 'e3c3e27694e5702e985bdcd8db266c64',
-      password: '223fcadc3bb7255266ab86d5693fa640'
+      headers: {
+        'X-Shopify-Access-Token': SECRET
+      }
     )
   end
 
-  def test_find_shop_and_products
+  def test_public_access_tokens
     shop = @client.find('Shop')
-    assert_equal 'Toronto', shop['city']
-
-    products = shop.all('products')
-    assert_equal 5, products.length
-    assert_equal 5, products.map { |p| p['title'] }.uniq.length
+    public_access_tokens = shop.all('publicAccessTokens')
+    new_token = public_access_tokens.create(title: 'Test')
+    assert_equal 32, new_token['accessToken'].length
   end
 end

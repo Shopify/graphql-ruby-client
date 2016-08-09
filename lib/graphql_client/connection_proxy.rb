@@ -3,14 +3,14 @@ module GraphQL
     class ConnectionProxy
       include Enumerable
 
-      def initialize(parent:, client:, return_type:, field:)
+      def initialize(parent:, client:, type:, field:)
         @parent = parent
         @client = client
-        @return_type = return_type
+        @type = type
         @field = field
         @objects = []
 
-        @query = ConnectionQuery.new(parent: @parent, field: @field, return_type: @return_type, client: @client)
+        @query = ConnectionQuery.new(parent: @parent, field: @field, return_type: @type, client: @client)
         fetch_page
       end
 
@@ -57,6 +57,36 @@ module GraphQL
         @objects.each do |node|
           yield node
         end
+      end
+
+      def create(attributes = {})
+        input_block = ''
+        attributes.each do |key, value|
+          input_block << "#{key.to_s}: \"#{value}\"\n"
+        end
+
+        fields = @type.primitive_fields.keys.join(',')
+        type_name = @type.name.camelize(:lower)
+
+        mutation = "
+          mutation {
+            #{type_name}Create(
+              input: {
+                #{input_block}
+              }
+            ) {
+              #{type_name} {
+                #{fields}
+              },
+            userErrors {
+              field,
+              message
+            }
+          }
+        }"
+
+        request = Request.new(client: @client, type: @type)
+        ObjectProxy.new(type: @type, properties: request.from_query(mutation).object[type_name], client: @client)
       end
     end
   end
