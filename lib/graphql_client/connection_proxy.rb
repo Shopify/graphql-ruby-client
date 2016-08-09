@@ -3,6 +3,8 @@ module GraphQL
     class ConnectionProxy
       include Enumerable
 
+      delegate :length, to: :entries
+
       def initialize(parent:, client:, type:, field:)
         @parent = parent
         @client = client
@@ -21,18 +23,18 @@ module GraphQL
         edges = deep_find(initial_response.data, 'edges')
 
         response = initial_response
-        @objects = @objects + edges.map{|edge| edge['node']}
-        while(has_next_page?(response.data))
+        @objects += edges.map { |edge| edge['node'] }
+        while next_page?(response.data)
           cursor = edges.last['cursor']
           response = Request.new(client: @client).from_query(@query.query(after: cursor))
           edges = deep_find(response.data, 'edges')
-          @objects = @objects + edges.map{|edge| edge['node']}
+          @objects += edges.map { |edge| edge['node'] }
         end
       end
 
       def deep_find(hash, target_key)
         return hash[target_key] if hash.key?(target_key)
-        hash.each do |key, value|
+        hash.each do |_, value|
           result = deep_find(value, target_key) if value.is_a? Hash
           return result unless result.nil?
         end
@@ -40,7 +42,7 @@ module GraphQL
         nil
       end
 
-      def has_next_page?(response_data)
+      def next_page?(response_data)
         next_page = deep_find(response_data, 'hasNextPage')
         if next_page.nil?
           false
@@ -49,11 +51,7 @@ module GraphQL
         end
       end
 
-      def length
-        entries.length
-      end
-
-      def each(&block)
+      def each
         @objects.each do |node|
           yield ObjectProxy.new(attributes: node, client: @client, type: @type)
         end
@@ -62,7 +60,7 @@ module GraphQL
       def create(attributes = {})
         input_block = ''
         attributes.each do |key, value|
-          input_block << "#{key.to_s}: \"#{value}\"\n"
+          input_block << "#{key}: \"#{value}\"\n"
         end
 
         fields = @type.primitive_fields.keys.join(',')

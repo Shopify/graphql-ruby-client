@@ -18,7 +18,7 @@ module GraphQL
           return determine_type(type[:ofType]) unless type[:ofType].nil?
         end
 
-        return type[:name]
+        type[:name]
       end
 
       def initialize(name, type)
@@ -30,10 +30,10 @@ module GraphQL
         @lists = {}
         @field_arguments = {}
 
-        if @type[:fields] != nil
+        unless @type[:fields].nil?
           @type[:fields].each do |field|
             if field.key?(:args)
-              if field[:args].length > 0
+              unless field[:args].empty?
                 @field_arguments[field[:name]] = []
                 field[:args].each do |argument|
                   @field_arguments[field[:name]] << GraphQL::Client::Argument.new(argument['name'], argument['description'])
@@ -54,7 +54,7 @@ module GraphQL
               end
             end
 
-            unless field[:type][:ofType] == nil
+            unless field[:type][:ofType].nil?
               kind = field[:type][:ofType][:kind]
             end
 
@@ -62,10 +62,10 @@ module GraphQL
               @objects[field[:name]] = kind
             else
               # Non-null types are wrapped in two layers
-              unless field[:type].fetch(:ofType).nil?
-                type_name = field[:type][:ofType][:name]
+              type_name = if field[:type].fetch(:ofType).nil?
+                field[:type][:name]
               else
-                type_name = field[:type][:name]
+                field[:type][:ofType][:name]
               end
 
               @fields[field[:name]] = Field.new(field[:name], type_name, false)
@@ -75,7 +75,7 @@ module GraphQL
       end
 
       def primitive_fields
-        @fields.select{|name,field| PRIMITIVES.include? field.type_name}
+        @fields.select { |_name, field| PRIMITIVES.include? field.type_name }
       end
     end
   end

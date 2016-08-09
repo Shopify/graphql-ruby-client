@@ -8,7 +8,7 @@ module GraphQL
     class Request
       attr_reader :type
 
-      def initialize(client: client, per_page: 10, type: nil)
+      def initialize(client:, per_page: 10, type: nil)
         @client = client
         @per_page = per_page
         @type = type
@@ -35,9 +35,9 @@ module GraphQL
         body = { query: query, variables: {} }.to_json
         req.body = body
 
-        response = Net::HTTP.start(parsed_url.hostname, parsed_url.port, use_ssl: parsed_url.scheme == 'https') {|http|
+        response = Net::HTTP.start(parsed_url.hostname, parsed_url.port, use_ssl: parsed_url.scheme == 'https') do |http|
           http.request(req)
-        }
+        end
 
         puts "Response body: \n#{response.body}"
         response.body

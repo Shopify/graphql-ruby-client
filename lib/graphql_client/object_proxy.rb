@@ -11,7 +11,7 @@ module GraphQL
         @type = type
       end
 
-      def method_missing(name, *arguments, &block)
+      def method_missing(name, *arguments)
         field = name.to_s
         return all_from_connection(field) if @type.connections.key? field
         return all_from_list(field) if @type.lists.key? field
@@ -27,7 +27,6 @@ module GraphQL
 
       def save
         type_name = @type.name.camelize(:lower)
-        fields = @type.primitive_fields.keys.join(',')
 
         attributes_block = ''
         @dirty_attributes.each do |name|
@@ -71,8 +70,8 @@ module GraphQL
             }
           }"
 
-          request = Request.new(client: @client, type: @type)
-          request.from_query(mutation)
+        request = Request.new(client: @client, type: @type)
+        request.from_query(mutation)
       end
 
       private

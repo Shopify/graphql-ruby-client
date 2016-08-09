@@ -3,6 +3,8 @@ module GraphQL
     class ListProxy
       include Enumerable
 
+      delegate :length, to: :entries
+
       def initialize(parent:, client:, type:, field:)
         @parent = parent
         @client = client
@@ -14,11 +16,7 @@ module GraphQL
         fetch_results
       end
 
-      def length
-        entries.length
-      end
-
-      def each(&block)
+      def each
         @objects.each do |node|
           yield node
         end
@@ -33,7 +31,7 @@ module GraphQL
       end
 
       def find_list(hash)
-        hash.each do |key, value|
+        hash.each do |_key, value|
           return value if value.is_a? Array
 
           if value.is_a? Hash

@@ -20,7 +20,8 @@ module GraphQL
           @field,
           @return_type,
           per_page: @per_page,
-          after: after)
+          after: after
+        )
       end
 
       def query_builder

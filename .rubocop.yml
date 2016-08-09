@@ -5,10 +5,7 @@ inherit_from:
   - http://shopify.github.io/ruby-style-guide/rubocop.yml
 
 AllCops:
-  TargetRubyVersion: 2.2
-
-Rails:
-  Enabled: true
+  TargetRubyVersion: 2.3
 
 Style/WordArray:
   Enabled: false
@@ -25,6 +22,3 @@ Metrics/LineLength:
   Max: 120
   Exclude:
     - test/integration/checkout_externals_test/**/*
-
-Rails/OutputSafety:
-  Enabled: false

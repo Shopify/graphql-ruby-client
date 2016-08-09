@@ -15,7 +15,8 @@ module GraphQL
           @root_type,
           @root_id,
           @field,
-          @return_type)
+          @return_type
+        )
       end
     end
   end
