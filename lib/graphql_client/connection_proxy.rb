@@ -49,10 +49,6 @@ module GraphQL
         end
       end
 
-      def [](index)
-        entries[index]
-      end
-
       def length
         entries.length
       end

@@ -14,10 +14,6 @@ module GraphQL
         fetch_results
       end
 
-      def [](index)
-        entries[index]
-      end
-
       def length
         entries.length
       end
