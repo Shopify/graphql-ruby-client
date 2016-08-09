@@ -15,6 +15,7 @@ module GraphQL
       end
 
       def from_query(query)
+        puts "Query: #{query}"
         response_body = send_request(query)
         Response.new(self, response_body)
       end
@@ -45,11 +46,13 @@ module GraphQL
       # Move these to the base client and only use Request#from_query
       def find(id)
         query = QueryBuilder.find(@type, id)
+        puts "Query: #{query}"
         Response.new(self, send_request(query))
       end
 
       def simple_find(type_name)
         query = QueryBuilder.simple_find(@client.schema.types[type_name])
+        puts "Query: #{query}"
         Response.new(self, send_request(query))
       end
     end

@@ -20,6 +20,27 @@ module GraphQL
         nil
       end
 
+      def destroy
+        type_name = @type.name.camelize(:lower)
+
+        mutation = "
+          mutation {
+            #{type_name}Delete(
+              input: {
+                id: \"#{@id}\"
+              }
+            ) {
+              userErrors {
+                field,
+                message
+              }
+            }
+          }"
+
+          request = Request.new(client: @client, type: @type)
+          request.from_query(mutation)
+      end
+
       private
 
       def all_from_connection(field)

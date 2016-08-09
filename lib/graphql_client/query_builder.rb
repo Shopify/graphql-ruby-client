@@ -15,9 +15,6 @@ module GraphQL
              #{fields}
            }
          }"
-
-        puts query
-        query
       end
 
       def self.simple_find(type)
@@ -29,9 +26,6 @@ module GraphQL
              #{fields}
            }
          }"
-
-        puts query
-        query
       end
 
       def connection_from_object(root_type, root_id, field, return_type, per_page: 10, after: nil)
@@ -63,9 +57,6 @@ module GraphQL
               }
             }
           }"
-
-        puts query
-        query
       end
 
       def self.list_from_object(root_type, root_id, field, return_type)
@@ -78,9 +69,6 @@ module GraphQL
               }
             }
           }"
-
-        puts query
-        query
       end
     end
   end
