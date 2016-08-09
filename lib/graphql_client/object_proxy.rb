@@ -1,29 +1,28 @@
 module GraphQL
   module Client
     class ObjectProxy
-      attr_reader :id, :type, :properties
+      attr_reader :id, :type, :attributes
 
-      def initialize(properties:, client:, type:)
-        @id = properties['id']
+      def initialize(attributes:, client:, type:)
+        @id = attributes['id']
         @client = client
-        @properties = properties
+        @attributes = attributes
         @dirty_attributes = Set.new
         @type = type
       end
 
-      def [](key)
-        @properties[key]
-      end
-
-      def []=(key, value)
-        @properties[key] = value
-        @dirty_attributes.add(key)
-      end
-
-      def all(field)
+      def method_missing(name, *arguments, &block)
+        field = name.to_s
         return all_from_connection(field) if @type.connections.key? field
         return all_from_list(field) if @type.lists.key? field
-        nil
+
+        if field.end_with? '='
+          field = field.chomp('=')
+          @attributes[field] = arguments.first
+          @dirty_attributes.add(field)
+        else
+          @attributes[field]
+        end
       end
 
       def save
@@ -32,7 +31,7 @@ module GraphQL
 
         attributes_block = ''
         @dirty_attributes.each do |name|
-          attributes_block << "#{name}: \"#{@properties[name]}\"\n"
+          attributes_block << "#{name}: \"#{@attributes[name]}\"\n"
         end
 
         mutation = "

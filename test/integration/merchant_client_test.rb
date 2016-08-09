@@ -19,23 +19,23 @@ class MerchantClientTest < Minitest::Test
 
   def test_find_shop_and_products
     shop = @client.find('Shop')
-    assert_equal 'Toronto', shop['city']
+    assert_equal 'Toronto', shop.city
 
-    products = shop.all('products')
+    products = shop.products
     assert_equal 5, products.length
-    assert_equal 5, products.map { |p| p['title'] }.uniq.length
+    assert_equal 5, products.map { |p| p.title }.uniq.length
   end
 
   def test_updating_product
     shop = @client.find('Shop')
-    products = shop.all('products')
+    products = shop.products
 
     title = "Renamed Product - #{Time.new.to_i}"
-    product = @client.find(products.to_a.last['id'])
-    product['title'] = title
+    product = @client.find(products.to_a.last.id)
+    product.title = title
     product.save
 
-    product = @client.find(products.to_a.last['id'])
-    assert_equal(title, product['title'])
+    product = @client.find(products.to_a.last.id)
+    assert_equal(title, product.title)
   end
 end

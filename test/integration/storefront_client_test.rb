@@ -19,25 +19,25 @@ class StorefrontClientTest < Minitest::Test
 
   def test_find_shop_and_products
     shop = @client.find('Shop')
-    assert_equal 'Toronto', shop['city']
+    assert_equal('Toronto', shop.city)
 
-    products = shop.all('products')
-    assert_equal 5, products.length
+    products = shop.products
+    assert_equal(5, products.length)
   end
 
   def test_non_paginated_request
     product = @client.find('gid://shopify/Product/7341512007')
-    assert_equal 'Abridgable Concrete Coat', product['title']
+    assert_equal('Abridgable Concrete Coat', product.title)
 
-    variants = product.all('variants')
-    assert_equal 2, variants.length
+    variants = product.variants
+    assert_equal(2, variants.length)
   end
 
   def test_paginated_request
     product = @client.find('gid://shopify/Product/7341512007')
 
-    collections = product.all('collections')
-    assert_equal 1, collections.length
+    collections = product.collections
+    assert_equal(1, collections.length)
   end
 
   def test_batch_paginated_request
@@ -49,10 +49,10 @@ class StorefrontClientTest < Minitest::Test
     )
 
     shop = client.find('Shop')
-    assert_equal 'Toronto', shop['city']
+    assert_equal('Toronto', shop.city)
 
-    products = shop.all('products')
-    assert_equal 5, products.length
-    assert_equal 5, products.map { |p| p['title'] }.uniq.length
+    products = shop.products
+    assert_equal(5, products.length)
+    assert_equal(5, products.map { |p| p.title }.uniq.length)
   end
 end

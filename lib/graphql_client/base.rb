@@ -24,7 +24,7 @@ module GraphQL
 
         type = @schema.types[global_id.model_name]
         request = Request.new(client: self, type: type)
-        ObjectProxy.new(type: type, properties: request.find(id).object, client: self)
+        ObjectProxy.new(type: type, attributes: request.find(id).object, client: self)
       end
 
       private
@@ -32,7 +32,7 @@ module GraphQL
       def simple_find(type_name)
         type = @schema.types[type_name]
         request = Request.new(client: self, type: type)
-        ObjectProxy.new(type: type, properties: request.simple_find(type_name).object, client: self)
+        ObjectProxy.new(type: type, attributes: request.simple_find(type_name).object, client: self)
       end
     end
   end

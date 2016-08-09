@@ -55,7 +55,7 @@ module GraphQL
 
       def each(&block)
         @objects.each do |node|
-          yield node
+          yield ObjectProxy.new(attributes: node, client: @client, type: @type)
         end
       end
 
@@ -86,7 +86,7 @@ module GraphQL
         }"
 
         request = Request.new(client: @client, type: @type)
-        ObjectProxy.new(type: @type, properties: request.from_query(mutation).object[type_name], client: @client)
+        ObjectProxy.new(type: @type, attributes: request.from_query(mutation).object[type_name], client: @client)
       end
     end
   end
