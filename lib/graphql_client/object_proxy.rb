@@ -7,6 +7,7 @@ module GraphQL
         @id = properties['id']
         @client = client
         @properties = properties
+        @dirty_attributes = Set.new
         @type = type
       end
 
@@ -14,10 +15,44 @@ module GraphQL
         @properties[key]
       end
 
+      def []=(key, value)
+        @properties[key] = value
+        @dirty_attributes.add(key)
+      end
+
       def all(field)
         return all_from_connection(field) if @type.connections.key? field
         return all_from_list(field) if @type.lists.key? field
         nil
+      end
+
+      def save
+        type_name = @type.name.camelize(:lower)
+        fields = @type.primitive_fields.keys.join(',')
+
+        attributes_block = ''
+        @dirty_attributes.each do |name|
+          attributes_block << "#{name}: \"#{@properties[name]}\"\n"
+        end
+
+        mutation = "
+          mutation {
+            #{type_name}Update(
+              input: {
+                id: \"#{@id}\"
+                #{attributes_block}
+              }
+            ) {
+              userErrors {
+                field,
+                message
+              }
+            }
+          }"
+
+        @dirty_attributes.clear
+        request = Request.new(client: @client, type: @type)
+        request.from_query(mutation)
       end
 
       def destroy

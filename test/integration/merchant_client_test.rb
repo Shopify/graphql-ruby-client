@@ -25,4 +25,17 @@ class MerchantClientTest < Minitest::Test
     assert_equal 5, products.length
     assert_equal 5, products.map { |p| p['title'] }.uniq.length
   end
+
+  def test_updating_product
+    shop = @client.find('Shop')
+    products = shop.all('products')
+
+    title = "Renamed Product - #{Time.new.to_i}"
+    product = @client.find(products.to_a.last['id'])
+    product['title'] = title
+    product.save
+
+    product = @client.find(products.to_a.last['id'])
+    assert_equal(title, product['title'])
+  end
 end
