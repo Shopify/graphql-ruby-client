@@ -1,5 +1,3 @@
-require 'active_support/all'
-
 require 'graphql_client/base.rb'
 require 'graphql_client/field.rb'
 require 'graphql_client/request.rb'

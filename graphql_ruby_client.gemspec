@@ -23,8 +23,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.license = 'MIT'
 
-  s.add_runtime_dependency 'activesupport'
-  s.add_runtime_dependency 'globalid'
+  s.add_runtime_dependency 'globalid', '~> 0.3', '>= 0.3.7'
 
   dev_dependencies = [['mocha', '>= 0.9.8'],
                       ['webmock'],
