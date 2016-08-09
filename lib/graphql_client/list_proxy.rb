@@ -3,8 +3,6 @@ module GraphQL
     class ListProxy
       include Enumerable
 
-      delegate :length, to: :entries
-
       def initialize(parent:, client:, type:, field:)
         @parent = parent
         @client = client
@@ -20,6 +18,10 @@ module GraphQL
         @objects.each do |node|
           yield node
         end
+      end
+
+      def length
+        entries.length
       end
 
       private

@@ -26,7 +26,7 @@ module GraphQL
       end
 
       def save
-        type_name = @type.name.camelize(:lower)
+        type_name = @type.camel_case_name
 
         attributes_block = ''
         @dirty_attributes.each do |name|
@@ -54,7 +54,7 @@ module GraphQL
       end
 
       def destroy
-        type_name = @type.name.camelize(:lower)
+        type_name = type.camel_case_name
 
         mutation = "
           mutation {

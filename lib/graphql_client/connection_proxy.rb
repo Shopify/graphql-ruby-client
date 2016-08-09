@@ -3,8 +3,6 @@ module GraphQL
     class ConnectionProxy
       include Enumerable
 
-      delegate :length, to: :entries
-
       def initialize(parent:, client:, type:, field:)
         @parent = parent
         @client = client
@@ -51,6 +49,10 @@ module GraphQL
         end
       end
 
+      def length
+        entries.length
+      end
+
       def each
         @objects.each do |node|
           yield ObjectProxy.new(attributes: node, client: @client, type: @type)
@@ -64,7 +66,7 @@ module GraphQL
         end
 
         fields = @type.primitive_fields.keys.join(',')
-        type_name = @type.name.camelize(:lower)
+        type_name = @type.camel_case_name
 
         mutation = "
           mutation {

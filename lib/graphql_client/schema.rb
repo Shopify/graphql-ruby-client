@@ -15,10 +15,10 @@ module GraphQL
 
       def build_type_map(schema_text)
         {}.tap do |types|
-          parsed_schema = JSON.parse(schema_text).with_indifferent_access
+          parsed_schema = JSON.parse(schema_text)
 
-          parsed_schema[:data][:__schema][:types].each do |type|
-            types[type[:name]] = Type.new(type[:name], type)
+          parsed_schema['data']['__schema']['types'].each do |type|
+            types[type['name']] = Type.new(type['name'], type)
           end
         end
       end

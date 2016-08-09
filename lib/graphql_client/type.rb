@@ -9,17 +9,7 @@ module GraphQL
         String
       )
 
-      attr_reader :fields, :lists, :objects, :connections, :name, :field_arguments
-
-      def determine_type(type)
-        return type if type.is_a? String
-
-        if type.key?(:ofType)
-          return determine_type(type[:ofType]) unless type[:ofType].nil?
-        end
-
-        type[:name]
-      end
+      attr_reader :fields, :lists, :objects, :connections, 'name', :field_arguments
 
       def initialize(name, type)
         @name = name
@@ -30,48 +20,65 @@ module GraphQL
         @lists = {}
         @field_arguments = {}
 
-        unless @type[:fields].nil?
-          @type[:fields].each do |field|
-            if field.key?(:args)
-              unless field[:args].empty?
-                @field_arguments[field[:name]] = []
-                field[:args].each do |argument|
-                  @field_arguments[field[:name]] << GraphQL::Client::Argument.new(argument['name'], argument['description'])
+        unless @type['fields'].nil?
+          @type['fields'].each do |field|
+            if field.key?('args')
+              unless field['args'].empty?
+                @field_arguments[field['name']] = []
+                field['args'].each do |argument|
+                  @field_arguments[field['name']] << GraphQL::Client::Argument.new(argument['name'], argument['description'])
                 end
                 if field.fetch('type', {}).fetch('ofType', nil).nil?
-                  # puts "Node detected for #{field[:name]}"
+                  # puts "Node detected for #{field['name']}"
                   next
                 else
                   if field.fetch('type', {}).fetch('ofType', {}).fetch('name', '').end_with? 'Connection'
-                    @connections[field[:name]] = determine_type(field[:type])
+                    @connections[field['name']] = determine_type(field['type'])
                     next
                   else
-                    type = determine_type(field[:type])
-                    @lists[field[:name]] = type
+                    type = determine_type(field['type'])
+                    @lists[field['name']] = type
                     next
                   end
                 end
               end
             end
 
-            unless field[:type][:ofType].nil?
-              kind = field[:type][:ofType][:kind]
+            unless field['type']['ofType'].nil?
+              kind = field['type']['ofType']['kind']
             end
 
             if kind == 'LIST'
-              @objects[field[:name]] = kind
+              @objects[field['name']] = kind
             else
               # Non-null types are wrapped in two layers
-              type_name = if field[:type].fetch(:ofType).nil?
-                field[:type][:name]
+              type_name = if field['type'].fetch('ofType').nil?
+                field['type']['name']
               else
-                field[:type][:ofType][:name]
+                field['type']['ofType']['name']
               end
 
-              @fields[field[:name]] = Field.new(field[:name], type_name, false)
+              @fields[field['name']] = Field.new(field['name'], type_name, false)
             end
           end
         end
+      end
+
+      def camel_case_name
+        result = @name.dup
+        result = result.replace(result.split("_").each_with_index { |s, i| s.capitalize! unless i == 0 }.join(""))
+        result[0] = result[0].downcase
+        result
+      end
+
+      def determine_type(type)
+        return type if type.is_a? String
+
+        if type.key?('ofType')
+          return determine_type(type['ofType']) unless type['ofType'].nil?
+        end
+
+        type['name']
       end
 
       def primitive_fields

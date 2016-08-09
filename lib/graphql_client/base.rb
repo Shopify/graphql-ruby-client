@@ -1,5 +1,3 @@
-require 'global_id'
-
 module GraphQL
   module Client
     class Base
@@ -16,13 +14,10 @@ module GraphQL
 
       # Fetch a single object by global ID
       def find(id)
-        begin
-          global_id = GlobalID.new(id)
-        rescue URI::BadURIError
-          return simple_find(id)
-        end
+        return simple_find(id) unless id.start_with? 'gid://'
 
-        type = @schema.types[global_id.model_name]
+        id =~ /gid:\/\/(.*?)\/(.*?)\//
+        type = @schema.types[$2]
         request = Request.new(client: self, type: type)
         ObjectProxy.new(type: type, attributes: request.find(id).object, client: self)
       end
