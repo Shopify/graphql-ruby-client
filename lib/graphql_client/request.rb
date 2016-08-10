@@ -2,8 +2,10 @@ require 'uri'
 
 module GraphQL
   module Client
-    class NetworkError < StandardError; end
-    class SchemaError < StandardError; end
+    JSON_MIME_TYPE = 'application/json'.freeze
+    DEFAULT_HEADERS = { 'Accept' => JSON_MIME_TYPE, 'Content-Type' => JSON_MIME_TYPE }
+
+    NetworkError = Class.new(StandardError)
 
     class Request
       attr_reader :type
@@ -20,33 +22,22 @@ module GraphQL
       end
 
       def send_request(query)
-        req = Net::HTTP::Post.new(@client.url)
-        parsed_url = URI.parse(@client.url)
+        req = build_request(query)
 
-        req.basic_auth(@client.username, @client.password)
-        req['Accept'] = 'application/json'
-        req['Content-Type'] = 'application/json'
-
-        @client.headers.each do |key, value|
-          req[key] = value
-        end
-
-        body = { query: query, variables: {} }.to_json
-        req.body = body
-
-        response = Net::HTTP.start(parsed_url.hostname, parsed_url.port, use_ssl: parsed_url.scheme == 'https') do |http|
+        response = Net::HTTP.start(@client.url.hostname, @client.url.port, use_ssl: https?) do |http|
           http.request(req)
         end
 
-        unless response.code == '200'
+        case response
+        when Net::HTTPOK then
+          puts "Response body: \n#{response.body}" if @client.debug
+          response.body
+        else
           raise NetworkError, "Response error - #{response.code}/#{response.message}"
         end
-
-        puts "Response body: \n#{response.body}" if @client.debug
-        response.body
       end
 
-      # Move these to the base client and only use Request#from_query
+      # TODO: Move these to the base client and only use Request#from_query
       def find(id)
         query = QueryBuilder.find(@type, id)
         puts "Query: #{query}" if @client.debug
@@ -57,6 +48,21 @@ module GraphQL
         query = QueryBuilder.simple_find(@client.schema.type(type_name))
         puts "Query: #{query}" if @client.debug
         Response.new(self, send_request(query))
+      end
+
+      private
+
+      def build_request(query)
+        headers = DEFAULT_HEADERS.merge(@client.headers)
+
+        Net::HTTP::Post.new(@client.url, headers).tap do |req|
+          req.basic_auth(@client.username, @client.password)
+          req.body = { query: query, variables: {} }.to_json
+        end
+      end
+
+      def https?
+        @client.url.scheme == 'https'
       end
     end
   end
