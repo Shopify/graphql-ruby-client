@@ -13,8 +13,8 @@ module GraphQL
 
       def method_missing(name, *arguments)
         field = name.to_s
-        return all_from_connection(field) if @type.connections.key? field
-        return all_from_list(field) if @type.lists.key? field
+        return all_from_connection(field) if @type.connection? field
+        return all_from_list(field) if @type.list? field
 
         if field.end_with? '='
           field = field.chomp('=')

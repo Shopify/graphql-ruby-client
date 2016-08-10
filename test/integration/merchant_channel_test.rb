@@ -20,11 +20,10 @@ class MerchantChannelTest < Minitest::Test
   end
 
   def test_public_access_tokens
-    shop = @client.find('Shop')
-    public_access_tokens = shop.publicAccessTokens
+    public_access_tokens = @client.shop.public_access_tokens
     new_token = public_access_tokens.create(title: 'Test')
 
-    assert_equal 32, new_token.accessToken.length
+    assert_equal 32, new_token.access_token.length
     assert_equal 'Test', new_token.title
 
     new_token.destroy
