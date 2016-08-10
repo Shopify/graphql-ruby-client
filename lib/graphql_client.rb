@@ -1,3 +1,4 @@
+require 'graphql_client/global_id.rb'
 require 'graphql_client/base.rb'
 require 'graphql_client/field.rb'
 require 'graphql_client/request.rb'

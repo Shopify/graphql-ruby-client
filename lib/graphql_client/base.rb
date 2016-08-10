@@ -15,8 +15,8 @@ module GraphQL
 
       # Fetch a single object by global ID
       def find(id)
-        id =~ /gid:\/\/(.*?)\/(.*?)\//
-        type = @schema.type($2)
+        global_id = GlobalID.new(id)
+        type = @schema.type(global_id.model_name)
         request = Request.new(client: self, type: type)
         ObjectProxy.new(type: type, attributes: request.find(id).object, client: self)
       end
