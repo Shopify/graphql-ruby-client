@@ -5,7 +5,7 @@ module GraphQL
 
       def initialize(schema:, url:, username: '', password: '', per_page: 100, headers: {}, debug: false)
         @schema = schema
-        @url = url
+        @url = URI(url)
         @username = username
         @password = password
         @per_page = per_page
