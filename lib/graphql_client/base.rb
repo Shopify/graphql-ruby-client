@@ -3,7 +3,7 @@ module GraphQL
     class Base
       attr_reader :schema, :url, :username, :password, :per_page, :headers
 
-      def initialize(schema:, url:, username: '', password: '', per_page: 10, headers: {})
+      def initialize(schema:, url:, username: '', password: '', per_page: 100, headers: {})
         @schema = schema
         @url = url
         @username = username

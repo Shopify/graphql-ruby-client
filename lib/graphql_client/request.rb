@@ -8,9 +8,8 @@ module GraphQL
     class Request
       attr_reader :type
 
-      def initialize(client:, per_page: 10, type: nil)
+      def initialize(client:, type: nil)
         @client = client
-        @per_page = per_page
         @type = type
       end
 
