@@ -10,7 +10,13 @@ module GraphQL
         @field = field
         @objects = []
 
-        @query = ConnectionQuery.new(parent: @parent, field: @field, return_type: @type, client: @client)
+        @query = ConnectionQuery.new(
+          parent: @parent,
+          field: @field,
+          return_type: @type,
+          client: @client
+        )
+
         fetch_page
       end
 

@@ -2,7 +2,7 @@ require 'uri'
 
 module GraphQL
   module Client
-    class QueryError < StandardError; end
+    class NetworkError < StandardError; end
     class SchemaError < StandardError; end
 
     class Request
@@ -37,6 +37,10 @@ module GraphQL
 
         response = Net::HTTP.start(parsed_url.hostname, parsed_url.port, use_ssl: parsed_url.scheme == 'https') do |http|
           http.request(req)
+        end
+
+        unless response.code == '200'
+          raise NetworkError.new("Response error - #{response.code}/#{response.message}")
         end
 
         puts "Response body: \n#{response.body}"

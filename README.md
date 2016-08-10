@@ -11,7 +11,7 @@ There's a lot missing right now. Some of the more immediate things to fix are:
 
 - Query validation
 - Mutation matching and validation
-- Error checking
+- GraphQL-level response validation and error checks
 - Allowing users to pass raw GraphQL queries into the library (for regular
   queries and mutations)
 
