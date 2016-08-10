@@ -14,7 +14,7 @@ module GraphQL
       end
 
       def from_query(query)
-        puts "Query: #{query}"
+        puts "Query: #{query}" if @client.debug
         response_body = send_request(query)
         Response.new(self, response_body)
       end
@@ -42,20 +42,20 @@ module GraphQL
           raise NetworkError.new("Response error - #{response.code}/#{response.message}")
         end
 
-        puts "Response body: \n#{response.body}"
+        puts "Response body: \n#{response.body}" if @client.debug
         response.body
       end
 
       # Move these to the base client and only use Request#from_query
       def find(id)
         query = QueryBuilder.find(@type, id)
-        puts "Query: #{query}"
+        puts "Query: #{query}" if @client.debug
         Response.new(self, send_request(query))
       end
 
       def simple_find(type_name)
         query = QueryBuilder.simple_find(@client.schema.type(type_name))
-        puts "Query: #{query}"
+        puts "Query: #{query}" if @client.debug
         Response.new(self, send_request(query))
       end
     end

@@ -1,15 +1,16 @@
 module GraphQL
   module Client
     class Base
-      attr_reader :schema, :url, :username, :password, :per_page, :headers
+      attr_reader :schema, :url, :username, :password, :per_page, :headers, :debug
 
-      def initialize(schema:, url:, username: '', password: '', per_page: 100, headers: {})
+      def initialize(schema:, url:, username: '', password: '', per_page: 100, headers: {}, debug: false)
         @schema = schema
         @url = url
         @username = username
         @password = password
         @per_page = per_page
         @headers = headers
+        @debug = debug
       end
 
       # Fetch a single object by global ID

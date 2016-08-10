@@ -9,7 +9,7 @@ module GraphQL
         String
       )
 
-      attr_reader :fields, :lists, :objects, :connections, 'name', :field_arguments
+      attr_reader :fields, :lists, :objects, :connections, :name, :field_arguments
 
       def initialize(name, type)
         @name = name
