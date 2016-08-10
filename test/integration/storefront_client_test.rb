@@ -17,6 +17,14 @@ class StorefrontClientTest < Minitest::Test
     )
   end
 
+  def test_query_root
+    shop = @client.shop
+    assert_equal('Toronto', shop.city)
+
+    shop = @client.find('shop')
+    assert_equal('Toronto', shop.city)
+  end
+
   def test_find_shop_and_products
     shop = @client.find('Shop')
     assert_equal('Toronto', shop.city)

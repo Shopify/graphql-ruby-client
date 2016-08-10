@@ -1,14 +1,20 @@
 module GraphQL
   module Client
     class Schema
-      attr_reader :types
-
       def initialize(schema_text)
         @types = build_type_map(schema_text)
+        @normalized_types = {}
+        @types.each do |name, type|
+          @normalized_types[name.downcase] = type
+        end
       end
 
       def query_root
         @types['QueryRoot']
+      end
+
+      def type(name)
+        @normalized_types[name.downcase]
       end
 
       private

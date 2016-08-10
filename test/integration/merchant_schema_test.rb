@@ -5,11 +5,9 @@ class MerchantSchemaTest < Minitest::Test
   def test_loading_merchant_schema
     schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/merchant_schema.json')
     schema_string = File.read(schema_path)
-
     schema = GraphQL::Client::Schema.new(schema_string)
-    assert !schema.types.empty?
 
-    product_type = schema.types['Product']
+    product_type = schema.type('Product')
 
     expected_fields = %w(bodyHtml
                          createdAt

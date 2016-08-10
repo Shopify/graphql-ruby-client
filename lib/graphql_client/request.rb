@@ -55,7 +55,7 @@ module GraphQL
       end
 
       def simple_find(type_name)
-        query = QueryBuilder.simple_find(@client.schema.types[type_name])
+        query = QueryBuilder.simple_find(@client.schema.type(type_name))
         puts "Query: #{query}"
         Response.new(self, send_request(query))
       end
