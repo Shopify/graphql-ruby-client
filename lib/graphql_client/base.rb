@@ -15,8 +15,6 @@ module GraphQL
 
       # Fetch a single object by global ID
       def find(id)
-        return simple_find(id) unless id.start_with? 'gid://'
-
         id =~ /gid:\/\/(.*?)\/(.*?)\//
         type = @schema.type($2)
         request = Request.new(client: self, type: type)

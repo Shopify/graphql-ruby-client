@@ -18,7 +18,7 @@ class MerchantClientTest < Minitest::Test
   end
 
   def test_find_shop_and_products
-    shop = @client.find('Shop')
+    shop = @client.shop
     assert_equal 'Toronto', shop.city
 
     products = shop.products
@@ -27,7 +27,7 @@ class MerchantClientTest < Minitest::Test
   end
 
   def test_updating_product
-    shop = @client.find('Shop')
+    shop = @client.shop
     products = shop.products
 
     title = "Renamed Product - #{Time.new.to_i}"
