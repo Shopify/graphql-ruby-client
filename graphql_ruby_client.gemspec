@@ -1,16 +1,16 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
 require 'graphql_client/version'
 
 Gem::Specification.new do |s|
-  s.name = %q{graphql_client}
+  s.name = 'graphql_client'
   s.version = GraphQL::Client::VERSION
   s.author = "Shopify"
 
-  s.summary = %q{}
-  s.description = %q{}
-  s.email = %q{developers@jadedpixel.com}
-  s.homepage = %q{http://www.shopify.com/partners/apps}
+  s.summary = ''
+  s.description = ''
+  s.email = 'developers@jadedpixel.com'
+  s.homepage = 'http://www.shopify.com/partners/apps'
 
   s.extra_rdoc_files = [
     "LICENSE",
@@ -29,8 +29,7 @@ Gem::Specification.new do |s|
                       ['simplecov'],
                       ['rake'],
                       ['rubocop'],
-                      ['vcr']
-  ]
+                      ['vcr']]
 
   dev_dependencies.each { |dep| s.add_development_dependency(*dep) }
 end

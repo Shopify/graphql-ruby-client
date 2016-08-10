@@ -21,7 +21,7 @@ module GraphQL
         ObjectProxy.new(type: type, attributes: request.find(id).object, client: self)
       end
 
-      def method_missing(name, *arguments)
+      def method_missing(name, *_arguments)
         field = name.to_s
         type = @schema.query_root
         return all_from_connection(field) if type.connections.key? field

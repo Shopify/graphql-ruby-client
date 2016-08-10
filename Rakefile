@@ -12,14 +12,7 @@ end
 task(default: :test)
 
 def load_gem_and_dummy
-  $:.push File.expand_path("../lib", __FILE__)
-  $:.push File.expand_path("../test", __FILE__)
+  $LOAD_PATH.push File.expand_path("../lib", __FILE__)
+  $LOAD_PATH.push File.expand_path("../test", __FILE__)
   require "graphql_client"
-end
-
-task :console do
-  require "pry"
-  load_gem_and_dummy
-  ARGV.clear
-  binding.pry
 end

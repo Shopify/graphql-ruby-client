@@ -39,7 +39,7 @@ module GraphQL
         end
 
         unless response.code == '200'
-          raise NetworkError.new("Response error - #{response.code}/#{response.message}")
+          raise NetworkError, "Response error - #{response.code}/#{response.message}"
         end
 
         puts "Response body: \n#{response.body}" if @client.debug

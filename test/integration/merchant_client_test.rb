@@ -23,7 +23,7 @@ class MerchantClientTest < Minitest::Test
 
     products = shop.products
     assert_equal 5, products.length
-    assert_equal 5, products.map { |p| p.title }.uniq.length
+    assert_equal 5, products.map(&:title).uniq.length
   end
 
   def test_updating_product

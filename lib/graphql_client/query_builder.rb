@@ -29,7 +29,7 @@ module GraphQL
 
       def connection_from_object(root_type, root_id, _field, return_type, after: nil, per_page:)
         camel_case_model = root_type.camel_case_name
-        pluralized = return_type.camel_case_name  + 's'
+        pluralized = return_type.camel_case_name + 's'
         fields = return_type.primitive_fields.keys.join(',')
 
         after_stanza = after.nil? ? '' : ", after: \"#{after}\""

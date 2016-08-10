@@ -3,7 +3,7 @@ require 'minitest/autorun'
 
 class StorefrontClientTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/api/graph'
-  USERNAME = 'f86e15d95f634ccf794487e8e6c55a8c'
+  USERNAME = 'e88d84f918c0212e53b4baf0fb61159e'
 
   def setup
     schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/storefront_schema.json')
@@ -53,6 +53,6 @@ class StorefrontClientTest < Minitest::Test
 
     products = shop.products
     assert_equal(5, products.length)
-    assert_equal(5, products.map { |p| p.title }.uniq.length)
+    assert_equal(5, products.map(&:title).uniq.length)
   end
 end
