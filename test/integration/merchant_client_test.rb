@@ -12,8 +12,8 @@ class MerchantClientTest < Minitest::Test
     @client = GraphQL::Client::Base.new(
       schema: @schema,
       url: URL,
-      username: 'e3c3e27694e5702e985bdcd8db266c64',
-      password: '223fcadc3bb7255266ab86d5693fa640'
+      username: ENV.fetch('MERCHANT_USERNAME'),
+      password: ENV.fetch('MERCHANT_PASSWORD')
     )
   end
 

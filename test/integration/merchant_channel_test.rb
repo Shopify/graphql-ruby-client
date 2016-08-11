@@ -3,7 +3,6 @@ require 'minitest/autorun'
 
 class MerchantChannelTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/admin/api/graphql.json'
-  SECRET = '5d62605439df48d903dcd6b3a2cadebf'
 
   def setup
     schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/merchant_schema.json')
@@ -14,7 +13,7 @@ class MerchantChannelTest < Minitest::Test
       schema: @schema,
       url: URL,
       headers: {
-        'X-Shopify-Access-Token': SECRET
+        'X-Shopify-Access-Token': ENV.fetch('MERCHANT_TOKEN')
       }
     )
   end

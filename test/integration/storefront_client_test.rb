@@ -3,7 +3,7 @@ require 'minitest/autorun'
 
 class StorefrontClientTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/api/graph'
-  USERNAME = 'e88d84f918c0212e53b4baf0fb61159e'
+  USERNAME = ENV.fetch('STOREFRONT_TOKEN')
 
   def setup
     schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/storefront_schema.json')

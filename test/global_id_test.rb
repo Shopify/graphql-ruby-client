@@ -3,7 +3,7 @@ require 'minitest/autorun'
 
 module GraphQL
   module Client
-    class TestGlobalID < Minitest::Test
+    class GlobalIDTest < Minitest::Test
       def test_global_id
         gid = GlobalID.new('gid://shopify/Product/80')
 
