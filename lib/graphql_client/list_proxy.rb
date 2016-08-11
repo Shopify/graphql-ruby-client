@@ -29,7 +29,10 @@ module GraphQL
       def fetch_results
         query = @query.query
         response = Request.new(client: @client).from_query(query)
-        @objects = find_list(response.data)
+
+        @objects = find_list(response.data).map do |object|
+          ObjectProxy.new(attributes: object, client: @client, type: @type)
+        end
       end
 
       def find_list(hash)
