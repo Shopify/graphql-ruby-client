@@ -77,15 +77,24 @@ new_token = public_access_tokens.create(title: 'Test')
 new_token.destroy
 ```
 
-## Tests
+## Testing
 
-Right now the tests are fairly tricky to get correct. Since this is internal to
-Shopify at this point there is a hardcoded set of access tokens in the
-integration tests that run through a number of operations in the context of a:
+Right now the tests are fairly tricky to get correct. Most of the functionality
+is covered by integration tests which can use a production or local Shopify
+store and operates in the following contexts:
 
 - Merchant
 - Channel (via the Merchant API)
 - Customer (via the StoreFront API)
+
+The following environment variables are used to drive the integration tests:
+
+- `MERCHANT_USERNAME`
+- `MERCHANT_PASSWORD`
+- `MERCHANT_TOKEN`
+- `STOREFRONT_TOKEN`
+
+Unit tests will run regardless of which variables are present.
 
 ## TODO
 
