@@ -17,6 +17,22 @@ class StorefrontClientTest < Minitest::Test
     )
   end
 
+  def test_request_counts
+    spy = Spy.on_instance_method(GraphQL::Client::Request, :send_request).and_call_through
+    shop = @client.shop
+    assert_equal 0, spy.calls.count
+
+    shop.title
+    assert_equal 1, spy.calls.count
+
+    products = shop.products
+    assert_equal 2, spy.calls.count
+
+    product = products.first
+    product.title
+    assert_equal 2, spy.calls.count
+  end
+
   def test_find_shop_and_products
     shop = @client.shop
     assert_equal('Toronto', shop.city)

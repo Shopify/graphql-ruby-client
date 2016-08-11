@@ -14,9 +14,9 @@ Gem::Specification.new do |s|
   s.version = GraphQL::Client::VERSION
 
   s.add_development_dependency 'minitest', '~> 5.8'
-  s.add_development_dependency 'mocha', '>= 0.9.8'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'spy'
 end
