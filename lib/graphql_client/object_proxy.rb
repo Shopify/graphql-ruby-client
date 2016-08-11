@@ -1,10 +1,9 @@
 module GraphQL
   module Client
     class ObjectProxy
-      attr_reader :id, :type, :attributes
+      attr_reader :type, :attributes
 
       def initialize(attributes:, client:, type:)
-        @id = attributes['id']
         @client = client
         @attributes = attributes
         @dirty_attributes = Set.new
@@ -37,7 +36,7 @@ module GraphQL
           mutation {
             #{type_name}Update(
               input: {
-                id: \"#{@id}\"
+                id: \"#{self.id}\"
                 #{attributes_block}
               }
             ) {
@@ -60,7 +59,7 @@ module GraphQL
           mutation {
             #{type_name}Delete(
               input: {
-                id: \"#{@id}\"
+                id: \"#{self.id}\"
               }
             ) {
               userErrors {
