@@ -2,31 +2,34 @@ module GraphQL
   module Client
     class Schema
       def initialize(schema_text)
-        @types = build_type_map(schema_text)
-        @normalized_types = {}
-        @types.each do |name, type|
-          @normalized_types[name.downcase] = type
-        end
+        @schema_text = schema_text
+      end
+
+      def [](type_name)
+        type(type_name)
       end
 
       def query_root
-        @types['QueryRoot']
+        type('QueryRoot')
       end
 
-      def type(name)
-        @normalized_types[name.downcase]
+      def type(type_name)
+        types[type_name.downcase]
+      end
+
+      def types
+        @types ||= schema.dig('data', '__schema', 'types').each_with_object({}) do |type, types|
+          name = type['name'].downcase
+          types[name] = Type.new(type['name'], type)
+        end
       end
 
       private
 
-      def build_type_map(schema_text)
-        {}.tap do |types|
-          parsed_schema = JSON.parse(schema_text)
+      attr_reader :schema_text
 
-          parsed_schema['data']['__schema']['types'].each do |type|
-            types[type['name']] = Type.new(type['name'], type)
-          end
-        end
+      def schema
+        @schema ||= JSON.parse(schema_text)
       end
     end
   end
