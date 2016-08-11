@@ -1,24 +1,17 @@
 module GraphQL
   module Client
     class Type
-      PRIMITIVES = %w(
-        Boolean
-        DateTime
-        ID
-        Int
-        String
-      )
-
-      attr_reader :fields, :lists, :objects, :connections, :name, :field_arguments
+      attr_reader :connections, :field_arguments, :fields, :lists, :methods, :objects, :name
 
       def initialize(name, type)
-        @name = name
-        @type = type
-        @fields = {}
-        @objects = {}
         @connections = {}
-        @lists = {}
         @field_arguments = {}
+        @fields = {}
+        @lists = {}
+        @methods = {}
+        @name = name
+        @objects = {}
+        @type = type
 
         unless @type['fields'].nil?
           @type['fields'].each do |field|
@@ -28,10 +21,8 @@ module GraphQL
                 field['args'].each do |argument|
                   @field_arguments[field['name']] << GraphQL::Client::Argument.new(argument['name'], argument['description'])
                 end
-                if field.fetch('type', {}).fetch('ofType', nil).nil?
-                  # puts "Node detected for #{field['name']}"
-                  next
-                else
+
+                unless field.fetch('type', {}).fetch('ofType', nil).nil?
                   if field.fetch('type', {}).fetch('ofType', {}).fetch('name', '').end_with? 'Connection'
                     @connections[field['name']] = determine_type(field['type'])
                     next
@@ -46,19 +37,27 @@ module GraphQL
 
             unless field['type']['ofType'].nil?
               kind = field['type']['ofType']['kind']
+            else
+              kind = field['type']['kind']
+            end
+
+            # Non-null types are wrapped in two layers
+            type_name = if field['type'].fetch('ofType').nil?
+              field['type']['name']
+            else
+              field['type']['ofType']['name']
             end
 
             if kind == 'LIST'
-              @objects[field['name']] = kind
+              @lists[field['name']] = Field.new(field['name'], type_name, false)
+            elsif kind == 'OBJECT'
+              @objects[field['name']] = Field.new(field['name'], type_name, false)
             else
-              # Non-null types are wrapped in two layers
-              type_name = if field['type'].fetch('ofType').nil?
-                field['type']['name']
+              if field.fetch('args', []).length > 0
+                @methods[field['name']] = Field.new(field['name'], type_name, false)
               else
-                field['type']['ofType']['name']
+                @fields[field['name']] = Field.new(field['name'], type_name, false)
               end
-
-              @fields[field['name']] = Field.new(field['name'], type_name, false)
             end
           end
         end
@@ -98,10 +97,6 @@ module GraphQL
         end
 
         type['name']
-      end
-
-      def primitive_fields
-        @fields.select { |_name, field| PRIMITIVES.include? field.type_name }
       end
     end
   end

@@ -7,7 +7,7 @@ module GraphQL
 
       def self.find(type, id)
         camel_case_model = type.camel_case_name
-        fields = type.primitive_fields.keys.join(',')
+        fields = type.fields.keys.join(',')
 
         "query {
            #{camel_case_model}(id: \"#{id}\") {
@@ -18,7 +18,7 @@ module GraphQL
 
       def self.simple_find(type)
         camel_case_model = type.camel_case_name
-        fields = type.primitive_fields.keys.join(',')
+        fields = type.fields.keys.join(',')
 
         "query {
            #{camel_case_model} {
@@ -30,7 +30,7 @@ module GraphQL
       def connection_from_object(root_type, root_id, _field, return_type, after: nil, per_page:)
         camel_case_model = root_type.camel_case_name
         pluralized = return_type.camel_case_name + 's'
-        fields = return_type.primitive_fields.keys.join(',')
+        fields = return_type.fields.keys.join(',')
 
         after_stanza = after.nil? ? '' : ", after: \"#{after}\""
 
@@ -59,7 +59,7 @@ module GraphQL
 
       def self.list_from_object(root_type, root_id, field, return_type)
         camel_case_model = root_type.camel_case_name
-        fields = return_type.primitive_fields.keys.join(',')
+        fields = return_type.fields.keys.join(',')
 
         "query {
            #{camel_case_model}(id: \"#{root_id}\") {
