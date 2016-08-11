@@ -1,12 +1,19 @@
 module GraphQL
   module Client
     class ObjectProxy
-      attr_reader :id, :type, :attributes
+      attr_reader :type, :attributes
 
-      def initialize(attributes:, client:, type:)
-        @id = attributes['id']
+      def initialize(attributes: nil, id: nil, client:, type:)
+        if attributes.nil?
+          @loaded = false
+          @attributes = {}
+        else
+          @loaded = true
+          @attributes = attributes
+        end
+
+        @id = id
         @client = client
-        @attributes = attributes
         @dirty_attributes = Set.new
         @type = type
       end
@@ -21,8 +28,21 @@ module GraphQL
           @attributes[field] = arguments.first
           @dirty_attributes.add(field)
         else
+          load unless @loaded
           @attributes[field]
         end
+      end
+
+      def load
+        request = Request.new(client: @client, type: @type)
+
+        if @id
+          @attributes = request.find(@id).object
+        else
+          @attributes = request.simple_find(@type.name).object
+        end
+
+        @loaded = true
       end
 
       def save
@@ -37,7 +57,7 @@ module GraphQL
           mutation {
             #{type_name}Update(
               input: {
-                id: \"#{@id}\"
+                id: \"#{self.id}\"
                 #{attributes_block}
               }
             ) {
@@ -60,7 +80,7 @@ module GraphQL
           mutation {
             #{type_name}Delete(
               input: {
-                id: \"#{@id}\"
+                id: \"#{self.id}\"
               }
             ) {
               userErrors {

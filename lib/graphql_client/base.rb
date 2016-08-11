@@ -17,8 +17,7 @@ module GraphQL
       def find(id)
         global_id = GlobalID.new(id)
         type = @schema.type(global_id.model_name)
-        request = Request.new(client: self, type: type)
-        ObjectProxy.new(type: type, attributes: request.find(id).object, client: self)
+        ObjectProxy.new(type: type, client: self, id: id)
       end
 
       def method_missing(name, *_arguments)
@@ -33,8 +32,7 @@ module GraphQL
 
       def simple_find(type_name)
         type = @schema.type(type_name)
-        request = Request.new(client: self, type: type)
-        ObjectProxy.new(type: type, attributes: request.simple_find(type_name).object, client: self)
+        ObjectProxy.new(type: type, client: self)
       end
     end
   end
