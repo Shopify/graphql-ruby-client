@@ -11,26 +11,19 @@ module GraphQL
         @per_page = per_page
         @headers = headers
         @debug = debug
-      end
 
-      # Fetch a single object by global ID
-      def find(id)
-        global_id = GlobalID.new(id)
-        type = @schema[global_id.model_name]
-        ObjectProxy.new(type: type, client: self, id: id)
-      end
-
-      def method_missing(name, *_arguments)
-        field = name.to_s
-        type = @schema.query_root
-        return simple_find(field) if type.fields.key? field
+        define_field_accessors
       end
 
       private
 
-      def simple_find(type_name)
-        type = @schema[type_name]
-        ObjectProxy.new(type: type, client: self)
+      def define_field_accessors
+        @schema.query_root.fields.keys.each do |name|
+          define_singleton_method(name) do
+            type = @schema[name]
+            ObjectProxy.new(type: type, client: self)
+          end
+        end
       end
     end
   end
