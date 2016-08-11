@@ -16,7 +16,7 @@ module GraphQL
       # Fetch a single object by global ID
       def find(id)
         global_id = GlobalID.new(id)
-        type = @schema.type(global_id.model_name)
+        type = @schema[global_id.model_name]
         ObjectProxy.new(type: type, client: self, id: id)
       end
 
@@ -31,7 +31,7 @@ module GraphQL
       private
 
       def simple_find(type_name)
-        type = @schema.type(type_name)
+        type = @schema[type_name]
         ObjectProxy.new(type: type, client: self)
       end
     end
