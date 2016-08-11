@@ -13,8 +13,7 @@ class MerchantClientTest < Minitest::Test
       schema: @schema,
       url: URL,
       username: ENV.fetch('MERCHANT_USERNAME'),
-      password: ENV.fetch('MERCHANT_PASSWORD'),
-      debug: true
+      password: ENV.fetch('MERCHANT_PASSWORD')
     )
   end
 

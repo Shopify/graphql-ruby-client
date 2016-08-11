@@ -35,28 +35,20 @@ module GraphQL
               end
             end
 
-            unless field['type']['ofType'].nil?
-              kind = field['type']['ofType']['kind']
-            else
-              kind = field['type']['kind']
-            end
+            type_name = determine_type(field['type'])
+            kind = determine_kind(field)
+            new_field = Field.new(field['name'], type_name, false)
 
-            # Non-null types are wrapped in two layers
-            type_name = if field['type'].fetch('ofType').nil?
-              field['type']['name']
+            case kind
+            when 'LIST'
+              @lists[field['name']] = new_field
+            when 'OBJECT'
+              @objects[field['name']] = new_field
             else
-              field['type']['ofType']['name']
-            end
-
-            if kind == 'LIST'
-              @lists[field['name']] = Field.new(field['name'], type_name, false)
-            elsif kind == 'OBJECT'
-              @objects[field['name']] = Field.new(field['name'], type_name, false)
-            else
-              if field.fetch('args', []).length > 0
-                @methods[field['name']] = Field.new(field['name'], type_name, false)
+              if !field.fetch('args', []).empty?
+                @methods[field['name']] = new_field
               else
-                @fields[field['name']] = Field.new(field['name'], type_name, false)
+                @fields[field['name']] = new_field
               end
             end
           end
@@ -87,6 +79,16 @@ module GraphQL
 
       def camel_case_name
         camel_case(@name)
+      end
+
+      private
+
+      def determine_kind(field)
+        if field['type']['ofType']
+          field['type']['ofType']['kind']
+        else
+          field['type']['kind']
+        end
       end
 
       def determine_type(type)
