@@ -21,6 +21,12 @@ class SchemaTest < Minitest::Test
     assert_equal shop_type.name, schema.type('shop').name
   end
 
+  def test_type_fails_with_invalid_type_for_non_existent_type_name
+    assert_raises GraphQL::Client::Schema::INVALID_TYPE do
+      schema['foo']
+    end
+  end
+
   def test_types_returns_all_types_from_schema
     assert_equal 189, schema.types.size
     assert_equal GraphQL::Client::Type, schema.types.values.first.class

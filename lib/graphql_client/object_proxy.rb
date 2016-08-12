@@ -1,45 +1,28 @@
 module GraphQL
   module Client
     class ObjectProxy
-      attr_reader :type, :attributes
+      attr_reader :attributes, :id, :type
 
-      def initialize(attributes: nil, id: nil, client:, type:)
-        if attributes.nil?
-          @loaded = false
-          @attributes = {}
-        else
-          @loaded = true
-          @attributes = attributes
-        end
-
+      def initialize(attributes: {}, id: nil, client:, type:)
+        @attributes = attributes
         @id = id
         @client = client
-        @dirty_attributes = Set.new
         @type = type
-      end
+        @dirty_attributes = Set.new
+        @loaded = !@attributes.empty?
 
-      def method_missing(name, *arguments)
-        field = name.to_s
-        return all_from_connection(field) if @type.connection? field
-        return all_from_list(field) if @type.list? field
-
-        if field.end_with? '='
-          field = field.chomp('=')
-          @attributes[field] = arguments.first
-          @dirty_attributes.add(field)
-        else
-          load unless @loaded
-          @attributes[field]
-        end
+        define_field_accessors
+        define_lists_accessors
+        define_connections_accessors
       end
 
       def load
         request = Request.new(client: @client, type: @type)
 
-        if @id
-          @attributes = request.find(@id).object
+        @attributes = if @id
+          request.find(@id).object
         else
-          @attributes = request.simple_find(@type.name).object
+          request.simple_find(@type.name).object
         end
 
         @loaded = true
@@ -57,7 +40,7 @@ module GraphQL
           mutation {
             #{type_name}Update(
               input: {
-                id: \"#{self.id}\"
+                id: \"#{id}\"
                 #{attributes_block}
               }
             ) {
@@ -80,7 +63,7 @@ module GraphQL
           mutation {
             #{type_name}Delete(
               input: {
-                id: \"#{self.id}\"
+                id: \"#{id}\"
               }
             ) {
               userErrors {
@@ -96,17 +79,52 @@ module GraphQL
 
       private
 
-      def all_from_connection(field)
-        connection_type = @type.connections[field]
-        return_type_name = connection_type.gsub('Connection', '')
-        return_type = @client.schema.type(return_type_name)
-        ConnectionProxy.new(parent: self, client: @client, type: return_type, field: field)
+      def define_connections_accessors
+        type.connections.each do |name, type_name|
+          name = underscore(name)
+
+          define_singleton_method(name) do
+            return_type_name = type_name.gsub('Connection', '')
+            return_type = @client.schema.type(return_type_name)
+            ConnectionProxy.new(parent: self, client: @client, type: return_type, field: name)
+          end
+        end
       end
 
-      def all_from_list(field)
-        return_type_name = @type.lists[field]
-        return_type = @client.schema.type(return_type_name)
-        ListProxy.new(parent: self, client: @client, type: return_type, field: field)
+      def define_field_accessors
+        type.fields.each do |name, _field_type|
+          underscored_name = underscore(name)
+
+          define_singleton_method(underscored_name) do
+            load unless @loaded
+            @attributes[name]
+          end
+
+          define_singleton_method("#{underscored_name}=") do |value|
+            @attributes[name] = value
+            @dirty_attributes.add(name)
+          end
+        end
+      end
+
+      def define_lists_accessors
+        type.lists.each do |name, type_name|
+          name = underscore(name)
+
+          define_singleton_method(name) do
+            return_type = @client.schema.type(type_name)
+            ListProxy.new(parent: self, client: @client, type: return_type, field: name)
+          end
+        end
+      end
+
+      def underscore(name)
+        name
+          .gsub(/::/, '/')
+          .gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+          .gsub(/([a-z\d])([A-Z])/,'\1_\2')
+          .tr('-', '_')
+          .downcase
       end
     end
   end

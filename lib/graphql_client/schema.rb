@@ -1,6 +1,8 @@
 module GraphQL
   module Client
     class Schema
+      INVALID_TYPE = Class.new(StandardError)
+
       def initialize(schema_text)
         @schema_text = schema_text
       end
@@ -14,7 +16,9 @@ module GraphQL
       end
 
       def type(type_name)
-        types[type_name.downcase]
+        types.fetch(type_name.downcase) do
+          fail INVALID_TYPE, "#{type_name} does not exist in the schema"
+        end
       end
 
       def types

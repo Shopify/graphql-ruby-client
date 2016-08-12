@@ -31,11 +31,11 @@ class MerchantClientTest < Minitest::Test
     products = shop.products
 
     title = "Renamed Product - #{Time.new.to_i}"
-    product = @client.find(products.to_a.last.id)
+    product = products.to_a.last
     product.title = title
     product.save
 
-    product = @client.find(products.to_a.last.id)
-    assert_equal(title, product.title)
+    product = @client.shop.products.to_a.last
+    assert_equal title, product.title
   end
 end
