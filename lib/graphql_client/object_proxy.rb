@@ -92,7 +92,8 @@ module GraphQL
       end
 
       def define_field_accessors
-        type.fields.each do |name, _field_type|
+        accessors = type.fields.merge(type.objects)
+        accessors.each do |name, _field_type|
           underscored_name = underscore(name)
 
           define_singleton_method(underscored_name) do

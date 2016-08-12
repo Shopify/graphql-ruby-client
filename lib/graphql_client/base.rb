@@ -18,7 +18,8 @@ module GraphQL
       private
 
       def define_field_accessors
-        accessor_names = @schema.query_root.fields.keys + @schema.query_root.objects.keys
+        query_root = @schema.query_root
+        accessor_names = query_root.fields.keys + query_root.objects.keys
         accessor_names.each do |name|
           define_singleton_method(name) do
             type = @schema[name]
