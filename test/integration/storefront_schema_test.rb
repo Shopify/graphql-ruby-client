@@ -7,18 +7,21 @@ class StorefrontSchemaTest < Minitest::Test
     schema_string = File.read(schema_path)
     schema = GraphQL::Client::Schema.new(schema_string)
 
+    query_root = schema.query_root
+    assert_equal('Node', query_root.interfaces['node'].type_name)
+
     product_type = schema.type('Product')
 
-    expected_fields = %w(createdAt
-                         handle
-                         id
-                         productType
-                         publishedAt
-                         tags
-                         title
-                         updatedAt
-                         vendor)
-    assert_equal(expected_fields, product_type.fields.keys.sort)
+    expected_scalars = %w(createdAt
+                          handle
+                          id
+                          productType
+                          publishedAt
+                          tags
+                          title
+                          updatedAt
+                          vendor)
+    assert_equal(expected_scalars, product_type.scalars.keys.sort)
 
     expected_connections = %w(collections)
     assert_equal(expected_connections, product_type.connections.keys.sort)

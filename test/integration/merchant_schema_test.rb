@@ -9,22 +9,22 @@ class MerchantSchemaTest < Minitest::Test
 
     product_type = schema.type('Product')
 
-    expected_fields = %w(bodyHtml
-                         createdAt
-                         handle
-                         id
-                         productType
-                         publishedAt
-                         templateSuffix
-                         title
-                         totalInventory
-                         totalVariants
-                         tracksInventory
-                         updatedAt
-                         vendor)
+    expected_scalars = %w(bodyHtml
+                          createdAt
+                          handle
+                          id
+                          productType
+                          publishedAt
+                          templateSuffix
+                          title
+                          totalInventory
+                          totalVariants
+                          tracksInventory
+                          updatedAt
+                          vendor)
 
-    expected_fields.each do |field|
-      assert_includes(product_type.fields.keys, field)
+    expected_scalars.each do |name|
+      assert_includes(product_type.scalars.keys, name)
     end
   end
 end
