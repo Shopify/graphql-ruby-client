@@ -1,37 +1,35 @@
 module GraphQL
   module Client
     class Type
-      attr_reader :connections, :field_arguments, :fields, :lists, :methods, :objects, :name
+      attr_reader :connections, :field_arguments, :scalars, :lists, :interfaces, :objects, :name
 
       def initialize(name, type)
         @connections = {}
         @field_arguments = {}
-        @fields = {}
+        @interfaces = {}
         @lists = {}
-        @methods = {}
         @name = name
         @objects = {}
+        @scalars = {}
         @type = type
 
         unless @type['fields'].nil?
           @type['fields'].each do |field|
-            if field.key?('args')
-              unless field['args'].empty?
-                @field_arguments[field['name']] = []
-                field['args'].each do |argument|
-                  @field_arguments[field['name']] << GraphQL::Client::Argument.new(argument['name'], argument['description'])
+            unless field['args'].empty?
+              @field_arguments[field['name']] = []
+              field['args'].each do |argument|
+                @field_arguments[field['name']] << Argument.new(argument['name'], argument['description'])
+              end
+
+              unless field.fetch('type', {}).fetch('ofType', nil).nil?
+                if field.fetch('type', {}).fetch('ofType', {}).fetch('name', '').end_with? 'Connection'
+                  @connections[field['name']] = determine_type(field['type'])
+                else
+                  type = determine_type(field['type'])
+                  @lists[field['name']] = type
                 end
 
-                unless field.fetch('type', {}).fetch('ofType', nil).nil?
-                  if field.fetch('type', {}).fetch('ofType', {}).fetch('name', '').end_with? 'Connection'
-                    @connections[field['name']] = determine_type(field['type'])
-                    next
-                  else
-                    type = determine_type(field['type'])
-                    @lists[field['name']] = type
-                    next
-                  end
-                end
+                next
               end
             end
 
@@ -44,12 +42,10 @@ module GraphQL
               @lists[field['name']] = new_field
             when 'OBJECT'
               @objects[field['name']] = new_field
+            when 'INTERFACE'
+              @interfaces[field['name']] = new_field
             else
-              if !field.fetch('args', []).empty?
-                @methods[field['name']] = new_field
-              else
-                @fields[field['name']] = new_field
-              end
+              @scalars[field['name']] = new_field
             end
           end
         end

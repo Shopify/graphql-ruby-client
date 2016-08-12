@@ -92,7 +92,7 @@ module GraphQL
       end
 
       def define_field_accessors
-        accessors = type.fields.merge(type.objects)
+        accessors = type.scalars.merge(type.objects)
         accessors.each do |name, _field_type|
           underscored_name = underscore(name)
 
