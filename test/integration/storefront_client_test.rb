@@ -39,6 +39,10 @@ class StorefrontClientTest < Minitest::Test
 
     products = shop.products
     assert_equal 5, products.length
+
+    id = products.first.id
+    found_product = products.find(id)
+    assert_equal(id, found_product.id)
   end
 
   def test_paginated_request

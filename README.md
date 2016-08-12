@@ -55,7 +55,7 @@ requested (such as primitive objects, lists, connections, and so forth).
 Finally, mutations are (naively) supported as well:
 
 ```ruby
-product = client.find("gid://shopify/Products/1")
+product = shop.products.find('gid://shopify/Products/1')
 product.title = title
 product.save
 ```
