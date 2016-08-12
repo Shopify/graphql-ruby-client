@@ -55,22 +55,6 @@ module GraphQL
         end
       end
 
-      def connection?(field)
-        @connections.key? camel_case(field)
-      end
-
-      def list?(field)
-        @lists.key? camel_case(field)
-      end
-
-      def field?(field)
-        @fields.key? camel_case(field)
-      end
-
-      def object?(field)
-        @objects.key? camel_case(field)
-      end
-
       def camel_case(string)
         string = string.replace(string.split("_").each_with_index { |s, i| s.capitalize! unless i == 0 }.join(""))
         string[0] = string[0].downcase

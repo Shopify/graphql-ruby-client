@@ -46,6 +46,10 @@ module GraphQL
         nil
       end
 
+      def find(id)
+        ObjectProxy.new(client: @client, type: @type, id: id)
+      end
+
       def next_page?(response_data)
         next_page = deep_find(response_data, 'hasNextPage')
         if next_page.nil?
