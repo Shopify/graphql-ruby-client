@@ -71,7 +71,7 @@ module GraphQL
           input_block << "#{key}: \"#{value}\"\n"
         end
 
-        fields = @type.primitive_fields.keys.join(',')
+        fields = @type.fields.keys.join(',')
         type_name = @type.camel_case_name
 
         mutation = "

@@ -24,6 +24,10 @@ class MerchantClientTest < Minitest::Test
     products = shop.products
     assert_equal 5, products.length
     assert_equal 5, products.map(&:title).uniq.length
+
+    variants = products.first.variants
+    variant = variants.first
+    refute_nil variant.price
   end
 
   def test_updating_product
