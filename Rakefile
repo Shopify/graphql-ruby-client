@@ -5,6 +5,7 @@ Rake::TestTask.new do |t|
   t.warning = false
   t.test_files = FileList.new do |test_files|
     test_files.include('test/*_test.rb')
+    test_files.include('test/unit/*_test.rb')
     test_files.include('test/integration/merchant_schema_test.rb')
 
     if ENV['MERCHANT_USERNAME'] && ENV['MERCHANT_PASSWORD']

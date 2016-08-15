@@ -80,12 +80,11 @@ module GraphQL
       private
 
       def define_connections_accessors
-        type.connections.each do |name, type_name|
+        type.connections.each do |name, field|
           name = underscore(name)
 
           define_singleton_method(name) do
-            return_type_name = type_name.gsub('Connection', '')
-            return_type = @client.schema.type(return_type_name)
+            return_type = @client.schema.type(field.type_name)
             ConnectionProxy.new(parent: self, client: @client, type: return_type, field: name)
           end
         end
@@ -109,11 +108,11 @@ module GraphQL
       end
 
       def define_lists_accessors
-        type.lists.each do |name, type_name|
+        type.lists.each do |name, field|
           name = underscore(name)
 
           define_singleton_method(name) do
-            return_type = @client.schema.type(type_name)
+            return_type = @client.schema.type(field.type_name)
             ListProxy.new(parent: self, client: @client, type: return_type, field: name)
           end
         end
