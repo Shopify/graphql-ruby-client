@@ -16,6 +16,27 @@ module GraphQL
         define_connections_accessors
       end
 
+      def destroy
+        type_name = type.camel_case_name
+
+        mutation = "
+          mutation {
+            #{type_name}Delete(
+              input: {
+                id: \"#{id}\"
+              }
+            ) {
+              userErrors {
+                field,
+                message
+              }
+            }
+          }"
+
+        request = Request.new(client: @client, type: @type)
+        request.from_query(mutation)
+      end
+
       def load
         request = Request.new(client: @client, type: @type)
 
@@ -52,27 +73,6 @@ module GraphQL
           }"
 
         @dirty_attributes.clear
-        request = Request.new(client: @client, type: @type)
-        request.from_query(mutation)
-      end
-
-      def destroy
-        type_name = type.camel_case_name
-
-        mutation = "
-          mutation {
-            #{type_name}Delete(
-              input: {
-                id: \"#{id}\"
-              }
-            ) {
-              userErrors {
-                field,
-                message
-              }
-            }
-          }"
-
         request = Request.new(client: @client, type: @type)
         request.from_query(mutation)
       end
