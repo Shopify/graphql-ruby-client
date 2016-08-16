@@ -19,58 +19,6 @@ module GraphQL
         )
       end
 
-      def fetch_page
-        @loaded = true
-        query = @query.query
-        initial_response = Request.new(client: @client).from_query(query)
-
-        edges = deep_find(initial_response.data, 'edges')
-
-        response = initial_response
-        @objects += edges.map { |edge| edge['node'] }
-        while next_page?(response.data)
-          cursor = edges.last['cursor']
-          response = Request.new(client: @client).from_query(@query.query(after: cursor))
-          edges = deep_find(response.data, 'edges')
-          @objects += edges.map { |edge| edge['node'] }
-        end
-      end
-
-      def deep_find(hash, target_key)
-        return hash[target_key] if hash.key?(target_key)
-        hash.each do |_, value|
-          result = deep_find(value, target_key) if value.is_a? Hash
-          return result unless result.nil?
-        end
-
-        nil
-      end
-
-      def find(id)
-        ObjectProxy.new(client: @client, type: @type, id: id)
-      end
-
-      def next_page?(response_data)
-        next_page = deep_find(response_data, 'hasNextPage')
-        if next_page.nil?
-          false
-        else
-          next_page
-        end
-      end
-
-      def length
-        entries.length
-      end
-
-      def each
-        fetch_page unless @loaded
-
-        @objects.each do |node|
-          yield ObjectProxy.new(attributes: node, client: @client, type: @type)
-        end
-      end
-
       def create(attributes = {})
         input_block = ''
         attributes.each do |key, value|
@@ -99,6 +47,60 @@ module GraphQL
 
         request = Request.new(client: @client, type: @type)
         ObjectProxy.new(type: @type, attributes: request.from_query(mutation).object[type_name], client: @client)
+      end
+
+      def find(id)
+        ObjectProxy.new(client: @client, type: @type, id: id)
+      end
+
+      def each
+        fetch_page unless @loaded
+
+        @objects.each do |node|
+          yield ObjectProxy.new(attributes: node, client: @client, type: @type)
+        end
+      end
+
+      def length
+        entries.length
+      end
+
+      private
+
+      def deep_find(hash, target_key)
+        return hash[target_key] if hash.key?(target_key)
+        hash.each do |_, value|
+          result = deep_find(value, target_key) if value.is_a? Hash
+          return result unless result.nil?
+        end
+
+        nil
+      end
+
+      def fetch_page
+        @loaded = true
+        query = @query.query
+        initial_response = Request.new(client: @client).from_query(query)
+
+        edges = deep_find(initial_response.data, 'edges')
+
+        response = initial_response
+        @objects += edges.map { |edge| edge['node'] }
+        while next_page?(response.data)
+          cursor = edges.last['cursor']
+          response = Request.new(client: @client).from_query(@query.query(after: cursor))
+          edges = deep_find(response.data, 'edges')
+          @objects += edges.map { |edge| edge['node'] }
+        end
+      end
+
+      def next_page?(response_data)
+        next_page = deep_find(response_data, 'hasNextPage')
+        if next_page.nil?
+          false
+        else
+          next_page
+        end
       end
     end
   end
