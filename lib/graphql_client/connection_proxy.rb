@@ -9,6 +9,7 @@ module GraphQL
         @type = type
         @field = field
         @objects = []
+        @loaded = false
 
         @query = ConnectionQuery.new(
           parent: @parent,
@@ -16,11 +17,10 @@ module GraphQL
           return_type: @type,
           client: @client
         )
-
-        fetch_page
       end
 
       def fetch_page
+        @loaded = true
         query = @query.query
         initial_response = Request.new(client: @client).from_query(query)
 
@@ -64,6 +64,8 @@ module GraphQL
       end
 
       def each
+        fetch_page unless @loaded
+
         @objects.each do |node|
           yield ObjectProxy.new(attributes: node, client: @client, type: @type)
         end
