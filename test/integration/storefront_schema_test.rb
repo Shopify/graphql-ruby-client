@@ -17,7 +17,6 @@ class StorefrontSchemaTest < Minitest::Test
                           id
                           productType
                           publishedAt
-                          tags
                           title
                           updatedAt
                           vendor)
@@ -32,6 +31,6 @@ class StorefrontSchemaTest < Minitest::Test
     assert_equal(expected_lists, product_type.lists.keys.sort)
 
     # validate that the type matches for sub-queries
-    assert_equal('ProductVariant', product_type.lists['variants'])
+    assert(product_type.lists['variants'].list?)
   end
 end

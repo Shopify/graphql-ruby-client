@@ -1,17 +1,13 @@
 module GraphQL
   module Client
     class Type
-      attr_reader :connections, :field_arguments, :scalars, :lists, :interfaces, :objects, :name
+      attr_reader :field_arguments, :fields, :name
 
       def initialize(name, type)
-        @connections = {}
         @field_arguments = {}
-        @interfaces = {}
-        @lists = {}
         @name = name
-        @objects = {}
-        @scalars = {}
         @type = type
+        @fields = {}
 
         unless @type['fields'].nil?
           @type['fields'].each do |field|
@@ -20,65 +16,45 @@ module GraphQL
               field['args'].each do |argument|
                 @field_arguments[field['name']] << Argument.new(argument['name'], argument['description'])
               end
-
-              unless field.fetch('type', {}).fetch('ofType', nil).nil?
-                if field.fetch('type', {}).fetch('ofType', {}).fetch('name', '').end_with? 'Connection'
-                  @connections[field['name']] = determine_type(field['type'])
-                else
-                  type = determine_type(field['type'])
-                  @lists[field['name']] = type
-                end
-
-                next
-              end
             end
 
-            type_name = determine_type(field['type'])
-            kind = determine_kind(field)
-            new_field = Field.new(field['name'], type_name, false)
-
-            case kind
-            when 'LIST'
-              @lists[field['name']] = new_field
-            when 'OBJECT'
-              @objects[field['name']] = new_field
-            when 'INTERFACE'
-              @interfaces[field['name']] = new_field
-            else
-              @scalars[field['name']] = new_field
-            end
+            new_field = Field.new(field)
+            @fields[new_field.name] = new_field
           end
         end
       end
 
+      def connections
+        @fields.select { |_name, field| field.connection? }
+      end
+
+      def interfaces
+        @fields.select { |_name, field| field.interface? }
+      end
+
+      def lists
+        @fields.select { |_name, field| field.list? }
+      end
+
+      def objects
+        @fields.select { |_name, field| field.object? }
+      end
+
+      def scalars
+        @fields.select { |_name, field| field.scalar? }
+      end
+
       def camel_case(string)
-        string = string.replace(string.split("_").each_with_index { |s, i| s.capitalize! unless i == 0 }.join(""))
+        string = string.replace(string.split("_").each_with_index do |s, i|
+          s.capitalize! unless i.zero?
+        end.join(""))
+
         string[0] = string[0].downcase
         string
       end
 
       def camel_case_name
         camel_case(@name)
-      end
-
-      private
-
-      def determine_kind(field)
-        if field['type']['ofType']
-          field['type']['ofType']['kind']
-        else
-          field['type']['kind']
-        end
-      end
-
-      def determine_type(type)
-        return type if type.is_a? String
-
-        if type.key?('ofType')
-          return determine_type(type['ofType']) unless type['ofType'].nil?
-        end
-
-        type['name']
       end
     end
   end
