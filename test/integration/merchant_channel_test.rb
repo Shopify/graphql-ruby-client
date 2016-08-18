@@ -8,7 +8,7 @@ class MerchantChannelTest < Minitest::Test
     schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/merchant_schema.json')
     schema_string = File.read(schema_path)
 
-    @schema = GraphQL::Client::Schema.new(schema_string)
+    @schema = GraphQLSchema.new(schema_string)
     @client = GraphQL::Client::Base.new(
       schema: @schema,
       url: URL,
