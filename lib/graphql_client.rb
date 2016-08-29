@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'bundler/setup'
 require 'graphql_schema'
-require 'graphql_client/global_id.rb'
 require 'graphql_client/base.rb'
 require 'graphql_client/request.rb'
 require 'graphql_client/connection_proxy.rb'
