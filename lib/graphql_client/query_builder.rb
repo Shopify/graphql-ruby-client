@@ -27,9 +27,8 @@ module GraphQL
          }"
       end
 
-      def connection_from_object(root_type, root_id, _field, return_type, after: nil, per_page:)
+      def connection_from_object(root_type, root_id, field_name, return_type, after: nil, per_page:)
         camel_case_model = root_type.camel_case_name
-        pluralized = return_type.camel_case_name + 's'
         fields = return_type.scalars.keys.join(',')
 
         after_stanza = after.nil? ? '' : ", after: \"#{after}\""
@@ -42,7 +41,7 @@ module GraphQL
 
         "query {
            #{camel_case_model}#{id_stanza} {
-             #{pluralized}(first: #{per_page}#{after_stanza}) {
+             #{field_name}(first: #{per_page}#{after_stanza}) {
                pageInfo {
                  hasNextPage
                }

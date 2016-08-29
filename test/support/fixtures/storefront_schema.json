@@ -492,7 +492,7 @@
         {
           "kind": "SCALAR",
           "name": "String",
-          "description": null,
+          "description": "Represents textual data as UTF-8 character sequences. This type is most often used by GraphQL to represent free-form human-readable text.",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -607,7 +607,7 @@
         {
           "kind": "SCALAR",
           "name": "Boolean",
-          "description": null,
+          "description": "Represents `true` or `false` values.",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -1367,29 +1367,46 @@
               "args": [
                 {
                   "name": "first",
-                  "description": "Truncate the array result to this size",
+                  "description": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": "Non-Null",
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "after",
+                  "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Int",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "reverse",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "false"
                 }
               ],
               "type": {
                 "kind": "NON_NULL",
                 "name": "Non-Null",
                 "ofType": {
-                  "kind": "LIST",
-                  "name": "List",
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": "Non-Null",
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "ProductVariant"
-                    }
-                  }
+                  "kind": "OBJECT",
+                  "name": "ProductVariantConnection",
+                  "ofType": null
                 }
               },
               "isDeprecated": false,
@@ -1424,7 +1441,7 @@
         {
           "kind": "SCALAR",
           "name": "Int",
-          "description": null,
+          "description": "Represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -1603,6 +1620,111 @@
               "name": "Node",
               "ofType": null
             }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ProductVariantConnection",
+          "description": null,
+          "fields": [
+            {
+              "name": "edges",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "LIST",
+                  "name": "List",
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": "Non-Null",
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "ProductVariantEdge"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "pageInfo",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "PageInfo",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ProductVariantEdge",
+          "description": null,
+          "fields": [
+            {
+              "name": "cursor",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ProductVariant",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
           ],
           "enumValues": null,
           "possibleTypes": null
@@ -1895,7 +2017,7 @@
               "deprecationReason": null
             },
             {
-              "name": "_SCORE",
+              "name": "RELEVANCE",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -2065,7 +2187,7 @@
               "deprecationReason": null
             },
             {
-              "name": "_SCORE",
+              "name": "RELEVANCE",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -2802,6 +2924,60 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "onField",
+              "description": "Does this directive apply to fields?",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": true,
+              "deprecationReason": "Moved to 'locations' field"
+            },
+            {
+              "name": "onFragment",
+              "description": "Does this directive apply to fragments?",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": true,
+              "deprecationReason": "Moved to 'locations' field"
+            },
+            {
+              "name": "onOperation",
+              "description": "Does this directive apply to operations?",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": true,
+              "deprecationReason": "Moved to 'locations' field"
             }
           ],
           "inputFields": null,
