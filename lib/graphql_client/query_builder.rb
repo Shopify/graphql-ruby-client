@@ -43,7 +43,7 @@ module GraphQL
 
         "query {
            #{camel_case_model}#{id_stanza} {
-             #{field_name}(first: #{per_page}#{after_stanza}) {
+             #{camelize(field_name)}(first: #{per_page}#{after_stanza}) {
                pageInfo {
                  hasNextPage
                }
@@ -69,6 +69,12 @@ module GraphQL
              }
            }
          }"
+      end
+
+      def camelize(string)
+        result = string.split('_').collect(&:capitalize).join
+        result[0] = result[0].downcase
+        result
       end
     end
   end
