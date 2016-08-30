@@ -1,6 +1,7 @@
 module GraphQL
   module Client
     class QueryBuilder
+      BLACKLISTED_FIELDS = %w(analyticsToken)
       def initialize(schema:)
         @schema = schema
       end
@@ -18,7 +19,8 @@ module GraphQL
 
       def self.simple_find(type)
         camel_case_model = type.camel_case_name
-        fields = type.scalars.keys.join(',')
+        field_names = type.scalars.keys - BLACKLISTED_FIELDS
+        fields = field_names.join(',')
 
         "query {
            #{camel_case_model} {
