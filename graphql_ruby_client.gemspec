@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.summary = ''
   s.test_files = `git ls-files -- {test}/*`.split("\n")
   s.version = GraphQL::Client::VERSION
+  s.executables << 'graphql-client'
 
   s.add_development_dependency 'minitest', '~> 5.8'
   s.add_development_dependency 'pry'
