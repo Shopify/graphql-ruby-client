@@ -15,15 +15,18 @@ module GraphQL
         define_field_accessors
       end
 
+      def build_query
+        Query.new(schema: @schema)
+      end
+
       private
 
       def define_field_accessors
         query_root = @schema.query_root
-        accessor_names = query_root.scalars.keys + query_root.objects.keys
-        accessor_names.each do |name|
+        fields = query_root.fields.select { |_, field| field.scalar? || field.object? }
+        fields.each do |name, field|
           define_singleton_method(name) do
-            type = @schema[name]
-            ObjectProxy.new(type: type, client: self)
+            ObjectProxy.new(type: field.base_type, client: self)
           end
         end
       end

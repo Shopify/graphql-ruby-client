@@ -25,8 +25,11 @@ module GraphQL
           input_block << "#{key}: \"#{value}\"\n"
         end
 
-        fields = @type.scalars.keys.join(',')
-        type_name = @type.camel_case_name
+        type = @type.node_type
+        type_name = type.name
+        fields = type.fields.select { |_, field| field.scalar? }.keys.join(',')
+
+        type_name[0] = type_name[0].downcase
 
         mutation = "
           mutation {
