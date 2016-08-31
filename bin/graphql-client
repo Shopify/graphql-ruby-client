@@ -1,0 +1,69 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+Bundler.require
+
+require 'irb'
+require 'irb/completion'
+require 'optparse'
+require_relative '../lib/graphql_client'
+
+JSON_MIME_TYPE = 'application/json'.freeze
+DEFAULT_HEADERS = { 'Accept' => JSON_MIME_TYPE, 'Content-Type' => JSON_MIME_TYPE }
+
+options = {}
+
+op = OptionParser.new do |opts|
+  opts.banner = 'Usage: bin/graphql-client <url> [options]'
+
+  opts.on('-u', '--username [USERNAME]', 'HTTP Basic Auth Username') do |arg|
+    options[:username] = arg
+  end
+
+  opts.on('-p', '--password [PASSWORD]', 'HTTP Basic Auth Password') do |arg|
+    options[:password] = arg
+  end
+
+  opts.on('-h', '--headers [HEADERS]', Array, 'Comma separated string of headers (eg: -h"X-TOKEN=token,X-FOO=bar")') do |arg|
+    options[:headers] = arg.map { |header| header.split('=') }.to_h
+  end
+
+  opts.on('-v', '--verbose', 'Verbose mode: show debugging info') do |arg|
+    options[:verbose] = arg
+  end
+end
+
+op.parse!
+
+if ARGV.empty?
+  puts op.help
+  exit(-1)
+end
+
+uri = URI.parse(ARGV.pop)
+
+response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
+  headers = DEFAULT_HEADERS.merge(options[:headers])
+
+  request = Net::HTTP::Post.new(uri, headers).tap do |req|
+    req.basic_auth(options[:username], options[:password])
+    req.body = { query: GraphQL::Client::INTROSPECTION_QUERY }.to_json
+  end
+
+  http.request(request)
+end
+
+schema = GraphQLSchema.new(response.body)
+client = GraphQL::Client::Base.new(
+  schema: schema,
+  url: uri,
+  debug: options[:verbose],
+  username: options[:username],
+  password: options[:password],
+  headers: options[:headers]
+)
+
+IRB.setup nil
+IRB.conf[:MAIN_CONTEXT] = IRB::Irb.new.context
+require 'irb/ext/multi-irb'
+IRB.irb nil, client
