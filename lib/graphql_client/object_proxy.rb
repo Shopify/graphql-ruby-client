@@ -12,12 +12,12 @@ module GraphQL
         @loaded = !@attributes.empty?
 
         define_field_accessors
-        define_lists_accessors
         define_connections_accessors
       end
 
       def destroy
-        type_name = type.camel_case_name
+        type_name = type.node_type.name
+        type_name[0] = type_name[0].downcase
 
         mutation = "
           mutation {
@@ -50,7 +50,13 @@ module GraphQL
       end
 
       def save
-        type_name = @type.camel_case_name
+        type_name = if @type.respond_to?(:node_type)
+          @type.node_type.name
+        else
+          @type.name
+        end
+
+        type_name[0] = type_name[0].downcase
 
         attributes_block = ''
         @dirty_attributes.each do |name|
@@ -80,18 +86,26 @@ module GraphQL
       private
 
       def define_connections_accessors
-        type.connections.each do |name, field|
-          name = underscore(name)
+        accessors = if type.name.end_with? 'Connection'
+          type.node_type.fields.select { |_, field| field.connection? }
+        else
+          type.fields.select { |_, field| field.connection? }
+        end
 
-          define_singleton_method(name) do
-            return_type = @client.schema.type(field.type_name)
-            ConnectionProxy.new(parent: self, client: @client, type: return_type, field: name)
+        accessors.each do |name, field|
+          define_singleton_method(underscore(name)) do
+            ConnectionProxy.new(parent: self, client: @client, type: field.base_type, field: name)
           end
         end
       end
 
       def define_field_accessors
-        accessors = type.scalars.merge(type.objects)
+        accessors = if type.name.end_with? 'Connection'
+          type.node_type.fields.select { |_, field| field.scalar? || field.object? }
+        else
+          type.fields.select { |_, field| field.scalar? || field.object? }
+        end
+
         accessors.each do |name, _field_type|
           underscored_name = underscore(name)
 
@@ -107,22 +121,11 @@ module GraphQL
         end
       end
 
-      def define_lists_accessors
-        type.lists.each do |name, field|
-          name = underscore(name)
-
-          define_singleton_method(name) do
-            return_type = @client.schema.type(field.type_name)
-            ListProxy.new(parent: self, client: @client, type: return_type, field: name)
-          end
-        end
-      end
-
       def underscore(name)
         name
           .gsub(/::/, '/')
-          .gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
-          .gsub(/([a-z\d])([A-Z])/,'\1_\2')
+          .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
+          .gsub(/([a-z\d])([A-Z])/, '\1_\2')
           .tr('-', '_')
           .downcase
       end

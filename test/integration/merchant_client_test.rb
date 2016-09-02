@@ -30,6 +30,12 @@ class MerchantClientTest < Minitest::Test
     refute_nil variant.price
   end
 
+  def test_product_tags
+    product = @client.shop.products.first
+    tags = product.tags
+    assert_equal ['summer', 'winter'], tags.sort
+  end
+
   def test_updating_product
     shop = @client.shop
     products = shop.products
