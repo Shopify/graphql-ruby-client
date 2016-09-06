@@ -52,10 +52,6 @@ module GraphQL
         ObjectProxy.new(type: @type, attributes: request.from_query(mutation).object[type_name], client: @client)
       end
 
-      def find(id)
-        ObjectProxy.new(client: @client, type: @type, id: id)
-      end
-
       def each
         fetch_page unless @loaded
 

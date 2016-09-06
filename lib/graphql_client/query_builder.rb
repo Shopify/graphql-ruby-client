@@ -7,23 +7,6 @@ module GraphQL
         @client = client
       end
 
-      def self.find(type, id)
-        if type.name.end_with? 'Connection'
-          camel_case_model = camelize(type.node_type.name)
-          type = type.node_type
-        else
-          camel_case_model = camelize(type.name)
-        end
-
-        fields = type.fields.select { |_k, v| v.scalar? }.keys.join(',')
-
-        "query {
-           #{camel_case_model}(id: \"#{id}\") {
-             #{fields}
-           }
-         }"
-      end
-
       def self.simple_find(type)
         camel_case_model = camelize(type.name)
         scalars = type.fields.select { |_k, v| v.scalar? }

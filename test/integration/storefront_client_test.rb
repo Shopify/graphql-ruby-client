@@ -43,7 +43,7 @@ class StorefrontClientTest < Minitest::Test
     assert_equal 5, products.length
 
     id = products.to_a.find { |p| p.title == 'Abridgable Concrete Coat' }.id
-    found_product = products.find(id)
+    found_product = @client.product(id: id)
     assert_equal(id, found_product.id)
 
     variants = found_product.variants

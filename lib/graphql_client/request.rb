@@ -37,9 +37,18 @@ module GraphQL
         end
       end
 
-      # TODO: Move these to the base client and only use Request#from_query
       def find(id)
-        query = QueryBuilder.find(@type, id)
+        type = if @type.name.end_with? 'Connection'
+          @type.node_type
+        else
+          @type
+        end
+
+        field_name = type.name
+        field_name[0] = field_name[0].downcase
+        query = @client.build_query
+        object_query = query.add_field(field_name, id: id)
+        object_query.add_fields(*type.fields.select { |_, field| field.scalar? }.keys)
         puts "Query: #{query}" if @client.debug
         Response.new(self, send_request(query))
       end

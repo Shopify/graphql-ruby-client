@@ -25,8 +25,8 @@ module GraphQL
         query_root = @schema.query_root
         fields = query_root.fields.select { |_, field| field.scalar? || field.object? }
         fields.each do |name, field|
-          define_singleton_method(name) do
-            ObjectProxy.new(type: field.base_type, client: self)
+          define_singleton_method(name) do |**arguments|
+            ObjectProxy.new(type: field.base_type, client: self, **arguments)
           end
         end
       end
