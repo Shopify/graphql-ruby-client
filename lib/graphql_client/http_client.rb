@@ -16,7 +16,13 @@ module GraphQL
       end
 
       def build_query
-        Query.new(schema: @schema)
+        query = Query::QueryOperation.new(@schema)
+
+        if block_given?
+          yield query
+        else
+          query
+        end
       end
 
       private

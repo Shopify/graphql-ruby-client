@@ -46,19 +46,25 @@ module GraphQL
 
         field_name = type.name
         field_name[0] = field_name[0].downcase
-        query = @client.build_query
-        object_query = query.add_field(field_name, id: id)
-        object_query.add_fields(*type.scalar_fields.names)
+
+        query = Query::QueryOperation.new(@client.schema) do |q|
+          q.add_field(field_name, id: id) do |field|
+            type.scalar_fields.names.each do |scalar_field_name|
+              field.add_field(scalar_field_name)
+            end
+          end
+        end.to_query
+
         puts "Query: #{query}" if @client.debug
         Response.new(self, send_request(query))
       end
 
       def query_builder
-        @query_builder ||= QueryBuilder.new(schema: @client.schema, client: @client)
+        @query_builder ||= QueryBuilder.new(@client.schema)
       end
 
       def simple_find(type_name)
-        query = query_builder.simple_find(@client.schema.type(type_name))
+        query = query_builder.simple_find(@client.schema[type_name])
         puts "Query: #{query}" if @client.debug
         Response.new(self, send_request(query))
       end
