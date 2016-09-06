@@ -9,7 +9,7 @@ class MerchantChannelTest < Minitest::Test
     schema_string = File.read(schema_path)
 
     @schema = GraphQLSchema.new(schema_string)
-    @client = GraphQL::Client::Base.new(
+    @client = GraphQL::Client.new(
       schema: @schema,
       url: URL,
       headers: {
