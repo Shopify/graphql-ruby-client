@@ -1,6 +1,6 @@
 module GraphQL
   module Client
-    class Base
+    class HTTPClient
       attr_reader :schema, :url, :username, :password, :per_page, :headers, :debug
 
       def initialize(schema:, url:, username: '', password: '', per_page: 100, headers: {}, debug: false)

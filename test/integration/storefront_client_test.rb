@@ -10,7 +10,7 @@ class StorefrontClientTest < Minitest::Test
     schema_string = File.read(schema_path)
 
     @schema = GraphQLSchema.new(schema_string)
-    @client = GraphQL::Client::Base.new(
+    @client = GraphQL::Client.new(
       schema: @schema,
       url: URL,
       username: USERNAME
@@ -61,7 +61,7 @@ class StorefrontClientTest < Minitest::Test
   end
 
   def test_batch_paginated_request
-    client = GraphQL::Client::Base.new(
+    client = GraphQL::Client.new(
       schema: @schema,
       url: URL,
       username: USERNAME,
