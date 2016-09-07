@@ -7,17 +7,15 @@ module GraphQL
         @client = client
       end
 
-      def self.simple_find(type)
-        camel_case_model = camelize(type.name)
-        scalars = type.fields.select { |_k, v| v.scalar? }
-        field_names = scalars.keys - BLACKLISTED_FIELDS
-        fields = field_names.join(',')
+      def simple_find(type)
+        camel_case_model = self.class.camelize(type.name)
+        field_names = type.scalar_fields.names - BLACKLISTED_FIELDS
 
-        "query {
-           #{camel_case_model} {
-             #{fields}
-           }
-         }"
+        query = @client.build_query
+        field = query.add_field(camel_case_model)
+        field.add_fields(*field_names)
+
+        query.to_s
       end
 
       def connection_from_object(root_type, root_id, field_name, return_type, after: nil, per_page:)
@@ -26,7 +24,7 @@ module GraphQL
         end
 
         real_return_type = return_type.edges.base_type.node.base_type
-        scalars = real_return_type.fields.select { |_k, v| v.scalar? }
+        scalars = real_return_type.fields.scalars
 
         query = @client.build_query
         args = {}
@@ -35,7 +33,7 @@ module GraphQL
         end
         top_node = query.add_field(root_type.name.downcase, args)
         connection = top_node.add_connection(field_name, first: per_page, after: after)
-        connection.add_fields(*scalars.keys)
+        connection.add_fields(*scalars.names)
 
         query.to_s
       end
