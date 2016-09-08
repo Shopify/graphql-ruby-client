@@ -27,7 +27,7 @@ module GraphQL
 
         type = @type.node_type
         type_name = type.name
-        fields = type.fields.select { |_, field| field.scalar? }.keys.join(',')
+        fields = type.scalar_fields.names.join(',')
 
         type_name[0] = type_name[0].downcase
 

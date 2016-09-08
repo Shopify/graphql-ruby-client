@@ -87,9 +87,9 @@ module GraphQL
 
       def define_connections_accessors
         accessors = if type.name.end_with? 'Connection'
-          type.node_type.fields.select { |_, field| field.connection? }
+          type.node_type.fields.connections
         else
-          type.fields.select { |_, field| field.connection? }
+          type.fields.connections
         end
 
         accessors.each do |name, field|
@@ -101,9 +101,9 @@ module GraphQL
 
       def define_field_accessors
         accessors = if type.name.end_with? 'Connection'
-          type.node_type.fields.select { |_, field| field.scalar? || field.object? }
+          type.node_type.scalar_fields + type.node_type.object_fields
         else
-          type.fields.select { |_, field| field.scalar? || field.object? }
+          type.scalar_fields + type.object_fields
         end
 
         accessors.each do |name, _field_type|
