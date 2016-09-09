@@ -77,6 +77,39 @@ module GraphQL
           assert_equal query_string, query.to_query
         end
 
+        def test_to_query_handles_add_fields
+          query = QueryOperation.new(@schema) do |q|
+            q.add_field('product', id: 'gid://Product/1') do |product|
+              product.add_field('title')
+            end
+
+            q.add_field('shop') do |shop|
+              shop.add_field('name')
+
+              shop.add_field('billingAddress') do |billing_address|
+                billing_address.add_fields('city', 'country')
+              end
+            end
+          end
+
+          query_string = <<~QUERY
+            query {
+              product(id: "gid://Product/1") {
+                title
+              }
+              shop {
+                name
+                billingAddress {
+                  city
+                  country
+                }
+              }
+            }
+          QUERY
+
+          assert_equal query_string, query.to_query
+        end
+
         def test_to_query_handles_connections
           query = QueryOperation.new(@schema) do |q|
             q.add_field('product', id: 'gid://Product/1') do |product|

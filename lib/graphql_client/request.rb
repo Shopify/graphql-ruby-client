@@ -49,9 +49,7 @@ module GraphQL
 
         query = Query::QueryOperation.new(@client.schema) do |q|
           q.add_field(field_name, id: id) do |field|
-            type.scalar_fields.names.each do |scalar_field_name|
-              field.add_field(scalar_field_name)
-            end
+            field.add_fields(*type.scalar_fields.names)
           end
         end.to_query
 

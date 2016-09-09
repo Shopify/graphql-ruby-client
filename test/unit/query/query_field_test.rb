@@ -26,6 +26,15 @@ module GraphQL
           assert_equal 1, query_field.query_fields.size
         end
 
+        def test_add_fields_creates_multiple_query_fields
+          field = @schema.query_root.fields.fetch('shop')
+          query_field = QueryField.new(field, arguments: {})
+
+          query_field.add_fields('city', 'name')
+
+          assert_equal 2, query_field.query_fields.size
+        end
+
         def test_resolver_type_is_the_fields_base_type
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, arguments: {})

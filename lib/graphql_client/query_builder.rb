@@ -13,9 +13,7 @@ module GraphQL
 
         query = Query::QueryOperation.new(@schema) do |q|
           q.add_field(camel_case_model) do |field|
-            field_names.each do |field_name|
-              field.add_field(field_name)
-            end
+            field.add_fields(*field_names)
           end
         end
 
@@ -40,9 +38,7 @@ module GraphQL
 
         query.add_field(root_type.name.downcase, args) do |node|
           node.add_connection(field_name, first: per_page, after: after) do |connection|
-            scalars.names.each do |scalar_field_name|
-              connection.add_field(scalar_field_name)
-            end
+            connection.add_fields(*scalars.names)
           end
         end
 
