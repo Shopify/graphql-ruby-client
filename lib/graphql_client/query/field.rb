@@ -31,6 +31,12 @@ module GraphQL
           end
         end
 
+        def add_fields(*field_names)
+          field_names.each do |field_name|
+            add_field(field_name)
+          end
+        end
+
         private
 
         def resolve(field_name)
