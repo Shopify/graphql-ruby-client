@@ -68,6 +68,7 @@ module GraphQL
 
       def deep_find(hash, target_key)
         return hash[target_key] if hash.key?(target_key)
+
         hash.each do |_, value|
           result = deep_find(value, target_key) if value.is_a? Hash
           return result unless result.nil?
@@ -84,12 +85,14 @@ module GraphQL
         edges = deep_find(initial_response.data, 'edges')
 
         response = initial_response
-        @objects += edges.map { |edge| edge['node'] }
+        @objects += edges.map { |edge| edge.fetch('node') }
+
         while next_page?(response.data)
-          cursor = edges.last['cursor']
+          cursor = edges.last.fetch('cursor')
           response = Request.new(client: @client).from_query(@query.query(after: cursor))
           edges = deep_find(response.data, 'edges')
-          @objects += edges.map { |edge| edge['node'] }
+
+          @objects += edges.map { |edge| edge.fetch('node') }
         end
       end
 

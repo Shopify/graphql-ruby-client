@@ -25,7 +25,7 @@ module GraphQL
       end
 
       def query_builder
-        QueryBuilder.new(schema: @schema, client: @client)
+        QueryBuilder.new(@schema)
       end
     end
   end

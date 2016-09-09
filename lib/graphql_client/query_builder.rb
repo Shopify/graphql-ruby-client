@@ -2,20 +2,24 @@ module GraphQL
   module Client
     class QueryBuilder
       BLACKLISTED_FIELDS = %w(analyticsToken)
-      def initialize(schema:, client: nil)
+
+      def initialize(schema)
         @schema = schema
-        @client = client
       end
 
       def simple_find(type)
         camel_case_model = self.class.camelize(type.name)
         field_names = type.scalar_fields.names - BLACKLISTED_FIELDS
 
-        query = @client.build_query
-        field = query.add_field(camel_case_model)
-        field.add_fields(*field_names)
+        query = Query::QueryOperation.new(@schema) do |q|
+          q.add_field(camel_case_model) do |field|
+            field_names.each do |field_name|
+              field.add_field(field_name)
+            end
+          end
+        end
 
-        query.to_s
+        query.to_query
       end
 
       def connection_from_object(root_type, root_id, field_name, return_type, after: nil, per_page:)
@@ -26,29 +30,23 @@ module GraphQL
         real_return_type = return_type.edges.base_type.node.base_type
         scalars = real_return_type.fields.scalars
 
-        query = @client.build_query
+        query = Query::QueryOperation.new(@schema)
+
         args = {}
+
         if root_id && @schema.query_root.fields[root_type.name.downcase].args.key?('id')
           args['id'] = root_id
         end
-        top_node = query.add_field(root_type.name.downcase, args)
-        connection = top_node.add_connection(field_name, first: per_page, after: after)
-        connection.add_fields(*scalars.names)
 
-        query.to_s
-      end
+        query.add_field(root_type.name.downcase, args) do |node|
+          node.add_connection(field_name, first: per_page, after: after) do |connection|
+            scalars.names.each do |scalar_field_name|
+              connection.add_field(scalar_field_name)
+            end
+          end
+        end
 
-      def self.list_from_object(root_type, root_id, field, return_type)
-        camel_case_model = camelize(root_type.name)
-        fields = return_type.scalars.keys.join(',')
-
-        "query {
-           #{camel_case_model}(id: \"#{root_id}\") {
-             #{field} {
-               #{fields}
-             }
-           }
-         }"
+        query.to_query
       end
 
       def self.camelize(string)
