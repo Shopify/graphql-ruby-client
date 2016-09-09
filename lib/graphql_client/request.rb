@@ -61,8 +61,8 @@ module GraphQL
         @query_builder ||= QueryBuilder.new(@client.schema)
       end
 
-      def simple_find(type_name)
-        query = query_builder.simple_find(@client.schema[type_name])
+      def for_field(field)
+        query = query_builder.for_field(field)
         puts "Query: #{query}" if @client.debug
         Response.new(self, send_request(query))
       end

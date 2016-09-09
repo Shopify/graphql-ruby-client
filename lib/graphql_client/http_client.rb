@@ -32,7 +32,7 @@ module GraphQL
         fields = query_root.fields.scalars + query_root.fields.objects
         fields.each do |name, field|
           define_singleton_method(name) do |**arguments|
-            ObjectProxy.new(type: field.base_type, client: self, **arguments)
+            ObjectProxy.new(field: field, client: self, **arguments)
           end
         end
       end

@@ -3,16 +3,18 @@ module GraphQL
     class ConnectionProxy
       include Enumerable
 
-      def initialize(parent:, client:, type:, field:)
+      def initialize(parent:, parent_field:, client:, field:)
         @parent = parent
+        @parent_field = parent_field
         @client = client
-        @type = type
         @field = field
+        @type = @field.base_type
         @objects = []
         @loaded = false
 
         @query = ConnectionQuery.new(
           parent: @parent,
+          parent_field: @parent_field,
           field: @field,
           return_type: @type,
           client: @client
@@ -49,14 +51,14 @@ module GraphQL
         }"
 
         request = Request.new(client: @client, type: @type)
-        ObjectProxy.new(type: @type, attributes: request.from_query(mutation).object[type_name], client: @client)
+        ObjectProxy.new(attributes: request.from_query(mutation).object[type_name], client: @client, field: @field)
       end
 
       def each
         fetch_page unless @loaded
 
         @objects.each do |node|
-          yield ObjectProxy.new(attributes: node, client: @client, type: @type)
+          yield ObjectProxy.new(attributes: node, client: @client, field: @field)
         end
       end
 
