@@ -37,8 +37,11 @@ module GraphQL
           args['id'] = root_id
         end
 
+        connection_args = { first: per_page }
+        connection_args[:after] = after if after
+
         query.add_field(root_type.name.downcase, args) do |node|
-          node.add_connection(field.name, first: per_page, after: after) do |connection|
+          node.add_connection(field.name, connection_args) do |connection|
             connection.add_fields(*scalars.names)
           end
         end
