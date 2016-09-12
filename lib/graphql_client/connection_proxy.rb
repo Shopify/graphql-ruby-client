@@ -7,18 +7,11 @@ module GraphQL
         @parent = parent
         @parent_field = parent_field
         @client = client
+        @schema = @client.schema
         @field = field
         @type = @field.base_type
         @objects = []
         @loaded = false
-
-        @query = ConnectionQuery.new(
-          parent: @parent,
-          parent_field: @parent_field,
-          field: @field,
-          return_type: @type,
-          client: @client
-        )
       end
 
       def create(attributes = {})
@@ -68,6 +61,16 @@ module GraphQL
 
       private
 
+      def connection_query(after: nil)
+        query_builder.connection_from_object(
+          @parent.type,
+          @parent.id,
+          @field,
+          after: after,
+          per_page: @client.per_page
+        )
+      end
+
       def deep_find(hash, target_key)
         return hash[target_key] if hash.key?(target_key)
 
@@ -81,9 +84,8 @@ module GraphQL
 
       def fetch_page
         @loaded = true
-        query = @query.query
-        initial_response = Request.new(client: @client).from_query(query)
 
+        initial_response = Request.new(client: @client).from_query(connection_query)
         edges = deep_find(initial_response.data, 'edges')
 
         response = initial_response
@@ -91,7 +93,7 @@ module GraphQL
 
         while next_page?(response.data)
           cursor = edges.last.fetch('cursor')
-          response = Request.new(client: @client).from_query(@query.query(after: cursor))
+          response = Request.new(client: @client).from_query(connection_query(after: cursor))
           edges = deep_find(response.data, 'edges')
 
           @objects += edges.map { |edge| edge.fetch('node') }
@@ -105,6 +107,10 @@ module GraphQL
         else
           next_page
         end
+      end
+
+      def query_builder
+        @query_builder ||= QueryBuilder.new(@schema)
       end
     end
   end
