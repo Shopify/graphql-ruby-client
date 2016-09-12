@@ -19,25 +19,19 @@ module GraphQL
       end
 
       def destroy
-        type_name = type.node_type.name
+        type_name = type.node_type.name.dup
         type_name[0] = type_name[0].downcase
 
-        mutation = "
-          mutation {
-            #{type_name}Delete(
-              input: {
-                id: \"#{id}\"
-              }
-            ) {
-              userErrors {
-                field,
-                message
-              }
-            }
-          }"
+        mutation = Query::MutationOperation.new(@client.schema) do |q|
+          q.add_field("#{type_name}Delete", input: { id: id }) do |field|
+            field.add_field('userErrors') do |errors|
+              errors.add_fields('field', 'message')
+            end
+          end
+        end
 
         request = Request.new(client: @client, type: @type)
-        request.from_query(mutation)
+        request.from_query(mutation.to_query)
       end
 
       def load
@@ -57,33 +51,25 @@ module GraphQL
           @type.node_type.name
         else
           @type.name
-        end
+        end.dup
 
         type_name[0] = type_name[0].downcase
 
-        attributes_block = ''
-        @dirty_attributes.each do |name|
-          attributes_block << "#{name}: \"#{@attributes[name]}\"\n"
+        input = @dirty_attributes.each_with_object({}) do |name, hash|
+          hash[name] = @attributes[name]
         end
 
-        mutation = "
-          mutation {
-            #{type_name}Update(
-              input: {
-                id: \"#{id}\"
-                #{attributes_block}
-              }
-            ) {
-              userErrors {
-                field,
-                message
-              }
-            }
-          }"
+        mutation = Query::MutationOperation.new(@client.schema) do |q|
+          q.add_field("#{type_name}Update", input: input.merge(id: id)) do |field|
+            field.add_field('userErrors') do |errors|
+              errors.add_fields('field', 'message')
+            end
+          end
+        end
 
         @dirty_attributes.clear
         request = Request.new(client: @client, type: @type)
-        request.from_query(mutation)
+        request.from_query(mutation.to_query)
       end
 
       private

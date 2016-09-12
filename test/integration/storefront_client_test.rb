@@ -1,5 +1,4 @@
-require_relative '../test_helper'
-require 'minitest/autorun'
+require 'test_helper'
 
 class StorefrontClientTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/api/graph'

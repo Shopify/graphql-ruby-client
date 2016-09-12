@@ -1,12 +1,10 @@
-require_relative '../test_helper'
-require 'minitest/autorun'
+require 'test_helper'
 
 class MerchantClientTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/admin/api/graphql.json'
 
   def setup
-    schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/merchant_schema.json')
-    schema_string = File.read(schema_path)
+    schema_string = File.read(fixture_path('merchant_schema.json'))
 
     @schema = GraphQLSchema.new(schema_string)
     @client = GraphQL::Client.new(

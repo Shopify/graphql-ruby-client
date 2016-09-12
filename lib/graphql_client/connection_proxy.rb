@@ -15,36 +15,27 @@ module GraphQL
       end
 
       def create(attributes = {})
-        input_block = ''
-        attributes.each do |key, value|
-          input_block << "#{key}: \"#{value}\"\n"
-        end
-
         type = @type.node_type
-        type_name = type.name
-        fields = type.scalar_fields.names.join(',')
 
+        type_name = type.name.dup
         type_name[0] = type_name[0].downcase
 
-        mutation = "
-          mutation {
-            #{type_name}Create(
-              input: {
-                #{input_block}
-              }
-            ) {
-              #{type_name} {
-                #{fields}
-              },
-            userErrors {
-              field,
-              message
-            }
-          }
-        }"
+        mutation = Query::MutationOperation.new(@client.schema) do |q|
+          q.add_field("#{type_name}Create", input: attributes) do |field|
+            field.add_field(type_name) do |connection_type|
+              connection_type.add_fields(*type.scalar_fields.names)
+            end
+
+            field.add_field('userErrors') do |errors|
+              errors.add_fields('field', 'message')
+            end
+          end
+        end
 
         request = Request.new(client: @client, type: @type)
-        ObjectProxy.new(attributes: request.from_query(mutation).object[type_name], client: @client, field: @field)
+        attributes = request.from_query(mutation.to_query).object[type_name]
+
+        ObjectProxy.new(field: @field, attributes: attributes, client: @client)
       end
 
       def each
