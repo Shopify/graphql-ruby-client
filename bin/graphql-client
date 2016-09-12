@@ -54,7 +54,7 @@ response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https
 end
 
 schema = GraphQLSchema.new(response.body)
-client = GraphQL::Client::Base.new(
+client = GraphQL::Client.new(
   schema: schema,
   url: uri,
   debug: options[:verbose],

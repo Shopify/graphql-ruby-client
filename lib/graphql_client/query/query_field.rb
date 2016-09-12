@@ -19,7 +19,8 @@ module GraphQL
         end
 
         def to_query(indent: '')
-          query_string = "#{indent}#{@field.name}#{@arguments.to_query}"
+          query_string = "#{indent}#{@field.name}"
+          query_string << "(#{arguments_string.join(', ')})" if arguments.any?
 
           if selection_set?
             query_string << " {\n"
@@ -32,6 +33,12 @@ module GraphQL
 
         private
 
+        def arguments_string
+          arguments.map do |name, value|
+            "#{name}: #{value.to_query}"
+          end
+        end
+
         def query_fields_string(indent)
           query_fields.map { |qf| qf.to_query(indent: indent + '  ') }.join("\n")
         end
@@ -41,13 +48,14 @@ module GraphQL
         end
 
         def validate_arguments(arguments)
-          arguments = arguments.reject { |_, value| value.nil? }
-          invalid_arguments = arguments.keys.map(&:to_s) - field.args.keys
+          valid_args = field.args.keys
 
-          if invalid_arguments.empty?
-            Arguments.new(arguments)
-          else
-            raise INVALID_ARGUMENTS, invalid_arguments.to_a.join(',')
+          arguments.each_with_object({}) do |(name, value), hash|
+            if valid_args.include?(name.to_s)
+              hash[name] = Argument.new(value)
+            else
+              raise INVALID_ARGUMENTS, "#{name} is not a valid arg for #{field.name}"
+            end
           end
         end
       end

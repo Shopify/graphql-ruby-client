@@ -65,18 +65,33 @@ module GraphQL
         end
 
         def test_to_query_includes_arguments
-          field = @schema.query_root.fields.fetch('product')
-          query_field = QueryField.new(field, arguments: { id: '2' })
+          field = @schema.query_root.fields.fetch('shop')
 
-          query_field.add_field('title')
+          shop = QueryField.new(field)
+          shop.add_field('name')
+
+          shop.add_connection('products', first: 5, after: 'cursor') do |products|
+            products.add_field('title')
+          end
 
           query_string = <<~QUERY
-            product(id: "2") {
-              title
+            shop {
+              name
+              products(first: 5, after: "cursor") {
+                edges {
+                  cursor
+                  node {
+                    title
+                  }
+                }
+                pageInfo {
+                  hasNextPage
+                }
+              }
             }
           QUERY
 
-          assert_equal query_string.chomp, query_field.to_query
+          assert_equal query_string.chomp, shop.to_query
         end
       end
     end
