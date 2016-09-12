@@ -3,13 +3,16 @@ module GraphQL
     class ObjectProxy
       attr_reader :attributes, :id, :type
 
-      def initialize(attributes: {}, id: nil, client:, type:)
+      def initialize(attributes: {}, id: nil, client:, field:)
+        raise "No strings allowed" if field.is_a? String
         @attributes = attributes
         @id = id
         @client = client
         @type = type
         @dirty_attributes = Set.new
         @loaded = !@attributes.empty?
+        @field = field
+        @type = @field.base_type
 
         define_field_accessors
         define_connections_accessors
@@ -43,7 +46,7 @@ module GraphQL
         @attributes = if @id
           request.find(@id).object
         else
-          request.simple_find(@type.name).object
+          request.for_field(@field).object
         end
 
         @loaded = true
@@ -87,14 +90,14 @@ module GraphQL
 
       def define_connections_accessors
         accessors = if type.name.end_with? 'Connection'
-          type.node_type.fields.connections
+          type.node_type.connection_fields
         else
-          type.fields.connections
+          type.connection_fields
         end
 
         accessors.each do |name, field|
           define_singleton_method(underscore(name)) do
-            ConnectionProxy.new(parent: self, client: @client, type: field.base_type, field: name)
+            ConnectionProxy.new(parent: self, parent_field: @field, client: @client, field: field)
           end
         end
       end

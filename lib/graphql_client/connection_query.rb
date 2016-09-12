@@ -1,7 +1,8 @@
 module GraphQL
   module Client
     class ConnectionQuery
-      def initialize(parent:, field:, return_type:, client:)
+      def initialize(parent:, parent_field:, field:, return_type:, client:)
+        @parent_field = parent_field
         @root_type = parent.type
         @root_type_name = parent.type.name
         @root_id = parent.id
@@ -18,7 +19,7 @@ module GraphQL
           @root_type,
           @root_id,
           @field,
-          @return_type,
+          parent_field: @parent_field,
           per_page: @per_page,
           after: after
         )
