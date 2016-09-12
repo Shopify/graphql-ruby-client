@@ -1,7 +1,7 @@
 module GraphQL
   module Client
     module Query
-      module Field
+      module SelectionSet
         INVALID_FIELD = Class.new(StandardError)
 
         def add_connection(connection_name, arguments = {})
@@ -22,7 +22,7 @@ module GraphQL
         def add_field(field_name, arguments = {})
           field = resolve(field_name)
           query_field = QueryField.new(field, arguments: arguments)
-          @query_fields << query_field
+          @selection_set << query_field
 
           if block_given?
             yield query_field
@@ -43,6 +43,16 @@ module GraphQL
           resolver_type.fields.fetch(field_name) do
             raise INVALID_FIELD, "#{field_name} is not a valid field for #{resolver_type}"
           end
+        end
+
+        def selection_set?
+          !selection_set.empty?
+        end
+
+        def selection_set_query(indent = '')
+          selection_set.map do |field|
+            field.to_query(indent: indent + '  ')
+          end.join("\n")
         end
       end
     end

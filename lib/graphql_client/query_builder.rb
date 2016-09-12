@@ -11,10 +11,9 @@ module GraphQL
         type = field.base_type
 
         query = Query::QueryOperation.new(@schema) do |q|
-          q.add_field(field.name) do |field|
-            type.scalar_fields.each do |_, subfield|
-              field.add_field(subfield.name) unless BLACKLISTED_FIELDS.include?(subfield.name)
-            end
+          q.add_field(field.name) do |query_field|
+            scalar_field_names = type.scalar_fields.names - BLACKLISTED_FIELDS
+            query_field.add_fields(*scalar_field_names)
           end
         end
 

@@ -2,23 +2,15 @@ module GraphQL
   module Client
     module Query
       class Operation
-        include Field
+        include SelectionSet
 
-        attr_reader :query_fields, :schema
+        attr_reader :selection_set, :schema
 
         def initialize(schema)
           @schema = schema
-          @query_fields = []
+          @selection_set = []
 
           yield self if block_given?
-        end
-
-        private
-
-        def query_fields_string
-          @query_fields.map do |query_field|
-            query_field.to_query(indent: '  ')
-          end.join("\n")
         end
       end
     end

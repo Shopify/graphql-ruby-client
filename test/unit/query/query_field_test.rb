@@ -17,22 +17,22 @@ module GraphQL
           end
         end
 
-        def test_add_field_creates_field_and_adds_to_query_fields
+        def test_add_field_creates_field_and_adds_to_selection_set
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, arguments: {})
 
           query_field.add_field('name')
 
-          assert_equal 1, query_field.query_fields.size
+          assert_equal 1, query_field.selection_set.size
         end
 
-        def test_add_fields_creates_multiple_query_fields
+        def test_add_fields_creates_multiple_selection_set
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, arguments: {})
 
           query_field.add_fields('city', 'name')
 
-          assert_equal 2, query_field.query_fields.size
+          assert_equal 2, query_field.selection_set.size
         end
 
         def test_resolver_type_is_the_fields_base_type
@@ -49,7 +49,7 @@ module GraphQL
           assert_equal 'shop', query_field.to_query
         end
 
-        def test_to_query_includes_the_query_fields_selection_set
+        def test_to_query_includes_the_selection_set_selection_set
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, arguments: {})
 

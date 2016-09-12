@@ -9,7 +9,7 @@ module GraphQL
         def to_query
           <<~QUERY
             query {
-            #{query_fields_string}
+            #{selection_set_query}
             }
           QUERY
         end
