@@ -9,10 +9,9 @@ module GraphQL
 
       def for_field(field)
         type = field.base_type
-        camel_case_model = camelize(type.name)
 
         query = Query::QueryOperation.new(@schema) do |q|
-          q.add_field(camel_case_model) do |field|
+          q.add_field(field.name) do |field|
             type.scalar_fields.each do |name, subfield|
               field.add_field(subfield.name) unless BLACKLISTED_FIELDS.include?(subfield.name)
             end
@@ -45,14 +44,6 @@ module GraphQL
         end
 
         query.to_query
-      end
-
-      private
-
-      def camelize(string)
-        result = string.split('_').collect(&:capitalize).join
-        result[0] = result[0].downcase
-        result
       end
     end
   end
