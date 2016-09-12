@@ -12,7 +12,7 @@ module GraphQL
 
         query = Query::QueryOperation.new(@schema) do |q|
           q.add_field(field.name) do |field|
-            type.scalar_fields.each do |name, subfield|
+            type.scalar_fields.each do |_, subfield|
               field.add_field(subfield.name) unless BLACKLISTED_FIELDS.include?(subfield.name)
             end
           end
@@ -21,7 +21,7 @@ module GraphQL
         query.to_query
       end
 
-      def connection_from_object(root_type, root_id, field, after: nil, per_page:, parent_field:)
+      def connection_from_object(root_type, root_id, field, after: nil, per_page:)
         if root_type.is_a? GraphQLSchema::Types::Connection
           root_type = root_type.node_type
         end
