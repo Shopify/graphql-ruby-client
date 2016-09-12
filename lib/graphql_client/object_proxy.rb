@@ -3,7 +3,7 @@ module GraphQL
     class ObjectProxy
       attr_reader :attributes, :id, :type
 
-      def initialize(attributes: {}, id: nil, client:, field:)
+      def initialize(attributes: {}, id: nil, client:, field:, fields: [])
         raise "No strings allowed" if field.is_a? String
         @attributes = attributes
         @id = id
@@ -13,6 +13,7 @@ module GraphQL
         @loaded = !@attributes.empty?
         @field = field
         @type = @field.base_type
+        @fields = fields
 
         define_field_accessors
         define_connections_accessors
@@ -40,7 +41,8 @@ module GraphQL
         @attributes = if @id
           request.find(@id).object
         else
-          request.for_field(@field).object
+          raise "Object of type #{@type.name} requires a selection set" if @fields.empty?
+          request.for_field(@field, fields: @fields).object
         end
 
         @loaded = true
@@ -82,8 +84,8 @@ module GraphQL
         end
 
         accessors.each do |name, field|
-          define_singleton_method(underscore(name)) do
-            ConnectionProxy.new(parent: self, parent_field: @field, client: @client, field: field)
+          define_singleton_method(underscore(name)) do |**arguments|
+            ConnectionProxy.new(parent: self, parent_field: @field, client: @client, field: field, **arguments)
           end
         end
       end

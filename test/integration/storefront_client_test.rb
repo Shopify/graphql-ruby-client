@@ -18,13 +18,13 @@ class StorefrontClientTest < Minitest::Test
 
   def test_request_counts
     spy = Spy.on_instance_method(GraphQL::Client::Request, :send_request).and_call_through
-    shop = @client.shop
+    shop = @client.shop(fields: ['name'])
     assert_equal(0, spy.calls.count)
 
     shop.name
     assert_equal(1, spy.calls.count)
 
-    products = shop.products
+    products = shop.products(fields: ['title'])
     assert_equal(1, spy.calls.count)
 
     product = products.first
@@ -35,17 +35,17 @@ class StorefrontClientTest < Minitest::Test
   end
 
   def test_find_shop_and_products
-    shop = @client.shop
+    shop = @client.shop(fields: ['city'])
     assert_equal('Toronto', shop.city)
 
-    products = shop.products
+    products = shop.products(fields: ['id', 'title'])
     assert_equal 5, products.length
 
     id = products.to_a.find { |p| p.title == 'Abridgable Concrete Coat' }.id
-    found_product = @client.product(id: id)
+    found_product = @client.product(id: id, fields: ['id', 'title'])
     assert_equal(id, found_product.id)
 
-    variants = found_product.variants
+    variants = found_product.variants(fields: ['price'])
     assert_equal(2, variants.length)
 
     variant = variants.first
@@ -53,9 +53,9 @@ class StorefrontClientTest < Minitest::Test
   end
 
   def test_paginated_request
-    product = @client.shop.products.to_a.last
+    product = @client.shop.products(fields: ['title', 'id']).to_a.last
 
-    collections = product.collections
+    collections = product.collections(fields: ['title'])
     assert_equal 1, collections.length
   end
 
@@ -67,10 +67,10 @@ class StorefrontClientTest < Minitest::Test
       per_page: 3
     )
 
-    shop = client.shop
+    shop = client.shop(fields: ['city'])
     assert_equal('Toronto', shop.city)
 
-    products = shop.products
+    products = shop.products(fields: ['title'])
     assert_equal 5, products.length
     assert_equal 5, products.map(&:title).uniq.length
   end

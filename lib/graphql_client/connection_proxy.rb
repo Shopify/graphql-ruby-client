@@ -3,7 +3,7 @@ module GraphQL
     class ConnectionProxy
       include Enumerable
 
-      def initialize(parent:, parent_field:, client:, field:)
+      def initialize(parent:, parent_field:, client:, field:, fields: [])
         @parent = parent
         @parent_field = parent_field
         @client = client
@@ -11,6 +11,7 @@ module GraphQL
         @field = field
         @type = @field.base_type
         @objects = []
+        @fields = fields
         @loaded = false
       end
 
@@ -54,9 +55,9 @@ module GraphQL
 
       def connection_query(after: nil)
         query_builder.connection_from_object(
-          @parent.type,
-          @parent.id,
+          @parent,
           @field,
+          fields: @fields,
           after: after,
           per_page: @client.per_page
         )
