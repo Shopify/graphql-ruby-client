@@ -35,6 +35,7 @@ module GraphQL
 
         Net::HTTP::Post.new(@client.url, headers).tap do |req|
           req.basic_auth(@client.username, @client.password)
+          puts "Query: #{query}" if @client.debug
           req.body = { query: query, variables: {} }.to_json
         end
       end
