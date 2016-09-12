@@ -2,16 +2,16 @@ module GraphQL
   module Client
     module Query
       class QueryField
-        include Field
+        include SelectionSet
 
         INVALID_ARGUMENTS = Class.new(StandardError)
 
-        attr_reader :arguments, :field, :query_fields
+        attr_reader :arguments, :field, :selection_set
 
         def initialize(field, arguments: {})
           @field = field
           @arguments = validate_arguments(arguments)
-          @query_fields = []
+          @selection_set = []
         end
 
         def resolver_type
@@ -19,12 +19,12 @@ module GraphQL
         end
 
         def to_query(indent: '')
-          query_string = "#{indent}#{@field.name}"
+          query_string = "#{indent}#{field.name}"
           query_string << "(#{arguments_string.join(', ')})" if arguments.any?
 
           if selection_set?
             query_string << " {\n"
-            query_string << query_fields_string(indent)
+            query_string << selection_set_query(indent)
             query_string << "\n#{indent}}"
           end
 
@@ -37,14 +37,6 @@ module GraphQL
           arguments.map do |name, value|
             "#{name}: #{value.to_query}"
           end
-        end
-
-        def query_fields_string(indent)
-          query_fields.map { |qf| qf.to_query(indent: indent + '  ') }.join("\n")
-        end
-
-        def selection_set?
-          !query_fields.empty?
         end
 
         def validate_arguments(arguments)

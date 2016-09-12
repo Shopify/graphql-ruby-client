@@ -29,7 +29,7 @@ module GraphQL
           assert mock_schema.verify
         end
 
-        def test_to_query_handles_multiple_nested_query_fields
+        def test_to_query_handles_multiple_nested_selection_set
           query = MutationOperation.new(@schema) do |q|
             q.add_field('publicAccessTokenCreate', input: { title: 'Token Title' }) do |mutation|
               mutation.add_field('publicAccessToken') do |public_access_token|
