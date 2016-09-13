@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'bundler/setup'
+require 'json'
 require 'graphql_schema'
+
 require 'graphql_client/http_client.rb'
 require 'graphql_client/query/selection_set.rb'
 require 'graphql_client/query/argument.rb'
