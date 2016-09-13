@@ -11,7 +11,6 @@ require 'graphql_client/query/mutation_operation.rb'
 require 'graphql_client/request.rb'
 require 'graphql_client/connection_proxy.rb'
 require 'graphql_client/response.rb'
-require 'graphql_client/query_builder.rb'
 require 'graphql_client/object_proxy.rb'
 require 'graphql_client/introspection_query.rb'
 

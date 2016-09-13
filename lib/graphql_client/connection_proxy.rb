@@ -33,8 +33,8 @@ module GraphQL
           end
         end
 
-        request = Request.new(client: @client, type: @type)
-        attributes = request.from_query(mutation.to_query).object[type_name]
+        response = @client.query(mutation)
+        attributes = response_object(response).fetch(type_name)
 
         ObjectProxy.new(field: @field, attributes: attributes, client: @client)
       end
@@ -54,13 +54,32 @@ module GraphQL
       private
 
       def connection_query(after: nil)
-        query_builder.connection_from_object(
-          @parent,
-          @field,
-          fields: @fields,
-          after: after,
-          per_page: @client.per_page
-        )
+        raise "Connection field \"#{@field.name}\" requires a selection set" if @fields.empty?
+
+        parent_type = if @parent.type.is_a? GraphQLSchema::Types::Connection
+          @parent.type.node_type
+        else
+          @parent.type
+        end
+
+        query = Query::QueryOperation.new(@schema)
+
+        args = {}
+
+        if @schema.query_root.fields[parent_type.name.downcase].args.key?('id')
+          args['id'] = @parent.id
+        end
+
+        connection_args = { first: @client.per_page }
+        connection_args[:after] = after if after
+
+        query.add_field(parent_type.name.downcase, args) do |node|
+          node.add_connection(@field.name, connection_args) do |connection|
+            connection.add_fields(*@fields)
+          end
+        end
+
+        query
       end
 
       def deep_find(hash, target_key)
@@ -77,7 +96,7 @@ module GraphQL
       def fetch_page
         @loaded = true
 
-        initial_response = Request.new(client: @client).from_query(connection_query)
+        initial_response = @client.query(connection_query)
         edges = deep_find(initial_response.data, 'edges')
 
         response = initial_response
@@ -85,7 +104,8 @@ module GraphQL
 
         while next_page?(response.data)
           cursor = edges.last.fetch('cursor')
-          response = Request.new(client: @client).from_query(connection_query(after: cursor))
+
+          response = @client.query(connection_query(after: cursor))
           edges = deep_find(response.data, 'edges')
 
           @objects += edges.map { |edge| edge.fetch('node') }
@@ -101,8 +121,9 @@ module GraphQL
         end
       end
 
-      def query_builder
-        @query_builder ||= QueryBuilder.new(@schema)
+      def response_object(response)
+        object = response.data.keys.first
+        response.data.fetch(object)
       end
     end
   end

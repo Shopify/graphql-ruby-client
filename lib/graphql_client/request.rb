@@ -8,17 +8,8 @@ module GraphQL
     NetworkError = Class.new(StandardError)
 
     class Request
-      attr_reader :type
-
-      def initialize(client:, type: nil)
+      def initialize(client)
         @client = client
-        @type = type
-      end
-
-      def from_query(query)
-        puts "Query: #{query}" if @client.debug
-        response_body = send_request(query)
-        Response.new(self, response_body)
       end
 
       def send_request(query)
@@ -31,40 +22,10 @@ module GraphQL
         case response
         when Net::HTTPOK then
           puts "Response body: \n#{response.body}" if @client.debug
-          response.body
+          Response.new(response.body)
         else
-          raise NetworkError, "Response error - #{response.code}/#{response.message}"
+          raise NetworkError, "Response error: #{response.code}/#{response.message}"
         end
-      end
-
-      def find(id)
-        type = if @type.name.end_with? 'Connection'
-          @type.node_type
-        else
-          @type
-        end
-
-        field_name = type.name
-        field_name[0] = field_name[0].downcase
-
-        query = Query::QueryOperation.new(@client.schema) do |q|
-          q.add_field(field_name, id: id) do |field|
-            field.add_fields(*type.scalar_fields.names)
-          end
-        end.to_query
-
-        puts "Query: #{query}" if @client.debug
-        Response.new(self, send_request(query))
-      end
-
-      def query_builder
-        @query_builder ||= QueryBuilder.new(@client.schema)
-      end
-
-      def for_field(field, fields:)
-        query = query_builder.for_field(field, fields: fields)
-        puts "Query: #{query}" if @client.debug
-        Response.new(self, send_request(query))
       end
 
       private
@@ -74,6 +35,7 @@ module GraphQL
 
         Net::HTTP::Post.new(@client.url, headers).tap do |req|
           req.basic_auth(@client.username, @client.password)
+          puts "Query: #{query}" if @client.debug
           req.body = { query: query, variables: {} }.to_json
         end
       end
