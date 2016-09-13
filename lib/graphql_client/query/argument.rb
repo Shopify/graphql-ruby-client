@@ -24,7 +24,7 @@ module GraphQL
         private
 
         def generate_query_value(value)
-          JSON.generate(value)
+          JSON.generate(value, quirks_mode: true)
         end
       end
     end
