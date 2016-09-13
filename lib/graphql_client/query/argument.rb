@@ -1,5 +1,3 @@
-require 'json'
-
 module GraphQL
   module Client
     module Query
