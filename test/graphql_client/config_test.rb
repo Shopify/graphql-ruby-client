@@ -17,13 +17,13 @@ module GraphQL
         assert_nil config.username
       end
 
-      def test_initialize_parses_url_as_URI
+      def test_initialize_parses_url_as_uri
         config = Config.new(url: 'http://example.com')
 
         assert_kind_of URI, config.url
       end
 
-      def test_url_writer_coerces_to_URI
+      def test_url_writer_coerces_to_uri
         config = Config.new
         config.url = 'http://example.com'
 

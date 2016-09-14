@@ -3,7 +3,7 @@ require 'test_helper'
 module GraphQL
   module Client
     class ClientTest < Minitest::Test
-      def test_new_instantiates_an_HTTPClient
+      def test_new_instantiates_an_httpclient
         schema_string = File.read(fixture_path('merchant_schema.json'))
         schema = GraphQLSchema.new(schema_string)
 
@@ -12,7 +12,7 @@ module GraphQL
         assert_instance_of HTTPClient, client
       end
 
-      def test_new_accepts_a_block_for_HTTPClient
+      def test_new_accepts_a_block_for_httpclient
         schema_string = File.read(fixture_path('merchant_schema.json'))
         schema = GraphQLSchema.new(schema_string)
 

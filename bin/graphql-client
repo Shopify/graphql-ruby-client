@@ -43,18 +43,26 @@ end
 uri = URI.parse(ARGV.pop)
 
 response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
-  headers = DEFAULT_HEADERS.merge(options[:headers])
+  headers = DEFAULT_HEADERS.merge(options[:headers].to_h)
 
   request = Net::HTTP::Post.new(uri, headers).tap do |req|
-    req.basic_auth(options[:username], options[:password])
+    if options[:username] || options[:password]
+      req.basic_auth(options[:username], options[:password])
+    end
+
     req.body = { query: GraphQL::Client::INTROSPECTION_QUERY }.to_json
   end
 
   http.request(request)
 end
 
-schema = GraphQLSchema.new(response.body)
-config = GraphQL::Client::Config.new(options)
+case response
+when Net::HTTPOK then
+  schema = GraphQLSchema.new(response.body)
+  config = GraphQL::Client::Config.new(options)
+else
+  exit "Error: #{response.code}"
+end
 
 client = GraphQL::Client.new(schema, config: config) do
   configure do |c|
@@ -65,12 +73,6 @@ end
 IRB.setup nil
 IRB.conf[:AUTO_INDENT] = true
 IRB.conf[:MAIN_CONTEXT] = IRB::Irb.new.context
-IRB.conf[:USE_READLINE] = true
-
-IRB.conf[:LOAD_MODULES] = [] unless IRB.conf.key?(:LOAD_MODULES)
-unless IRB.conf[:LOAD_MODULES].include?('irb/completion')
-  IRB.conf[:LOAD_MODULES] << 'irb/completion'
-end
 
 require 'irb/ext/multi-irb'
 IRB.irb nil, client

@@ -4,6 +4,8 @@ class MerchantChannelTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/admin/api/graphql.json'
 
   def setup
+    WebMock.allow_net_connect!
+
     schema_string = File.read(fixture_path('merchant_schema.json'))
     @schema = GraphQLSchema.new(schema_string)
 

@@ -5,6 +5,8 @@ class StorefrontClientTest < Minitest::Test
   USERNAME = ENV.fetch('STOREFRONT_TOKEN')
 
   def setup
+    WebMock.allow_net_connect!
+
     schema_string = File.read(fixture_path('storefront_schema.json'))
     @schema = GraphQLSchema.new(schema_string)
 
