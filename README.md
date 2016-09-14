@@ -1,80 +1,82 @@
 # A Ruby GraphQL Client
 
-This is a fairly simple GraphQL client gem for Ruby. It implements most of the
-basic features you'd expect such as:
+**Note: do not use this yet. It's experimental and changes frequently**
 
-- Schema and type information parsing
-- Pagination
-- Mutations
+This is an early stage attempt at a *generic* GraphQL client in Ruby.
+
+Below you'll find some usage examples.
 
 ## Usage
 
-The API is similiar to ActiveRecord/ActiveResource. First initialize a schema -
-it's recommended that you load this schema once upon application boot from a
-stored file:
+Create a client:
 
 ```ruby
-schema_path = File.join(File.dirname(__FILE__), 'your_schema.json')
-schema_string = File.read(schema_path)
-schema = GraphQL::Client::Schema.new(schema_string)
+schema_string = File.read('path/to/schema.json')
+schema = GraphQLSchema.new(schema_string)
+
+client = GraphQL::Client.new do
+  configure do |c|
+    c.url = 'http://example.com'
+  end
+end
 ```
 
-Now initialize a `Client` object. This is the main interface to the remote
-GraphQL server, and contains all the network layer information such as
-authentication data.
+### Raw Queries
 
 ```ruby
-client = GraphQL::Client::Base.new(
-  schema: schema,
-  url: URL,
-  username: USERNAME,
-  password: PASSWORD,
-  headers: {
-    'X-Authentication-Token': TOKEN
-  }
-)
+client.raw_query('
+  query {
+    shop {
+       name
+      }
+    }
+')
 ```
 
-You can use any combination of username, password and arbitrary headers.
-Additionally the content type can be specified here (which defaults to
-`application/json`).
-
-The Client is considered the QueryRoot in GraphQL terminology; any fields on
-the query root can be directly requested, and attributes are exposed as methods
-on the objects:
+### Query Builder
 
 ```ruby
-shop = @client.shop
-products = shop.products
-products.first.title == 'A Cool Product'
+query = client.build_query do |q|
+  q.add_field('shop') do |shop|
+    shop.add_field('name')
+  end
+end
+
+client.query(query)
 ```
 
-The schema is used to determine what types are returned when fields are
-requested (such as primitive objects, lists, connections, and so forth).
-
-Finally, mutations are (naively) supported as well:
+More complex query using a connection:
 
 ```ruby
-product = shop.products.find('gid://shopify/Products/1')
-product.title = title
-product.save
+query = client.build_query do |q|
+  q.add_field('product', id: 'gid://Product/1') do |product|
+    product.add_connection('images', first: 10) do |connection|
+      connection.add_field('src')
+    end
+  end
+
+  q.add_field('shop') do |shop|
+    shop.add_field('name')
+
+    shop.add_field('billingAddress') do |billing_address|
+      billing_address.add_fields('city', 'country')
+    end
+  end
+end
+
+client.query(query)
 ```
 
-Additionally in the above example the `find` method is used to fetch a single
-object based on the identifier. You can create new objects off of the
-collection:
+### ActiveRecord Style API
+
+This API is the most experimental/unfinished one.
+
+It currently only supports building a tree of fields with explicit field selections.
 
 ```ruby
-products.create(title: "Another Cool Product")
-```
-
-The creation returns the newly fetched object from the server. Deletion is
-supported as well of course:
-
-```ruby
-public_access_tokens = client.shop.public_access_tokens
-new_token = public_access_tokens.create(title: 'Test')
-new_token.destroy
+shop = client.shop(fields: ['city'])
+products = shop.products(fields: ['id', 'title'])
+titles = products.map(&:title)
 ```
 
 ## Testing
@@ -103,12 +105,3 @@ There's a lot missing right now. Some of the more immediate things to fix are:
 - Query validation
 - Mutation matching and validation
 - GraphQL-level response validation and error checks
-- Allowing users to pass raw GraphQL queries into the library (for regular
-  queries and mutations)
-
-## Release Plans
-
-This can be open sourced and probably should be; there's no Ruby client for
-GraphQL yet and this would fill a community niche. There's nothing Shopify
-specific in the codebase other than the integration tests (which can be rebased
-out of existence and moved to a private repo).
