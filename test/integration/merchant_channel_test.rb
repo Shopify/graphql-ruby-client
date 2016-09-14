@@ -5,15 +5,14 @@ class MerchantChannelTest < Minitest::Test
 
   def setup
     schema_string = File.read(fixture_path('merchant_schema.json'))
-
     @schema = GraphQLSchema.new(schema_string)
-    @client = GraphQL::Client.new(
-      schema: @schema,
-      url: URL,
-      headers: {
-        'X-Shopify-Access-Token': ENV.fetch('MERCHANT_TOKEN')
-      },
-    )
+
+    @client = GraphQL::Client.new(@schema) do
+      configure do |c|
+        c.url = URL
+        c.headers = { 'X-Shopify-Access-Token': ENV.fetch('MERCHANT_TOKEN') }
+      end
+    end
   end
 
   def test_public_access_tokens

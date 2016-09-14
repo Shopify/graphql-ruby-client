@@ -54,16 +54,23 @@ response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https
 end
 
 schema = GraphQLSchema.new(response.body)
-client = GraphQL::Client.new(
-  schema: schema,
-  url: uri,
-  debug: options[:verbose],
-  username: options[:username],
-  password: options[:password],
-  headers: options[:headers]
-)
+config = GraphQL::Client::Config.new(options)
+
+client = GraphQL::Client.new(schema, config: config) do
+  configure do |c|
+    c.url = uri
+  end
+end
 
 IRB.setup nil
+IRB.conf[:AUTO_INDENT] = true
 IRB.conf[:MAIN_CONTEXT] = IRB::Irb.new.context
+IRB.conf[:USE_READLINE] = true
+
+IRB.conf[:LOAD_MODULES] = [] unless IRB.conf.key?(:LOAD_MODULES)
+unless IRB.conf[:LOAD_MODULES].include?('irb/completion')
+  IRB.conf[:LOAD_MODULES] << 'irb/completion'
+end
+
 require 'irb/ext/multi-irb'
 IRB.irb nil, client

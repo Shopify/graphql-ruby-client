@@ -70,7 +70,7 @@ module GraphQL
           args['id'] = @parent.id
         end
 
-        connection_args = { first: @client.per_page }
+        connection_args = { first: @client.config.per_page }
         connection_args[:after] = after if after
 
         query.add_field(parent_type.name.downcase, args) do |node|
