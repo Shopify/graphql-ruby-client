@@ -4,15 +4,18 @@ class MerchantClientTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/admin/api/graphql.json'
 
   def setup
-    schema_string = File.read(fixture_path('merchant_schema.json'))
+    WebMock.allow_net_connect!
 
+    schema_string = File.read(fixture_path('merchant_schema.json'))
     @schema = GraphQLSchema.new(schema_string)
-    @client = GraphQL::Client.new(
-      schema: @schema,
-      url: URL,
-      username: ENV.fetch('MERCHANT_USERNAME'),
-      password: ENV.fetch('MERCHANT_PASSWORD')
-    )
+
+    @client = GraphQL::Client.new(@schema) do
+      configure do |c|
+        c.url = URL
+        c.username = ENV.fetch('MERCHANT_USERNAME')
+        c.password = ENV.fetch('MERCHANT_PASSWORD')
+      end
+    end
   end
 
   def test_find_shop_and_products

@@ -4,16 +4,17 @@ class MerchantChannelTest < Minitest::Test
   URL = 'https://big-and-tall-for-pets.myshopify.com/admin/api/graphql.json'
 
   def setup
-    schema_string = File.read(fixture_path('merchant_schema.json'))
+    WebMock.allow_net_connect!
 
+    schema_string = File.read(fixture_path('merchant_schema.json'))
     @schema = GraphQLSchema.new(schema_string)
-    @client = GraphQL::Client.new(
-      schema: @schema,
-      url: URL,
-      headers: {
-        'X-Shopify-Access-Token': ENV.fetch('MERCHANT_TOKEN')
-      },
-    )
+
+    @client = GraphQL::Client.new(@schema) do
+      configure do |c|
+        c.url = URL
+        c.headers = { 'X-Shopify-Access-Token': ENV.fetch('MERCHANT_TOKEN') }
+      end
+    end
   end
 
   def test_public_access_tokens

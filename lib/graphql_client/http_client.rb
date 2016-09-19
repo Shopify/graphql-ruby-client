@@ -1,18 +1,15 @@
 module GraphQL
   module Client
     class HTTPClient
-      attr_reader :schema, :url, :username, :password, :per_page, :headers, :debug
+      attr_reader :config, :schema
 
-      def initialize(schema:, url:, username: '', password: '', per_page: 100, headers: {}, debug: false)
+      def initialize(schema, config: nil, &block)
+        @config = config || Config.new
         @schema = schema
-        @url = URI(url)
-        @username = username
-        @password = password
-        @per_page = per_page
-        @headers = headers
-        @debug = debug
 
         define_field_accessors
+
+        instance_eval(&block) if block_given?
       end
 
       def build_query
@@ -25,13 +22,17 @@ module GraphQL
         end
       end
 
+      def configure
+        yield @config
+      end
+
       def query(query)
-        req = Request.new(self)
+        req = Request.new(config)
         req.send_request(query.to_query)
       end
 
       def raw_query(query_string)
-        req = Request.new(self)
+        req = Request.new(config)
         req.send_request(query_string)
       end
 

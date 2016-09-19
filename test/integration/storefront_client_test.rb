@@ -5,15 +5,17 @@ class StorefrontClientTest < Minitest::Test
   USERNAME = ENV.fetch('STOREFRONT_TOKEN')
 
   def setup
-    schema_path = File.join(File.dirname(__FILE__), '../support/fixtures/storefront_schema.json')
-    schema_string = File.read(schema_path)
+    WebMock.allow_net_connect!
 
+    schema_string = File.read(fixture_path('storefront_schema.json'))
     @schema = GraphQLSchema.new(schema_string)
-    @client = GraphQL::Client.new(
-      schema: @schema,
-      url: URL,
-      username: USERNAME
-    )
+
+    @client = GraphQL::Client.new(@schema) do
+      configure do |c|
+        c.url = URL
+        c.username = USERNAME
+      end
+    end
   end
 
   def test_request_counts
@@ -60,12 +62,13 @@ class StorefrontClientTest < Minitest::Test
   end
 
   def test_batch_paginated_request
-    client = GraphQL::Client.new(
-      schema: @schema,
-      url: URL,
-      username: USERNAME,
-      per_page: 3
-    )
+    client = GraphQL::Client.new(@schema) do
+      configure do |c|
+        c.url = URL
+        c.username = USERNAME
+        c.per_page = 3
+      end
+    end
 
     shop = client.shop(fields: ['city'])
     assert_equal('Toronto', shop.city)
