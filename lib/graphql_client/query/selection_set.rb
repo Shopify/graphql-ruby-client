@@ -4,8 +4,8 @@ module GraphQL
       module SelectionSet
         INVALID_FIELD = Class.new(StandardError)
 
-        def add_connection(connection_name, arguments = {})
-          add_field(connection_name, arguments) do |connection|
+        def add_connection(connection_name, as: nil, **arguments)
+          add_field(connection_name, as: as, **arguments) do |connection|
             connection.add_field('edges') do |edges|
               edges.add_field('cursor')
               edges.add_field('node') do |node|
@@ -19,9 +19,9 @@ module GraphQL
           end
         end
 
-        def add_field(field_name, arguments = {})
+        def add_field(field_name, as: nil, **arguments)
           field = resolve(field_name)
-          query_field = QueryField.new(field, arguments: arguments)
+          query_field = QueryField.new(field, arguments: arguments, as: as)
           @selection_set << query_field
 
           if block_given?

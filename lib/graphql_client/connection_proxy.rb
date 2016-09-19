@@ -67,14 +67,14 @@ module GraphQL
         args = {}
 
         if @schema.query_root.fields[parent_type.name.downcase].args.key?('id')
-          args['id'] = @parent.id
+          args[:id] = @parent.id
         end
 
         connection_args = { first: @client.config.per_page }
         connection_args[:after] = after if after
 
-        query.add_field(parent_type.name.downcase, args) do |node|
-          node.add_connection(@field.name, connection_args) do |connection|
+        query.add_field(parent_type.name.downcase, **args) do |node|
+          node.add_connection(@field.name, **connection_args) do |connection|
             connection.add_fields(*@fields)
           end
         end

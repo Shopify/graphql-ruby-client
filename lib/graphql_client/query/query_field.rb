@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphQL
   module Client
     module Query
@@ -6,9 +8,10 @@ module GraphQL
 
         INVALID_ARGUMENTS = Class.new(StandardError)
 
-        attr_reader :arguments, :field, :selection_set
+        attr_reader :arguments, :as, :field, :selection_set
 
-        def initialize(field, arguments: {})
+        def initialize(field, arguments: {}, as: nil)
+          @as = as
           @field = field
           @arguments = validate_arguments(arguments)
           @selection_set = []
@@ -19,16 +22,17 @@ module GraphQL
         end
 
         def to_query(indent: '')
-          query_string = "#{indent}#{field.name}"
-          query_string << "(#{arguments_string.join(', ')})" if arguments.any?
+          indent.dup.tap do |query_string|
+            query_string << "#{as}: " if as
+            query_string << field.name
+            query_string << "(#{arguments_string.join(', ')})" if arguments.any?
 
-          if selection_set?
-            query_string << " {\n"
-            query_string << selection_set_query(indent)
-            query_string << "\n#{indent}}"
+            if selection_set?
+              query_string << " {\n"
+              query_string << selection_set_query(indent)
+              query_string << "\n#{indent}}"
+            end
           end
-
-          query_string
         end
 
         private

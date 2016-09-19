@@ -43,6 +43,20 @@ module GraphQL
           assert_equal query_string, query.to_query
         end
 
+        def test_to_query_with_a_field_alias
+          query = QueryOperation.new(@schema) do |q|
+            q.add_field('product', id: '2', as: 'userProduct')
+          end
+
+          query_string = <<~QUERY
+            query {
+              userProduct: product(id: "2")
+            }
+          QUERY
+
+          assert_equal query_string, query.to_query
+        end
+
         def test_to_query_handles_multiple_nested_query_fields
           query = QueryOperation.new(@schema) do |q|
             q.add_field('product', id: 'gid://Product/1') do |product|
