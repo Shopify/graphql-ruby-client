@@ -21,14 +21,16 @@ module GraphQL
         type_name = type.name.dup
         type_name[0] = type_name[0].downcase
 
-        mutation = Query::MutationOperation.new(@client.schema) do |q|
-          q.add_field("#{type_name}Create", input: attributes) do |field|
-            field.add_field(type_name) do |connection_type|
-              connection_type.add_fields(*type.scalar_fields.names)
-            end
+        mutation = Query::Document.new(@client.schema) do |d|
+          d.add_mutation do |m|
+            m.add_field("#{type_name}Create", input: attributes) do |field|
+              field.add_field(type_name) do |connection_type|
+                connection_type.add_fields(*type.scalar_fields.names)
+              end
 
-            field.add_field('userErrors') do |errors|
-              errors.add_fields('field', 'message')
+              field.add_field('userErrors') do |errors|
+                errors.add_fields('field', 'message')
+              end
             end
           end
         end
@@ -62,7 +64,8 @@ module GraphQL
           @parent.type
         end
 
-        query = Query::QueryOperation.new(@schema)
+        document = Query::Document.new(@schema)
+        query = document.add_query
 
         args = {}
 

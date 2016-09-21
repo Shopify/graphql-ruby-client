@@ -11,8 +11,9 @@ module GraphQL
 
         def test_initialize_yields_self
           query_object = nil
+          document = Document.new(@schema)
 
-          query = QueryOperation.new(@schema) do |q|
+          query = QueryOperation.new(document) do |q|
             query_object = q
           end
 
@@ -21,7 +22,8 @@ module GraphQL
 
         def test_resolver_type_is_the_schemas_query_root
           mock_schema = Minitest::Mock.new
-          query = QueryOperation.new(mock_schema)
+          document = Document.new(mock_schema)
+          query = QueryOperation.new(document)
 
           mock_schema.expect(:query_root, nil)
           query.resolver_type
@@ -30,7 +32,9 @@ module GraphQL
         end
 
         def test_to_query_with_a_single_query_field
-          query = QueryOperation.new(@schema) do |q|
+          document = Document.new(@schema)
+
+          query = QueryOperation.new(document) do |q|
             q.add_field('product', id: '2')
           end
 
@@ -44,7 +48,9 @@ module GraphQL
         end
 
         def test_to_query_with_a_field_alias
-          query = QueryOperation.new(@schema) do |q|
+          document = Document.new(@schema)
+
+          query = QueryOperation.new(document) do |q|
             q.add_field('product', id: '2', as: 'userProduct')
           end
 
@@ -58,7 +64,9 @@ module GraphQL
         end
 
         def test_to_query_handles_multiple_nested_query_fields
-          query = QueryOperation.new(@schema) do |q|
+          document = Document.new(@schema)
+
+          query = QueryOperation.new(document) do |q|
             q.add_field('product', id: 'gid://Product/1') do |product|
               product.add_field('title')
             end
@@ -92,7 +100,9 @@ module GraphQL
         end
 
         def test_to_query_handles_add_fields
-          query = QueryOperation.new(@schema) do |q|
+          document = Document.new(@schema)
+
+          query = QueryOperation.new(document) do |q|
             q.add_field('product', id: 'gid://Product/1') do |product|
               product.add_field('title')
             end
@@ -125,7 +135,9 @@ module GraphQL
         end
 
         def test_to_query_handles_connections
-          query = QueryOperation.new(@schema) do |q|
+          document = Document.new(@schema)
+
+          query = QueryOperation.new(document) do |q|
             q.add_field('product', id: 'gid://Product/1') do |product|
               product.add_connection('images', first: 10) do |connection|
                 connection.add_field('src')

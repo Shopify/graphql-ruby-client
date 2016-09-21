@@ -20,10 +20,12 @@ module GraphQL
       end
 
       def destroy
-        mutation = Query::MutationOperation.new(@client.schema) do |q|
-          q.add_field("#{base_node_type_name}Delete", input: { id: id }) do |field|
-            field.add_field('userErrors') do |errors|
-              errors.add_fields('field', 'message')
+        mutation = Query::Document.new(@client.schema) do |d|
+          d.add_mutation do |m|
+            m.add_field("#{base_node_type_name}Delete", input: { id: id }) do |field|
+              field.add_field('userErrors') do |errors|
+                errors.add_fields('field', 'message')
+              end
             end
           end
         end
@@ -41,7 +43,8 @@ module GraphQL
           @client.query(object_query(@id))
         else
           raise "Object of type #{type.name} requires a selection set" if @fields.empty?
-          query_root = Query::QueryOperation.new(@client.schema)
+          document = Query::Document.new(@client.schema)
+          query_root = document.add_query
           query = add_nested_query_fields(query_root)
 
           query.add_field('id') if @type.fields.field? 'id'
@@ -59,10 +62,12 @@ module GraphQL
           hash[name] = @attributes[name]
         end
 
-        mutation = Query::MutationOperation.new(@client.schema) do |q|
-          q.add_field("#{base_node_type_name}Update", input: input.merge(id: id)) do |field|
-            field.add_field('userErrors') do |errors|
-              errors.add_fields('field', 'message')
+        mutation = Query::Document.new(@client.schema) do |d|
+          d.add_mutation do |m|
+            m.add_field("#{base_node_type_name}Update", input: input.merge(id: id)) do |field|
+              field.add_field('userErrors') do |errors|
+                errors.add_fields('field', 'message')
+              end
             end
           end
         end
@@ -128,9 +133,11 @@ module GraphQL
       end
 
       def object_query(id)
-        Query::QueryOperation.new(@client.schema) do |q|
-          q.add_field(base_node_type_name, id: id) do |field|
-            field.add_fields(*base_node_type.scalar_fields.names)
+        Query::Document.new(@client.schema) do |d|
+          d.add_query do |q|
+            q.add_field(base_node_type_name, id: id) do |field|
+              field.add_fields(*base_node_type.scalar_fields.names)
+            end
           end
         end
       end

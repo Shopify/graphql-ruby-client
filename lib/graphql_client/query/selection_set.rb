@@ -3,6 +3,7 @@ module GraphQL
     module Query
       module SelectionSet
         INVALID_FIELD = Class.new(StandardError)
+        UNDEFINED_FRAGMENT = Class.new(StandardError)
 
         def add_connection(connection_name, as: nil, **arguments)
           add_field(connection_name, as: as, **arguments) do |connection|
@@ -21,7 +22,7 @@ module GraphQL
 
         def add_field(field_name, as: nil, **arguments)
           field = resolve(field_name)
-          query_field = QueryField.new(field, arguments: arguments, as: as)
+          query_field = QueryField.new(field, arguments: arguments, as: as, document: document)
           @selection_set << query_field
 
           if block_given?
@@ -35,6 +36,14 @@ module GraphQL
           field_names.each do |field_name|
             add_field(field_name)
           end
+        end
+
+        def add_fragment(fragment_name)
+          fragment = document.fragments.fetch(fragment_name) do
+            raise UNDEFINED_FRAGMENT, "a fragment named #{fragment_name} has not been defined"
+          end
+
+          @selection_set << fragment
         end
 
         private
