@@ -40,11 +40,11 @@ class StorefrontClientTest < Minitest::Test
     shop = @client.shop(fields: ['city'])
     assert_equal('Toronto', shop.city)
 
-    products = shop.products(fields: ['id', 'title'])
+    products = shop.products(fields: ['title'])
     assert_equal 5, products.length
 
     id = products.to_a.find { |p| p.title == 'Abridgable Concrete Coat' }.id
-    found_product = @client.product(id: id, fields: ['id', 'title'])
+    found_product = @client.product(id: id, fields: ['title'])
     assert_equal(id, found_product.id)
 
     variants = found_product.variants(fields: ['price'])

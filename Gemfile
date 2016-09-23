@@ -7,4 +7,4 @@ git_source :shopify do |name|
 end
 
 gem 'spy', github: 'lreeves/spy'
-gem 'graphql_schema', shopify: 'graphql-ruby-schema', ref: '6c4a2f366afe310fcc520f965a83e97237060366'
+gem 'graphql_schema', shopify: 'graphql-ruby-schema', ref: 'ca703fd52865fc333dc09921680bad3c1060e6bd'

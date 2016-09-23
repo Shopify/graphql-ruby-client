@@ -12,7 +12,7 @@ class MerchantChannelTest < Minitest::Test
     @client = GraphQL::Client.new(@schema) do
       configure do |c|
         c.url = URL
-        c.headers = { 'X-Shopify-Access-Token': ENV.fetch('MERCHANT_TOKEN') }
+        c.headers = { 'X-Shopify-Access-Token' => ENV.fetch('MERCHANT_TOKEN') }
       end
     end
   end

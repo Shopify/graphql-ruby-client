@@ -75,6 +75,7 @@ module GraphQL
 
         query.add_field(parent_type.name.downcase, **args) do |node|
           node.add_connection(@field.name, **connection_args) do |connection|
+            connection.add_field('id') if @type.node_type.fields.field? 'id'
             connection.add_fields(*@fields)
           end
         end

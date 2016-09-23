@@ -1,10 +1,9 @@
 module GraphQL
   module Client
     class ObjectProxy
-      attr_reader :attributes, :id, :type
+      attr_reader :attributes, :field, :id, :type
 
-      def initialize(attributes: {}, id: nil, client:, field:, fields: [])
-        raise "No strings allowed" if field.is_a? String
+      def initialize(attributes: {}, id: nil, client:, field:, fields: [], parent: nil)
         @attributes = attributes
         @id = id
         @client = client
@@ -14,6 +13,7 @@ module GraphQL
         @field = field
         @type = @field.base_type
         @fields = fields
+        @parent = parent
 
         define_field_accessors
         define_connections_accessors
@@ -31,19 +31,23 @@ module GraphQL
         @client.query(mutation)
       end
 
+      def add_nested_query_fields(query)
+        query = @parent.add_nested_query_fields(query) if @parent
+        query.add_field(@field.name)
+      end
+
       def load
         response = if @id
           @client.query(object_query(@id))
         else
           raise "Object of type #{type.name} requires a selection set" if @fields.empty?
+          query_root = Query::QueryOperation.new(@client.schema)
+          query = add_nested_query_fields(query_root)
 
-          query = Query::QueryOperation.new(@client.schema) do |q|
-            q.add_field(@field.name) do |query_field|
-              query_field.add_fields(*@fields)
-            end
-          end
+          query.add_field('id') if @type.fields.field? 'id'
+          query.add_fields(*@fields)
 
-          @client.query(query)
+          @client.query(query_root)
         end
 
         @attributes = response_object(response)
@@ -65,6 +69,13 @@ module GraphQL
 
         @dirty_attributes.clear
         @client.query(mutation)
+      end
+
+      def query_path
+        [].tap do |fields|
+          fields << @parent.query_path if @parent
+          fields << @field.name
+        end.flatten
       end
 
       private
@@ -93,9 +104,15 @@ module GraphQL
       end
 
       def define_field_accessors
-        accessors = base_node_type.scalar_fields + base_node_type.object_fields
+        base_node_type.object_fields.each do |name, field|
+          underscored_name = underscore(name)
 
-        accessors.each do |name, _field_type|
+          define_singleton_method(underscored_name) do |**arguments|
+            ObjectProxy.new(field: field, client: @client, parent: self, **arguments)
+          end
+        end
+
+        base_node_type.scalar_fields.each do |name, _field|
           underscored_name = underscore(name)
 
           define_singleton_method(underscored_name) do
@@ -119,8 +136,7 @@ module GraphQL
       end
 
       def response_object(response)
-        object = response.data.keys.first
-        response.data.fetch(object)
+        response.data.dig(*query_path)
       end
 
       def underscore(name)

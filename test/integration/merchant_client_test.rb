@@ -19,10 +19,11 @@ class MerchantClientTest < Minitest::Test
   end
 
   def test_find_shop_and_products
-    shop = @client.shop(fields: ['city'])
-    assert_equal 'Toronto', shop.city
+    shop = @client.shop
+    billing_address = shop.billing_address(fields: ['city'])
+    assert_equal 'Toronto', billing_address.city
 
-    products = shop.products(fields: ['id', 'title'])
+    products = shop.products(fields: ['title'])
     assert_equal 5, products.length
     assert_equal 5, products.map(&:title).uniq.length
 
@@ -39,7 +40,7 @@ class MerchantClientTest < Minitest::Test
 
   def test_updating_product
     shop = @client.shop
-    products = shop.products(fields: ['id', 'title'])
+    products = shop.products(fields: ['title'])
 
     title = "Renamed Product - #{Time.new.to_i}"
     product = products.to_a.last
