@@ -17,6 +17,16 @@ class MerchantChannelTest < Minitest::Test
     end
   end
 
+  def test_product_images
+    product = @client.shop.products(fields: ['title']).find { |p| p.title == 'Abridgable Concrete Coat' }
+    images = product.images(fields: ['src'])
+
+    assert images.length.positive?
+    images.each do |image|
+      refute_nil image.src
+    end
+  end
+
   def test_public_access_tokens
     public_access_tokens = @client.shop.public_access_tokens(fields: ['title'])
     assert public_access_tokens.count.positive?
