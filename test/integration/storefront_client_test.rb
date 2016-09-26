@@ -36,9 +36,20 @@ class StorefrontClientTest < Minitest::Test
     assert_equal(2, spy.calls.count)
   end
 
+  def test_product_images
+    product = @client.shop.products(fields: ['title']).find { |p| p.title == 'Abridgable Concrete Coat' }
+    images = product.images(fields: ['src'])
+
+    assert images.length.positive?
+    images.each do |image|
+      refute_nil image.src
+    end
+  end
+
   def test_find_shop_and_products
-    shop = @client.shop(fields: ['city'])
-    assert_equal('Toronto', shop.city)
+    shop = @client.shop
+    address = shop.billing_address(fields: ['city'])
+    assert_equal('Toronto', address.city)
 
     products = shop.products(fields: ['title'])
     assert_equal 5, products.length
@@ -70,8 +81,9 @@ class StorefrontClientTest < Minitest::Test
       end
     end
 
-    shop = client.shop(fields: ['city'])
-    assert_equal('Toronto', shop.city)
+    shop = client.shop
+    address = shop.billing_address(fields: ['city'])
+    assert_equal('Toronto', address.city)
 
     products = shop.products(fields: ['title'])
     assert_equal 5, products.length

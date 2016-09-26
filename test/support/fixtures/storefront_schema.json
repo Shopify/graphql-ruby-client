@@ -149,11 +149,6 @@
           "possibleTypes": [
             {
               "kind": "OBJECT",
-              "name": "Collect",
-              "ofType": null
-            },
-            {
-              "kind": "OBJECT",
               "name": "Collection",
               "ofType": null
             },
@@ -190,15 +185,19 @@
           "description": null,
           "fields": [
             {
-              "name": "city",
+              "name": "billingAddress",
               "description": null,
               "args": [
 
               ],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Address",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -275,7 +274,7 @@
               "deprecationReason": null
             },
             {
-              "name": "countryCode",
+              "name": "currencyCode",
               "description": null,
               "args": [
 
@@ -284,44 +283,8 @@
                 "kind": "NON_NULL",
                 "name": "Non-Null",
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "countryName",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "currency",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
+                  "kind": "ENUM",
+                  "name": "CurrencyCode",
                   "ofType": null
                 }
               },
@@ -338,24 +301,6 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "domain",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -390,6 +335,24 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "primaryDomain",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Domain",
                   "ofType": null
                 }
               },
@@ -466,9 +429,262 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Address",
+          "description": null,
+          "fields": [
+            {
+              "name": "address1",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "address2",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "city",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "company",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "country",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "countryCode",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "firstName",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "formatted",
+              "description": null,
+              "args": [
+                {
+                  "name": "withName",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "false"
+                },
+                {
+                  "name": "withCompany",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "false"
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "LIST",
+                  "name": "List",
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": "Non-Null",
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "lastName",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "latitude",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "longitude",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "phone",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             },
             {
               "name": "province",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "provinceCode",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "zip",
               "description": null,
               "args": [
 
@@ -496,6 +712,884 @@
           "fields": null,
           "inputFields": null,
           "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "Float",
+          "description": "Represents signed double-precision fractional values as specified by [IEEE 754](http:\/\/en.wikipedia.org\/wiki\/IEEE_floating_point).",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "Boolean",
+          "description": "Represents `true` or `false` values.",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "CurrencyCode",
+          "description": "Currency codes",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "USD",
+              "description": "United States Dollars (USD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "EUR",
+              "description": "Euro (EUR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "GBP",
+              "description": "United Kingdom Pounds (GBP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CAD",
+              "description": "Canadian Dollars (CAD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "AFN",
+              "description": "Afghan Afghani (AFN)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ALL",
+              "description": "Albanian Lek (ALL)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "DZD",
+              "description": "Algerian Dinar (DZD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "AOA",
+              "description": "Angolan Kwanza (AOA)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ARS",
+              "description": "Argentine Pesos (ARS)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "AMD",
+              "description": "Armenian Dram (AMD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "AWG",
+              "description": "Aruban Florin (AWG)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "AUD",
+              "description": "Australian Dollars (AUD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BBD",
+              "description": "Barbadian Dollar (BBD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "AZN",
+              "description": "Azerbaijani Manat (AZN)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BDT",
+              "description": "Bangladesh Taka (BDT)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BSD",
+              "description": "Bahamian Dollar (BSD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BHD",
+              "description": "Bahraini Dinar (BHD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BYR",
+              "description": "Belarusian Ruble (BYR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BZD",
+              "description": "Belize Dollar (BZD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BTN",
+              "description": "Bhutanese Ngultrum (BTN)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BAM",
+              "description": "Bosnia and Herzegovina Convertible Mark (BAM)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BRL",
+              "description": "Brazilian Real (BRL)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BOB",
+              "description": "Bolivian Boliviano (BOB)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BWP",
+              "description": "Botswana Pula (BWP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BND",
+              "description": "Brunei Dollar (BND)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BGN",
+              "description": "Bulgarian Lev (BGN)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MMK",
+              "description": "Burmese Kyat (MMK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "KHR",
+              "description": "Cambodian Riel",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "KYD",
+              "description": "Cayman Dollars (KYD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "XAF",
+              "description": "Central African CFA Franc (XAF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CLP",
+              "description": "Chilean Peso (CLP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CNY",
+              "description": "Chinese Yuan Renminbi (CNY)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "COP",
+              "description": "Colombian Peso (COP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "KMF",
+              "description": "Comorian Franc (KMF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CDF",
+              "description": "Congolese franc (CDF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CRC",
+              "description": "Costa Rican Colones (CRC)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "HRK",
+              "description": "Croatian Kuna (HRK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CZK",
+              "description": "Czech Koruny (CZK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "DKK",
+              "description": "Danish Kroner (DKK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "DOP",
+              "description": "Dominican Peso (DOP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "XCD",
+              "description": "East Caribbean Dollar (XCD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "EGP",
+              "description": "Egyptian Pound (EGP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ETB",
+              "description": "Ethiopian Birr (ETB)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "XPF",
+              "description": "CFP Franc (XPF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "FJD",
+              "description": "Fijian Dollars (FJD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "GMD",
+              "description": "Gambian Dalasi (GMD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "GHS",
+              "description": "Ghanaian Cedi (GHS)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "GTQ",
+              "description": "Guatemalan Quetzal (GTQ)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "GYD",
+              "description": "Guyanese Dollar (GYD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "GEL",
+              "description": "Georgian Lari (GEL)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "HTG",
+              "description": "Haitian Gourde (HTG)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "HNL",
+              "description": "Honduran Lempira (HNL)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "HKD",
+              "description": "Hong Kong Dollars (HKD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "HUF",
+              "description": "Hungarian Forint (HUF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ISK",
+              "description": "Icelandic Kronur (ISK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "INR",
+              "description": "Indian Rupees (INR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "IDR",
+              "description": "Indonesian Rupiah (IDR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ILS",
+              "description": "Israeli New Shekel (NIS)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "JMD",
+              "description": "Jamaican Dollars (JMD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "JPY",
+              "description": "Japanese Yen (JPY)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "JEP",
+              "description": "Jersey Pound",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "JOD",
+              "description": "Jordanian Dinar (JOD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "KZT",
+              "description": "Kazakhstani Tenge (KZT)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "KES",
+              "description": "Kenyan Shilling (KES)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "KWD",
+              "description": "Kuwaiti Dinar (KWD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "KGS",
+              "description": "Kyrgyzstani Som (KGS)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "LAK",
+              "description": "Laotian Kip (LAK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "LVL",
+              "description": "Latvian Lati (LVL)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "LBP",
+              "description": "Lebanese Pounds (LBP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "LSL",
+              "description": "Lesotho Loti (LSL)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "LRD",
+              "description": "Liberian Dollar (LRD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "LTL",
+              "description": "Lithuanian Litai (LTL)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MGA",
+              "description": "Malagasy Ariary (MGA)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MKD",
+              "description": "Macedonia Denar (MKD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MOP",
+              "description": "Macanese Pataca (MOP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MWK",
+              "description": "Malawian Kwacha (MWK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MVR",
+              "description": "Maldivian Rufiyaa (MVR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MXN",
+              "description": "Mexican Pesos (MXN)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MYR",
+              "description": "Malaysian Ringgits (MYR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MUR",
+              "description": "Mauritian Rupee (MUR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MDL",
+              "description": "Moldovan Leu (MDL)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MAD",
+              "description": "Moroccan Dirham",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MNT",
+              "description": "Mongolian Tugrik",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MZN",
+              "description": "Mozambican Metical",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "NAD",
+              "description": "Namibian Dollar",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "NPR",
+              "description": "Nepalese Rupee (NPR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ANG",
+              "description": "Netherlands Antillean Guilder",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "NZD",
+              "description": "New Zealand Dollars (NZD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "NIO",
+              "description": "Nicaraguan Córdoba (NIO)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "NGN",
+              "description": "Nigerian Naira (NGN)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "NOK",
+              "description": "Norwegian Kroner (NOK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "OMR",
+              "description": "Omani Rial (OMR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "PKR",
+              "description": "Pakistani Rupee (PKR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "PGK",
+              "description": "Papua New Guinean Kina (PGK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "PYG",
+              "description": "Paraguayan Guarani (PYG)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "PEN",
+              "description": "Peruvian Nuevo Sol (PEN)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "PHP",
+              "description": "Philippine Peso (PHP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "PLN",
+              "description": "Polish Zlotych (PLN)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "QAR",
+              "description": "Qatari Rial (QAR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "RON",
+              "description": "Romanian Lei (RON)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "RUB",
+              "description": "Russian Rubles (RUB)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "RWF",
+              "description": "Rwandan Franc (RWF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "WST",
+              "description": "Samoan Tala (WST)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SAR",
+              "description": "Saudi Riyal (SAR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "STD",
+              "description": "Sao Tome And Principe Dobra (STD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "RSD",
+              "description": "Serbian dinar (RSD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SCR",
+              "description": "Seychellois Rupee (SCR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SGD",
+              "description": "Singapore Dollars (SGD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SYP",
+              "description": "Syrian Pound (SYP)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ZAR",
+              "description": "South African Rand (ZAR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "KRW",
+              "description": "South Korean Won (KRW)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "LKR",
+              "description": "Sri Lankan Rupees (LKR)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SRD",
+              "description": "Surinamese Dollar (SRD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SEK",
+              "description": "Swedish Kronor (SEK)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CHF",
+              "description": "Swiss Francs (CHF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TWD",
+              "description": "Taiwan Dollars (TWD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "THB",
+              "description": "Thai baht (THB)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TZS",
+              "description": "Tanzanian Shilling (TZS)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TTD",
+              "description": "Trinidad and Tobago Dollars (TTD)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TND",
+              "description": "Tunisian Dinar (TND)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TRY",
+              "description": "Turkish Lira (TRY)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TMT",
+              "description": "Turkmenistani Manat (TMT)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "UGX",
+              "description": "Ugandan Shilling (UGX)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "UAH",
+              "description": "Ukrainian Hryvnia (UAH)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "AED",
+              "description": "United Arab Emirates Dirham (AED)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "UYU",
+              "description": "Uruguayan Pesos (UYU)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "UZS",
+              "description": "Uzbekistan som (UZS)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "VUV",
+              "description": "Vanuatu Vatu (VUV)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "VEF",
+              "description": "Venezuelan Bolivares (VEF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "VND",
+              "description": "Vietnamese đồng (VND)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "XOF",
+              "description": "West African CFA franc (XOF)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "YER",
+              "description": "Yemeni Rial (YER)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ZMW",
+              "description": "Zambian Kwacha (ZMW)",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Domain",
+          "description": null,
+          "fields": [
+            {
+              "name": "host",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sslEnabled",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -605,16 +1699,6 @@
           "possibleTypes": null
         },
         {
-          "kind": "SCALAR",
-          "name": "Boolean",
-          "description": "Represents `true` or `false` values.",
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
           "kind": "OBJECT",
           "name": "CollectionEdge",
           "description": null,
@@ -669,7 +1753,43 @@
           "description": null,
           "fields": [
             {
-              "name": "collects",
+              "name": "handle",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "products",
               "description": null,
               "args": [
                 {
@@ -712,43 +1832,7 @@
                 "name": "Non-Null",
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "CollectConnection",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "handle",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "id",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "ProductConnection",
                   "ofType": null
                 }
               },
@@ -815,7 +1899,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "CollectConnection",
+          "name": "ProductConnection",
           "description": null,
           "fields": [
             {
@@ -835,7 +1919,7 @@
                     "name": "Non-Null",
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "CollectEdge"
+                      "name": "ProductEdge"
                     }
                   }
                 }
@@ -871,7 +1955,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "CollectEdge",
+          "name": "ProductEdge",
           "description": null,
           "fields": [
             {
@@ -903,156 +1987,17 @@
                 "name": "Non-Null",
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "Collect",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [
-
-          ],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "Collect",
-          "description": null,
-          "fields": [
-            {
-              "name": "createdAt",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "DateTime",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "featured",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "id",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "modifiedAt",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "DateTime",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "product",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "OBJECT",
                   "name": "Product",
                   "ofType": null
                 }
               },
               "isDeprecated": false,
               "deprecationReason": null
-            },
-            {
-              "name": "sortValue",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "updatedAt",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "DateTime",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
             }
           ],
           "inputFields": null,
           "interfaces": [
-            {
-              "kind": "INTERFACE",
-              "name": "Node",
-              "ofType": null
-            }
+
           ],
           "enumValues": null,
           "possibleTypes": null
@@ -1138,9 +2083,13 @@
 
               ],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -1169,13 +2118,37 @@
               "args": [
                 {
                   "name": "first",
-                  "description": "Truncate the array result to this size",
+                  "description": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": "Non-Null",
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "after",
+                  "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Int",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "reverse",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "false"
                 },
                 {
                   "name": "maxWidth",
@@ -1222,16 +2195,9 @@
                 "kind": "NON_NULL",
                 "name": "Non-Null",
                 "ofType": {
-                  "kind": "LIST",
-                  "name": "List",
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": "Non-Null",
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "Image"
-                    }
-                  }
+                  "kind": "OBJECT",
+                  "name": "ImageConnection",
+                  "ofType": null
                 }
               },
               "isDeprecated": false,
@@ -1278,9 +2244,13 @@
 
               ],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -1292,13 +2262,9 @@
 
               ],
               "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "DateTime",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -1310,15 +2276,18 @@
 
               ],
               "type": {
-                "kind": "LIST",
-                "name": "List",
+                "kind": "NON_NULL",
+                "name": "Non-Null",
                 "ofType": {
-                  "kind": "NON_NULL",
-                  "name": "Non-Null",
+                  "kind": "LIST",
+                  "name": "List",
                   "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
+                    "kind": "NON_NULL",
+                    "name": "Non-Null",
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
                   }
                 }
               },
@@ -1419,9 +2388,13 @@
 
               ],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -1445,6 +2418,111 @@
           "fields": null,
           "inputFields": null,
           "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ImageConnection",
+          "description": null,
+          "fields": [
+            {
+              "name": "edges",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "LIST",
+                  "name": "List",
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": "Non-Null",
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "ImageEdge"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "pageInfo",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "PageInfo",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ImageEdge",
+          "description": null,
+          "fields": [
+            {
+              "name": "cursor",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Image",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -1749,24 +2827,6 @@
               "deprecationReason": null
             },
             {
-              "name": "grams",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "id",
               "description": null,
               "args": [
@@ -1918,6 +2978,38 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "weight",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "weightUnit",
+              "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": "Non-Null",
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "WeightUnit",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -1929,6 +3021,41 @@
             }
           ],
           "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "WeightUnit",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "KILOGRAMS",
+              "description": "1 equals 1000 grams",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "GRAMS",
+              "description": "Metric system unit of mass",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "POUNDS",
+              "description": "1 equals 16 ounces",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "OUNCES",
+              "description": "Imperial system unit of mass",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
           "possibleTypes": null
         },
         {
@@ -2023,111 +3150,6 @@
               "deprecationReason": null
             }
           ],
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "ProductConnection",
-          "description": null,
-          "fields": [
-            {
-              "name": "edges",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "LIST",
-                  "name": "List",
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": "Non-Null",
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "ProductEdge"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "pageInfo",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "PageInfo",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [
-
-          ],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "ProductEdge",
-          "description": null,
-          "fields": [
-            {
-              "name": "cursor",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "node",
-              "description": null,
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": "Non-Null",
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "Product",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [
-
-          ],
-          "enumValues": null,
           "possibleTypes": null
         },
         {
