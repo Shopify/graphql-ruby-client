@@ -10,9 +10,10 @@ module GraphQL
         end
 
         def test_initialize_yields_self
+          document = Document.new(@schema)
           query_object = nil
 
-          query = MutationOperation.new(@schema) do |q|
+          query = MutationOperation.new(document) do |q|
             query_object = q
           end
 
@@ -21,7 +22,9 @@ module GraphQL
 
         def test_resolver_type_is_the_schemas_mutation_root
           mock_schema = Minitest::Mock.new
-          query = MutationOperation.new(mock_schema)
+          document = Document.new(mock_schema)
+
+          query = MutationOperation.new(document)
 
           mock_schema.expect(:mutation_root, nil)
           query.resolver_type
@@ -30,7 +33,9 @@ module GraphQL
         end
 
         def test_to_query_handles_multiple_nested_selection_set
-          query = MutationOperation.new(@schema) do |q|
+          document = Document.new(@schema)
+
+          query = MutationOperation.new(document) do |q|
             q.add_field('publicAccessTokenCreate', input: { title: 'Token Title' }) do |mutation|
               mutation.add_field('publicAccessToken') do |public_access_token|
                 public_access_token.add_field('title')

@@ -83,6 +83,60 @@ module GraphQL
           end
         end
 
+        def test_define_fragment_creates_a_fragment
+          document = Document.new(@schema)
+
+          fragment = document.define_fragment('imageFields', on: 'Image')
+
+          assert_equal 'imageFields', fragment.name
+          assert_equal @schema['Image'], fragment.type
+          assert_equal document, fragment.document
+          assert_equal({ 'imageFields' => fragment }, document.fragments)
+        end
+
+        def test_define_fragment_yields_fragment
+          document = Document.new(@schema)
+          fragment_object = nil
+
+          fragment = document.define_fragment('imageFields', on: 'Image') do |f|
+            fragment_object = f
+          end
+
+          assert_equal fragment_object, fragment
+        end
+
+        def test_define_fragment_raises_exception_for_invalid_targets
+          document = Document.new(@schema)
+
+          assert_raises Document::INVALID_FRAGMENT_TARGET do
+            document.define_fragment('imageFields', on: 'String')
+          end
+        end
+
+        def test_fragment_definitions_is_the_fragments_definition_string
+          document = Document.new(@schema) do |d|
+            d.define_fragment('imageFields', on: 'Image') do |f|
+              f.add_field('src')
+            end
+
+            d.define_fragment('shopName', on: 'Shop') do |f|
+              f.add_field('name')
+            end
+          end
+
+          fragment_string = <<~QUERY
+            fragment imageFields on Image {
+              src
+            }
+
+            fragment shopName on Shop {
+              name
+            }
+          QUERY
+
+          assert_equal fragment_string, document.fragment_definitions
+        end
+
         def test_to_query_joins_all_operations
           document = Document.new(@schema) do |d|
             d.add_query('shopQuery') do |q|
@@ -111,6 +165,69 @@ module GraphQL
               publicAccessTokenCreate(input: { title: "Token Title" }) {
                 publicAccessToken {
                   title
+                }
+              }
+            }
+          QUERY
+
+          assert_equal query_string, document.to_query
+        end
+
+        def test_to_query_includes_fragment_definitions
+          document = Document.new(@schema) do |d|
+            d.define_fragment('imageFields', on: 'Image') do |f|
+              f.add_field('src')
+            end
+
+            d.add_query('getShop') do |q|
+              q.add_field('shop') do |shop|
+                shop.add_inline_fragment('Node') do |f|
+                  f.add_field('id')
+                end
+              end
+            end
+
+            d.add_query('getProductImages') do |q|
+              q.add_field('product', id: 'gid://Product/1') do |product|
+                product.add_connection('images', first: 10) do |connection|
+                  connection.add_fragment('imageFields')
+
+                  connection.add_inline_fragment do |f|
+                    f.add_field('altText')
+                  end
+                end
+              end
+            end
+          end
+
+          query_string = <<~QUERY
+            fragment imageFields on Image {
+              src
+            }
+
+            query getShop {
+              shop {
+                ... on Node {
+                  id
+                }
+              }
+            }
+
+            query getProductImages {
+              product(id: "gid://Product/1") {
+                images(first: 10) {
+                  edges {
+                    cursor
+                    node {
+                      ...imageFields
+                      ... on Image {
+                        altText
+                      }
+                    }
+                  }
+                  pageInfo {
+                    hasNextPage
+                  }
                 }
               }
             }

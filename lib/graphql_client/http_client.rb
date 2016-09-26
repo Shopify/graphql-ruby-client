@@ -13,7 +13,7 @@ module GraphQL
       end
 
       def build_query
-        query = Query::QueryOperation.new(@schema)
+        query = Query::Document.new(@schema)
 
         if block_given?
           yield query

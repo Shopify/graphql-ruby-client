@@ -4,16 +4,18 @@ module GraphQL
   module Client
     module Query
       class QueryField
+        include AddInlineFragment
         include SelectionSet
 
         INVALID_ARGUMENTS = Class.new(StandardError)
 
-        attr_reader :arguments, :as, :field, :selection_set
+        attr_reader :arguments, :as, :document, :field, :selection_set
 
-        def initialize(field, arguments: {}, as: nil)
-          @as = as
+        def initialize(field, document:, arguments: {}, as: nil)
           @field = field
+          @document = document
           @arguments = validate_arguments(arguments)
+          @as = as
           @selection_set = []
         end
 
