@@ -7,6 +7,8 @@ module GraphQL
         def setup
           schema_string = File.read(fixture_path('merchant_schema.json'))
           @schema = GraphQLSchema.new(schema_string)
+
+          @graphql_schema = GraphQL::Schema::Loader.load(JSON.parse(schema_string))
         end
 
         def test_initialize_yields_self
@@ -35,32 +37,42 @@ module GraphQL
           document = Document.new(@schema)
 
           query = QueryOperation.new(document) do |q|
-            q.add_field('product', id: '2')
+            q.add_field('product', id: '2') do |product|
+              product.add_field('title')
+            end
           end
 
           query_string = <<~QUERY
             query {
-              product(id: "2")
+              product(id: "2") {
+                title
+              }
             }
           QUERY
 
           assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema
         end
 
         def test_to_query_with_a_field_alias
           document = Document.new(@schema)
 
           query = QueryOperation.new(document) do |q|
-            q.add_field('product', id: '2', as: 'userProduct')
+            q.add_field('product', id: '2', as: 'userProduct') do |product|
+              product.add_field('title')
+            end
           end
 
           query_string = <<~QUERY
             query {
-              userProduct: product(id: "2")
+              userProduct: product(id: "2") {
+                title
+              }
             }
           QUERY
 
           assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema
         end
 
         def test_to_query_handles_multiple_nested_query_fields
@@ -97,6 +109,7 @@ module GraphQL
           QUERY
 
           assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema
         end
 
         def test_to_query_handles_add_fields
@@ -132,6 +145,7 @@ module GraphQL
           QUERY
 
           assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema
         end
 
         def test_to_query_handles_connections
@@ -164,6 +178,7 @@ module GraphQL
           QUERY
 
           assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema
         end
       end
     end

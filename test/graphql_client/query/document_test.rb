@@ -7,6 +7,7 @@ module GraphQL
         def setup
           schema_string = File.read(fixture_path('merchant_schema.json'))
           @schema = GraphQLSchema.new(schema_string)
+          @graphql_schema = GraphQL::Schema::Loader.load(JSON.parse(schema_string))
         end
 
         def test_initialize_yields_self
@@ -114,14 +115,14 @@ module GraphQL
         end
 
         def test_fragment_definitions_is_the_fragments_definition_string
-          document = Document.new(@schema) do |d|
-            d.define_fragment('imageFields', on: 'Image') do |f|
-              f.add_field('src')
-            end
+          document = Document.new(@schema)
 
-            d.define_fragment('shopName', on: 'Shop') do |f|
-              f.add_field('name')
-            end
+          document.define_fragment('imageFields', on: 'Image') do |f|
+            f.add_field('src')
+          end
+
+          document.define_fragment('shopName', on: 'Shop') do |f|
+            f.add_field('name')
           end
 
           fragment_string = <<~QUERY
@@ -171,6 +172,8 @@ module GraphQL
           QUERY
 
           assert_equal query_string, document.to_query
+          assert_valid_query query_string, @graphql_schema, operation_name: 'shopQuery'
+          assert_valid_query query_string, @graphql_schema, operation_name: 'tokens'
         end
 
         def test_to_query_includes_fragment_definitions
@@ -234,6 +237,7 @@ module GraphQL
           QUERY
 
           assert_equal query_string, document.to_query
+          assert_valid_query query_string, @graphql_schema, operation_name: 'getShop'
         end
       end
     end
