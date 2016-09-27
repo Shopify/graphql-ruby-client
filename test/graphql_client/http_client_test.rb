@@ -20,14 +20,14 @@ module GraphQL
         config = Config.new(url: 'http://example.com')
 
         query = Minitest::Mock.new
-        query.expect(:to_query, 'query { shop }')
+        query.expect(:to_query, 'query shopQuery { shop }')
 
         req = Minitest::Mock.new
-        req.expect(:send_request, nil, ['query { shop }'])
+        req.expect(:send_request, nil, ['query shopQuery { shop }', operation_name: 'shopQuery'])
 
         Request.stub(:new, req) do
           client = HTTPClient.new(schema, config: config)
-          client.query(query)
+          client.query(query, operation_name: 'shopQuery')
 
           query.verify
           req.verify
@@ -40,7 +40,7 @@ module GraphQL
         config = Config.new(url: 'http://example.com')
 
         req = Minitest::Mock.new
-        req.expect(:send_request, nil, ['query { shop }'])
+        req.expect(:send_request, nil, ['query { shop }', operation_name: nil])
 
         Request.stub(:new, req) do
           client = HTTPClient.new(schema, config: config)

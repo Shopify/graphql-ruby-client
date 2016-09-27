@@ -26,14 +26,14 @@ module GraphQL
         yield @config
       end
 
-      def query(query)
+      def query(query, operation_name: nil)
         req = Request.new(config)
-        req.send_request(query.to_query)
+        req.send_request(query.to_query, operation_name: operation_name)
       end
 
-      def raw_query(query_string)
+      def raw_query(query_string, operation_name: nil)
         req = Request.new(config)
-        req.send_request(query_string)
+        req.send_request(query_string, operation_name: operation_name)
       end
 
       private

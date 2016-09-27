@@ -1,7 +1,6 @@
 require 'pry'
 require 'json'
 require 'simplecov'
-require 'spy/integration'
 require 'webmock/minitest'
 
 SimpleCov.start
