@@ -21,7 +21,7 @@ module GraphQL
 
         case response
         when Net::HTTPOK then
-          puts "Response body: \n#{response.body}" if @config.debug
+          puts "Response body: \n#{JSON.pretty_generate(JSON.parse(response.body))}" if @config.debug
           Response.new(response.body)
         else
           raise NetworkError, "Response error: #{response.code}/#{response.message}"

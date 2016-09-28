@@ -28,7 +28,7 @@ class StorefrontClientTest < Minitest::Test
     end
   end
 
-  def test_find_shop_and_products
+  def test_shop_and_products
     shop = @client.shop
     address = shop.billing_address(fields: ['city'])
     assert_equal('Toronto', address.city)
@@ -45,6 +45,11 @@ class StorefrontClientTest < Minitest::Test
 
     variant = variants.first
     assert_equal('12.00', variant.price)
+  end
+
+  def test_product_tags
+    product = @client.shop.products(fields: ['title', 'tags']).find { |p| p.title == 'Abridgable Concrete Coat' }
+    refute(product.tags.empty?)
   end
 
   def test_paginated_request
