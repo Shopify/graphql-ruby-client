@@ -6,7 +6,7 @@ module GraphQL
       def setup
         schema_string = File.read(fixture_path('merchant_schema.json'))
         schema = GraphQLSchema.new(schema_string)
-        @client = HTTPClient.new(schema)
+        @client = Base.new(schema)
       end
 
       def test_query_path

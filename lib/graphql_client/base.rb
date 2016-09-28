@@ -1,11 +1,12 @@
 module GraphQL
   module Client
-    class HTTPClient
-      attr_reader :config, :schema
+    class Base
+      attr_reader :adapter, :config, :schema
 
-      def initialize(schema, config: nil, &block)
+      def initialize(schema, config: nil, adapter: nil, &block)
         @config = config || Config.new
         @schema = schema
+        @adapter = adapter || Adapters::HTTPAdapter.new(@config)
 
         define_field_accessors
 
@@ -27,13 +28,11 @@ module GraphQL
       end
 
       def query(query, operation_name: nil)
-        req = Request.new(config)
-        req.send_request(query.to_query, operation_name: operation_name)
+        adapter.request(query.to_query, operation_name: operation_name)
       end
 
       def raw_query(query_string, operation_name: nil)
-        req = Request.new(config)
-        req.send_request(query_string, operation_name: operation_name)
+        adapter.request(query_string, operation_name: operation_name)
       end
 
       private
