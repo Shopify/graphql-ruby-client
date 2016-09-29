@@ -20,12 +20,10 @@ module GraphQL
       end
 
       def destroy
-        mutation = Query::Document.new(@client.schema) do |d|
-          d.add_mutation do |m|
-            m.add_field("#{base_node_type_name}Delete", input: { id: id }) do |field|
-              field.add_field('userErrors') do |errors|
-                errors.add_fields('field', 'message')
-              end
+        mutation = Query::MutationDocument.new(@client.schema) do |m|
+          m.add_field("#{base_node_type_name}Delete", input: { id: id }) do |field|
+            field.add_field('userErrors') do |errors|
+              errors.add_fields('field', 'message')
             end
           end
         end
@@ -62,12 +60,10 @@ module GraphQL
           hash[name] = @attributes[name]
         end
 
-        mutation = Query::Document.new(@client.schema) do |d|
-          d.add_mutation do |m|
-            m.add_field("#{base_node_type_name}Update", input: input.merge(id: id)) do |field|
-              field.add_field('userErrors') do |errors|
-                errors.add_fields('field', 'message')
-              end
+        mutation = Query::MutationDocument.new(@client.schema) do |m|
+          m.add_field("#{base_node_type_name}Update", input: input.merge(id: id)) do |field|
+            field.add_field('userErrors') do |errors|
+              errors.add_fields('field', 'message')
             end
           end
         end
@@ -133,11 +129,9 @@ module GraphQL
       end
 
       def object_query(id)
-        Query::Document.new(@client.schema) do |d|
-          d.add_query do |q|
-            q.add_field(base_node_type_name, id: id) do |field|
-              field.add_fields(*base_node_type.scalar_fields.names)
-            end
+        Query::QueryDocument.new(@client.schema) do |q|
+          q.add_field(base_node_type_name, id: id) do |field|
+            field.add_fields(*base_node_type.scalar_fields.names)
           end
         end
       end
