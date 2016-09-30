@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.version = GraphQL::Client::VERSION
   s.executables << 'graphql-client'
 
+  s.add_development_dependency 'graphql', '~> 0.19.0'
   s.add_development_dependency 'minitest', '~> 5.8'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'rake'

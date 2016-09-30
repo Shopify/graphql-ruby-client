@@ -7,6 +7,7 @@ module GraphQL
         def setup
           schema_string = File.read(fixture_path('merchant_schema.json'))
           @schema = GraphQLSchema.new(schema_string)
+          @graphql_schema = GraphQL::Schema::Loader.load(JSON.parse(schema_string))
         end
 
         def test_initialize_yields_self
@@ -56,6 +57,7 @@ module GraphQL
           QUERY
 
           assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema
         end
       end
     end
