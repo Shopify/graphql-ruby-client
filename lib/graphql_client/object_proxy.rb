@@ -1,19 +1,20 @@
 module GraphQL
   module Client
     class ObjectProxy
-      attr_reader :attributes, :field, :id, :type
+      attr_reader :attributes, :field, :id, :parent, :type
 
-      def initialize(attributes: {}, id: nil, client:, field:, fields: [], parent: nil)
-        @attributes = attributes
+      def initialize(field:, id: nil, client:, fields: [], parent: nil, data: {}, includes: {})
+        @field = field
         @id = id
         @client = client
         @type = type
         @dirty_attributes = Set.new
-        @loaded = !@attributes.empty?
-        @field = field
         @type = @field.base_type
         @fields = fields
         @parent = parent
+        @data = data
+        @includes = includes
+        @loaded = !@data.empty?
 
         define_field_accessors
         define_connections_accessors
@@ -36,6 +37,14 @@ module GraphQL
         query.add_field(@field.name)
       end
 
+      def field_name
+        if connection?
+          base_node_type.name.downcase
+        else
+          field.name
+        end
+      end
+
       def load
         response = if @id
           @client.query(object_query(@id))
@@ -51,13 +60,13 @@ module GraphQL
           @client.query(query_root)
         end
 
-        @attributes = response_object(response)
+        @data = response_object(response)
         @loaded = true
       end
 
       def save
         input = @dirty_attributes.each_with_object({}) do |name, hash|
-          hash[name] = @attributes[name]
+          hash[name] = @data[name]
         end
 
         mutation = Query::MutationDocument.new(@client.schema) do |m|
@@ -74,8 +83,8 @@ module GraphQL
 
       def query_path
         [].tap do |fields|
-          fields << @parent.query_path if @parent
-          fields << @field.name
+          fields << parent.field_name if parent
+          fields << field_name
         end.flatten
       end
 
@@ -99,7 +108,26 @@ module GraphQL
       def define_connections_accessors
         base_node_type.connection_fields.each do |name, field|
           define_singleton_method(underscore(name)) do |**arguments|
-            ConnectionProxy.new(parent: self, parent_field: @field, client: @client, field: field, **arguments)
+            if @includes.empty?
+              ConnectionProxy.new(
+                client: @client,
+                field: field,
+                includes: @includes,
+                parent: self,
+                parent_field: @field,
+                **arguments
+              )
+            else
+              ConnectionProxy.new(
+                client: @client,
+                data: @data[name],
+                field: field,
+                includes: @includes,
+                parent: self,
+                parent_field: @field,
+                **arguments
+              )
+            end
           end
         end
       end
@@ -109,7 +137,24 @@ module GraphQL
           underscored_name = underscore(name)
 
           define_singleton_method(underscored_name) do |**arguments|
-            ObjectProxy.new(field: field, client: @client, parent: self, **arguments)
+            if field.list?
+              @data[name.to_s].map do |item_data|
+                ObjectProxy.new(
+                  client: @client,
+                  data: item_data,
+                  field: field,
+                  parent: self,
+                  **arguments
+                )
+              end
+            else
+              ObjectProxy.new(
+                client: @client,
+                field: field,
+                parent: self,
+                **arguments
+              )
+            end
           end
         end
 
@@ -118,11 +163,11 @@ module GraphQL
 
           define_singleton_method(underscored_name) do
             load unless @loaded
-            @attributes[name]
+            @data[name]
           end
 
           define_singleton_method("#{underscored_name}=") do |value|
-            @attributes[name] = value
+            @data[name] = value
             @dirty_attributes.add(name)
           end
         end

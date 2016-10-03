@@ -3,16 +3,20 @@ module GraphQL
     class ConnectionProxy
       include Enumerable
 
-      def initialize(parent:, parent_field:, client:, field:, fields: [])
+      attr_reader :objects, :parent
+
+      def initialize(field:, parent:, parent_field:, client:, fields: [], data: {}, includes: {})
+        @field = field
         @parent = parent
         @parent_field = parent_field
         @client = client
         @schema = @client.schema
-        @field = field
         @type = @field.base_type
         @objects = []
         @fields = fields
         @loaded = false
+        @data = data
+        @includes = includes
       end
 
       def create(attributes = {})
@@ -36,14 +40,19 @@ module GraphQL
         response = @client.query(mutation)
         attributes = response_object(response).fetch(type_name)
 
-        ObjectProxy.new(field: @field, attributes: attributes, client: @client)
+        ObjectProxy.new(field: @field, data: attributes, client: @client)
       end
 
       def each
-        fetch_page unless @loaded
+        load_page unless @loaded
 
         @objects.each do |node|
-          yield ObjectProxy.new(attributes: node, client: @client, field: @field)
+          yield ObjectProxy.new(
+            client: @client,
+            data: node,
+            field: @field,
+            includes: @includes,
+          )
         end
       end
 
@@ -77,49 +86,79 @@ module GraphQL
           node.add_connection(@field.name, **connection_args) do |connection|
             connection.add_field('id') if @type.node_type.fields.field? 'id'
             connection.add_fields(*@fields)
+
+            if @includes.any?
+              add_includes(connection, @includes)
+            end
           end
         end
 
         query
       end
 
-      def deep_find(hash, target_key)
-        return hash[target_key] if hash.key?(target_key)
-
-        hash.each do |_, value|
-          result = deep_find(value, target_key) if value.is_a? Hash
-          return result unless result.nil?
+      def add_includes(connection, includes)
+        includes.each do |key, values|
+          if connection.resolver_type.fields[key.to_s].connection?
+            connection.add_connection(key.to_s, first: 100) do |subconnection|
+              values.each do |field|
+                if field.is_a? String
+                  subconnection.add_field(field)
+                else
+                  add_includes(subconnection, field)
+                end
+              end
+            end
+          else
+            connection.add_field(key.to_s) do |subfield|
+              values.each do |field|
+                if field.is_a? String
+                  subfield.add_field(field)
+                else
+                  add_includes(subfield, field)
+                end
+              end
+            end
+          end
         end
+      end
 
-        nil
+      def connection_edges(response_data)
+        response_data.dig(*parent.query_path, @field.name, 'edges')
       end
 
       def fetch_page
-        @loaded = true
-
         initial_response = @client.query(connection_query)
-        edges = deep_find(initial_response.data, 'edges')
+        edges = connection_edges(initial_response.data)
+        @objects += nodes(edges)
 
         response = initial_response
-        @objects += edges.map { |edge| edge.fetch('node') }
 
         while next_page?(response.data)
           cursor = edges.last.fetch('cursor')
 
           response = @client.query(connection_query(after: cursor))
-          edges = deep_find(response.data, 'edges')
 
-          @objects += edges.map { |edge| edge.fetch('node') }
+          edges = connection_edges(response.data)
+          @objects += nodes(edges)
         end
       end
 
-      def next_page?(response_data)
-        next_page = deep_find(response_data, 'hasNextPage')
-        if next_page.nil?
-          false
+      def load_page
+        if @data.empty?
+          fetch_page
         else
-          next_page
+          @objects += nodes(@data['edges'])
         end
+
+        @loaded = true
+      end
+
+      def next_page?(response_data)
+        response_data.dig(*parent.query_path, @field.name, 'pageInfo', 'hasNextPage')
+      end
+
+      def nodes(edges_data)
+        edges_data.map { |edge| edge.fetch('node') }
       end
 
       def response_object(response)

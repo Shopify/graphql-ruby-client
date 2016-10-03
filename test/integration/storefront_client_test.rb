@@ -18,6 +18,30 @@ class StorefrontClientTest < Minitest::Test
     end
   end
 
+  def test_includes_with_images
+    image_count = 0
+    products = @client.shop.products(
+      fields: ['title'],
+      includes: { variants: ['title', images: ['src']] }
+    )
+
+    products.each do |product|
+      variants = product.variants
+      assert variants.length.nonzero?
+
+      variants.each do |variant|
+        refute_nil variant.title
+
+        variant.images.each do |image|
+          image_count += 1
+          refute_nil image.src
+        end
+      end
+    end
+
+    assert image_count.nonzero?
+  end
+
   def test_product_images
     product = @client.shop.products(fields: ['title']).find { |p| p.title == 'Abridgable Concrete Coat' }
     images = product.images(fields: ['src'])
