@@ -20,34 +20,34 @@ class MerchantClientTest < Minitest::Test
 
   def test_find_shop_and_products
     shop = @client.shop
-    billing_address = shop.billing_address(fields: ['city'])
+    billing_address = shop.billing_address(:city)
     assert_equal 'Toronto', billing_address.city
 
-    products = shop.products(fields: ['title'])
+    products = shop.products(:title)
     assert_equal 5, products.length
     assert_equal 5, products.map(&:title).uniq.length
 
-    variants = products.first.variants(fields: ['price'])
+    variants = products.first.variants(:price)
     variant = variants.first
     refute_nil variant.price
   end
 
   def test_product_tags
-    product = @client.shop.products(fields: ['tags']).first
+    product = @client.shop.products(:tags).first
     tags = product.tags
     assert_equal ['summer', 'winter'], tags.sort
   end
 
   def test_updating_product
     shop = @client.shop
-    products = shop.products(fields: ['title'])
+    products = shop.products(:title)
 
     title = "Renamed Product - #{Time.new.to_i}"
     product = products.to_a.last
     product.title = title
     product.save
 
-    product = @client.shop.products(fields: ['title']).to_a.last
+    product = @client.shop.products(:title).to_a.last
     assert_equal title, product.title
   end
 end

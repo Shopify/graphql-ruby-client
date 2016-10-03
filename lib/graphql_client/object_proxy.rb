@@ -3,14 +3,14 @@ module GraphQL
     class ObjectProxy
       attr_reader :attributes, :field, :id, :parent, :type
 
-      def initialize(field:, id: nil, client:, fields: [], parent: nil, data: {}, includes: {})
+      def initialize(*fields, field:, client:, parent: nil, data: {}, includes: {}, **arguments)
+        @fields = fields.map(&:to_s)
         @field = field
-        @id = id
+        @id = arguments[:id]
         @client = client
         @type = type
         @dirty_attributes = Set.new
         @type = @field.base_type
-        @fields = fields
         @parent = parent
         @data = data
         @includes = includes
@@ -47,7 +47,7 @@ module GraphQL
 
       def load
         response = if @id
-          @client.query(object_query(@id))
+          @client.query(object_query)
         else
           raise "Object of type #{type.name} requires a selection set" if @fields.empty?
           document = Query::Document.new(@client.schema)
@@ -107,9 +107,10 @@ module GraphQL
 
       def define_connections_accessors
         base_node_type.connection_fields.each do |name, field|
-          define_singleton_method(underscore(name)) do |**arguments|
+          define_singleton_method(underscore(name)) do |*fields, **arguments|
             if @includes.empty?
               ConnectionProxy.new(
+                *fields,
                 client: @client,
                 field: field,
                 includes: @includes,
@@ -119,6 +120,7 @@ module GraphQL
               )
             else
               ConnectionProxy.new(
+                *fields,
                 client: @client,
                 data: @data[name],
                 field: field,
@@ -136,10 +138,11 @@ module GraphQL
         base_node_type.object_fields.each do |name, field|
           underscored_name = underscore(name)
 
-          define_singleton_method(underscored_name) do |**arguments|
+          define_singleton_method(underscored_name) do |*fields, **arguments|
             if field.list?
               @data[name.to_s].map do |item_data|
                 ObjectProxy.new(
+                  *fields,
                   client: @client,
                   data: item_data,
                   field: field,
@@ -149,6 +152,7 @@ module GraphQL
               end
             else
               ObjectProxy.new(
+                *fields,
                 client: @client,
                 field: field,
                 parent: self,
@@ -173,9 +177,9 @@ module GraphQL
         end
       end
 
-      def object_query(id)
+      def object_query
         Query::QueryDocument.new(@client.schema) do |q|
-          q.add_field(base_node_type_name, id: id) do |field|
+          q.add_field(base_node_type_name, id: @id) do |field|
             field.add_fields(*base_node_type.scalar_fields.names)
           end
         end

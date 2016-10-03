@@ -5,18 +5,18 @@ module GraphQL
 
       attr_reader :objects, :parent
 
-      def initialize(field:, parent:, parent_field:, client:, fields: [], data: {}, includes: {})
+      def initialize(*fields, field:, parent:, parent_field:, client:, data: {}, includes: {})
+        @fields = fields.map(&:to_s)
         @field = field
         @parent = parent
         @parent_field = parent_field
         @client = client
+        @data = data
+        @includes = includes
         @schema = @client.schema
         @type = @field.base_type
         @objects = []
-        @fields = fields
         @loaded = false
-        @data = data
-        @includes = includes
       end
 
       def create(attributes = {})
