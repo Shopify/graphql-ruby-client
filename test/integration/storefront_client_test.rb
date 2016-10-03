@@ -20,10 +20,9 @@ class StorefrontClientTest < Minitest::Test
 
   def test_includes_with_images
     image_count = 0
-    products = @client.shop.products(
-      fields: ['title'],
-      includes: { variants: ['title', images: ['src']] }
-    )
+    products = @client.shop.products(:title, includes: {
+      variants: ['title', images: ['src']]
+    })
 
     products.each do |product|
       variants = product.variants
@@ -43,8 +42,8 @@ class StorefrontClientTest < Minitest::Test
   end
 
   def test_product_images
-    product = @client.shop.products(fields: ['title']).find { |p| p.title == 'Abridgable Concrete Coat' }
-    images = product.images(fields: ['src'])
+    product = @client.shop.products(:title).find { |p| p.title == 'Abridgable Concrete Coat' }
+    images = product.images(:src)
 
     assert images.length.positive?
     images.each do |image|
@@ -54,17 +53,17 @@ class StorefrontClientTest < Minitest::Test
 
   def test_shop_and_products
     shop = @client.shop
-    address = shop.billing_address(fields: ['city'])
+    address = shop.billing_address(:city)
     assert_equal('Toronto', address.city)
 
-    products = shop.products(fields: ['title'])
+    products = shop.products(:title)
     assert_equal 5, products.length
 
     id = products.to_a.find { |p| p.title == 'Abridgable Concrete Coat' }.id
-    found_product = @client.product(id: id, fields: ['title'])
+    found_product = @client.product(:title, id: id)
     assert_equal(id, found_product.id)
 
-    variants = found_product.variants(fields: ['price'])
+    variants = found_product.variants(:price)
     assert_equal(2, variants.length)
 
     variant = variants.first
@@ -72,14 +71,14 @@ class StorefrontClientTest < Minitest::Test
   end
 
   def test_product_tags
-    product = @client.shop.products(fields: ['title', 'tags']).find { |p| p.title == 'Abridgable Concrete Coat' }
+    product = @client.shop.products(:tags, :title).find { |p| p.title == 'Abridgable Concrete Coat' }
     refute(product.tags.empty?)
   end
 
   def test_paginated_request
-    product = @client.shop.products(fields: ['title', 'id']).to_a.last
+    product = @client.shop.products(:id, :title).to_a.last
 
-    collections = product.collections(fields: ['title'])
+    collections = product.collections(:title)
     assert_equal 1, collections.length
   end
 
@@ -93,10 +92,10 @@ class StorefrontClientTest < Minitest::Test
     end
 
     shop = client.shop
-    address = shop.billing_address(fields: ['city'])
+    address = shop.billing_address(:city)
     assert_equal('Toronto', address.city)
 
-    products = shop.products(fields: ['title'])
+    products = shop.products(:title)
     assert_equal 5, products.length
     assert_equal 5, products.map(&:title).uniq.length
   end
