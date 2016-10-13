@@ -64,6 +64,9 @@ Metrics/ModuleLength:
 Metrics/MethodLength:
   Enabled: false
 
+Metrics/BlockLength:
+  Enabled: false
+
 Metrics/ParameterLists:
   Max: 5
   CountKeywordArgs: false
@@ -73,6 +76,12 @@ Metrics/PerceivedComplexity:
 
 Lint/EndAlignment:
   AlignWith: variable
+
+Lint/PercentSymbolArray:
+  Enabled: true
+
+Lint/PercentStringArray:
+  Enabled: true
 
 Style/FrozenStringLiteralComment:
   Enabled: false
@@ -107,9 +116,16 @@ Style/DoubleNegation:
 
 Style/SingleLineBlockParams:
   Enabled: false
-  
+
 Style/StructInheritance:
   Enabled: false
-  
+
 Style/IfUnlessModifier:
   Enabled: false
+
+Style/VariableNumber:
+  Enabled: false
+
+AllCops:
+  Exclude:
+    - 'db/schema.rb'
