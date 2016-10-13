@@ -74,8 +74,7 @@ module GraphQL
         query = Query::QueryDocument.new(@schema)
 
         args = {}
-
-        if @schema.query_root.fields[parent_type.name.downcase].args.key?('id')
+        if @schema.query_root.fields.fetch(parent_type.name.downcase).args.key?('id')
           args[:id] = @parent.id
         end
 

@@ -15,6 +15,7 @@ module GraphQL
         @data = data
         @includes = includes
         @loaded = !@data.empty?
+        @arguments = arguments
 
         define_field_accessors
         define_connections_accessors
@@ -52,10 +53,11 @@ module GraphQL
           raise "Object of type #{type.name} requires a selection set" if @fields.empty?
           document = Query::Document.new(@client.schema)
           query_root = document.add_query
-          query = add_nested_query_fields(query_root)
+          field = add_nested_query_fields(query_root)
 
-          query.add_field('id') if @type.fields.field? 'id'
-          query.add_fields(*@fields)
+          field.arguments = @arguments if @arguments
+          field.add_field('id') if @type.fields.field? 'id'
+          field.add_fields(*@fields)
 
           @client.query(query_root)
         end

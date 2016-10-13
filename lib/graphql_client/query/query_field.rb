@@ -23,6 +23,10 @@ module GraphQL
           field.base_type
         end
 
+        def arguments=(arguments)
+          @arguments = validate_arguments(arguments)
+        end
+
         def to_query(indent: '')
           indent.dup.tap do |query_string|
             query_string << "#{as}: " if as

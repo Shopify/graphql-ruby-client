@@ -37,4 +37,12 @@ class MerchantChannelTest < Minitest::Test
 
     new_token.destroy
   end
+
+  def test_channel_by_handle
+    channel = @client
+      .shop
+      .channel_by_handle(:name, handle: 'buy-button-dev')
+
+    assert_equal('Buy Button (Development)', channel.name)
+  end
 end
