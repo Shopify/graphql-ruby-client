@@ -44,5 +44,12 @@ class MerchantChannelTest < Minitest::Test
       .channel_by_handle(:name, handle: 'buy-button-dev')
 
     assert_equal('Buy Button (Development)', channel.name)
+
+    publications = @client
+      .shop
+      .channel_by_handle(:name, handle: 'buy-button-dev')
+      .product_publications(includes: { product: ['title'] })
+
+    assert_equal(5, publications.length)
   end
 end

@@ -1,7 +1,7 @@
 module GraphQL
   module Client
     class ObjectProxy
-      attr_reader :attributes, :field, :id, :parent, :type
+      attr_reader :arguments, :attributes, :field, :id, :loaded, :parent, :type
 
       def initialize(*fields, field:, client:, parent: nil, data: {}, includes: {}, **arguments)
         @fields = fields.map(&:to_s)
@@ -81,6 +81,13 @@ module GraphQL
 
         @dirty_attributes.clear
         @client.query(mutation)
+      end
+
+      def proxy_path
+        [].tap do |parents|
+          parents << parent.proxy_path if parent
+          parents << parent if parent
+        end.flatten
       end
 
       def query_path

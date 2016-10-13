@@ -3,7 +3,7 @@ module GraphQL
     class ConnectionProxy
       include Enumerable
 
-      attr_reader :objects, :parent
+      attr_reader :arguments, :objects, :parent
 
       def initialize(*fields, field:, parent:, parent_field:, client:, data: {}, includes: {})
         @fields = fields.map(&:to_s)
@@ -17,6 +17,7 @@ module GraphQL
         @type = @field.base_type
         @objects = []
         @loaded = false
+        @arguments = {}
       end
 
       def create(attributes = {})
@@ -56,14 +57,31 @@ module GraphQL
         end
       end
 
+      def proxy_path
+        [].tap do |parents|
+          parents << @parent.proxy_path if @parent
+          parents << @parent if @parent
+        end.flatten
+      end
+
       def length
         entries.length
       end
 
       private
 
+      def rebuild_query(query = root)
+        proxy_path.each do |proxy|
+          query = query.add_field(proxy.field.name, proxy.arguments)
+        end
+
+        query
+      end
+
       def connection_query(after: nil)
-        raise "Connection field \"#{@field.name}\" requires a selection set" if @fields.empty?
+        raise "Connection field \"#{@field.name}\" requires a selection set" if @fields.empty? && @includes.empty?
+
+        args = {}
 
         parent_type = if @parent.type.is_a? GraphQLSchema::Types::Connection
           @parent.type.node_type
@@ -73,16 +91,29 @@ module GraphQL
 
         query = Query::QueryDocument.new(@schema)
 
-        args = {}
-        if @schema.query_root.fields.fetch(parent_type.name.downcase).args.key?('id')
+        if @parent.loaded && @parent.id && @schema.query_root.fields.fetch(parent_type.name.downcase).args.key?('id')
+          # We can shortcut this query and base it off of an already known node object
           args[:id] = @parent.id
-        end
 
-        connection_args = { first: @client.config.per_page }
-        connection_args[:after] = after if after
+          connection_args = { first: @client.config.per_page }
+          connection_args[:after] = after if after
 
-        query.add_field(parent_type.name.downcase, **args) do |node|
-          node.add_connection(@field.name, **connection_args) do |connection|
+          query.add_field(parent_type.name.downcase, **args) do |node|
+            node.add_connection(@field.name, **connection_args) do |connection|
+              connection.add_field('id') if @type.node_type.fields.field? 'id'
+              connection.add_fields(*@fields)
+
+              if @includes.any?
+                add_includes(connection, @includes)
+              end
+            end
+          end
+        else
+          connection_args = { first: @client.config.per_page }
+          connection_args[:after] = after if after
+
+          query_leaf = rebuild_query(query)
+          query_leaf.add_connection(@field.name, **connection_args) do |connection|
             connection.add_field('id') if @type.node_type.fields.field? 'id'
             connection.add_fields(*@fields)
 
