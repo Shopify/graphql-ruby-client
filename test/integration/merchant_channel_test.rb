@@ -51,5 +51,8 @@ class MerchantChannelTest < Minitest::Test
       .product_publications(includes: { product: ['title'] })
 
     assert_equal(5, publications.length)
+
+    product = publications.first.product
+    refute_nil product.title
   end
 end

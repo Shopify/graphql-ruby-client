@@ -160,13 +160,24 @@ module GraphQL
                 )
               end
             else
-              ObjectProxy.new(
-                *fields,
-                client: @client,
-                field: field,
-                parent: self,
-                **arguments
-              )
+              if @data && !@data.empty?
+                ObjectProxy.new(
+                  *fields,
+                  client: @client,
+                  field: field,
+                  data: @data[name.to_s],
+                  parent: self,
+                  **arguments
+                )
+              else
+                ObjectProxy.new(
+                  *fields,
+                  client: @client,
+                  field: field,
+                  parent: self,
+                  **arguments
+                )
+              end
             end
           end
         end
