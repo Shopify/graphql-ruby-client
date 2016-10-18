@@ -74,4 +74,20 @@ class MerchantChannelTest < Minitest::Test
     product = publications.first.product
     refute_nil product.title
   end
+
+  def test_publications_products_images
+    publications = @client
+      .shop
+      .channel_by_handle(:name, handle: 'buy-button-dev')
+      .product_publications(includes: { 'product' => ['title', 'images' => ['src']] })
+
+    assert_equal(5, publications.length)
+
+    image_count = 0
+    publications.each do |publication|
+      image_count += publication.product.images.length
+    end
+
+    refute_equal(0, image_count)
+  end
 end

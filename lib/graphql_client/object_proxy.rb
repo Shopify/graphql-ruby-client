@@ -153,6 +153,7 @@ module GraphQL
                 ObjectProxy.new(
                   *fields,
                   client: @client,
+                  includes: @includes,
                   data: item_data,
                   field: field,
                   parent: self,
@@ -165,6 +166,7 @@ module GraphQL
                   *fields,
                   client: @client,
                   field: field,
+                  includes: @includes,
                   data: @data[name.to_s],
                   parent: self,
                   **arguments
@@ -173,6 +175,7 @@ module GraphQL
                 ObjectProxy.new(
                   *fields,
                   client: @client,
+                  includes: @includes,
                   field: field,
                   parent: self,
                   **arguments
