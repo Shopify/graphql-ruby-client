@@ -4,7 +4,7 @@ module GraphQL
       attr_reader :arguments, :attributes, :field, :id, :loaded, :parent, :type
 
       def initialize(*fields, field:, client:, parent: nil, data: {}, includes: {}, **arguments)
-        @fields = fields.map(&:to_s)
+        @selection_set = fields.map(&:to_s)
         @field = field
         @id = arguments[:id]
         @client = client
@@ -50,14 +50,14 @@ module GraphQL
         response = if @id
           @client.query(object_query)
         else
-          raise "Object of type #{type.name} requires a selection set" if @fields.empty?
+          raise "Object of type #{type.name} requires a selection set" if @selection_set.empty?
           document = Query::Document.new(@client.schema)
           query_root = document.add_query
           field = add_nested_query_fields(query_root)
 
           field.arguments = @arguments if @arguments
           field.add_field('id') if @type.fields.field? 'id'
-          field.add_fields(*@fields)
+          field.add_fields(*@selection_set)
 
           @client.query(query_root)
         end
