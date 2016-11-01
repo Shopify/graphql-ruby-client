@@ -6,7 +6,7 @@ module GraphQL
       attr_reader :arguments, :objects, :parent
 
       def initialize(*fields, field:, parent:, parent_field:, client:, data: {}, includes: {}, **arguments)
-        @fields = fields.map(&:to_s)
+        @selection_set = fields.map(&:to_s)
         @field = field
         @parent = parent
         @parent_field = parent_field
@@ -87,7 +87,9 @@ module GraphQL
       end
 
       def connection_query(after: nil)
-        raise "Connection field \"#{@field.name}\" requires a selection set" if @fields.empty? && @includes.empty?
+        if @selection_set.empty? && @includes.empty?
+          raise %q(Connection field "#{@field.name}" requires a selection set)
+        end
 
         args = {}
 
@@ -109,7 +111,7 @@ module GraphQL
           query.add_field(parent_type.name.downcase, **args) do |node|
             node.add_connection(@field.name, **connection_args) do |connection|
               connection.add_field('id') if @type.node_type.fields.field? 'id'
-              connection.add_fields(*@fields)
+              connection.add_fields(*@selection_set)
 
               if @includes.any?
                 add_includes(connection, @includes)
@@ -123,7 +125,7 @@ module GraphQL
           query_leaf = rebuild_query(query)
           query_leaf.add_connection(@field.name, **connection_args) do |connection|
             connection.add_field('id') if @type.node_type.fields.field? 'id'
-            connection.add_fields(*@fields)
+            connection.add_fields(*@selection_set)
 
             if @includes.any?
               add_includes(connection, @includes)
