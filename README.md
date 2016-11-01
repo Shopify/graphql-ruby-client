@@ -69,14 +69,59 @@ client.query(query)
 
 ### ActiveRecord Style API
 
-This API is the most experimental/unfinished one.
+This API intends to mimic the style of ActiveRecord/ActiveResource for fetching
+GraphQL resources.
 
-It currently only supports building a tree of fields with explicit field selections.
+You can fetch objects, lists and connections through any schema's graph in a
+fairly straightforward way with fields explicitly specified:
 
 ```ruby
-shop = client.shop(fields: ['city'])
-products = shop.products(fields: ['id', 'title'])
-titles = products.map(&:title)
+shop = @client.shop
+address = shop.billing_address(:city)
+assert_equal('Toronto', address.city)
+
+products = shop.products(:title)
+assert_equal 5, products.length
+assert_equal 'Concrete Coat', products.first.title
+```
+
+An `includes` keyword allows you to nest relationships and efficiently fetch
+all the data required in one query:
+
+```ruby
+publications = @client
+  .shop
+  .channel_by_handle(:name, handle: 'buy-button-dev')
+  .product_publications(includes: { product: ['title'] })
+```
+
+You can also nest includes:
+
+```ruby
+collection_publications = @client
+      .shop
+      .channel_by_handle(handle: 'buy-button-dev')
+      .collection_publications(
+        first: 10,
+        includes: { collection: ['id', 'title', image: ['id', 'src']] }
+      )
+```
+
+Mutations are very much a work in progress, and currently match based on a
+naming convention used by Shopify that matches models and their actions.
+Updating, creating and deleting objects are supported:
+
+```ruby
+public_access_tokens = @client.shop.public_access_tokens(:title)
+
+new_token = public_access_tokens.create(title: 'Test')
+assert_equal 32, new_token.access_token.length
+assert_equal 'Test', new_token.title
+
+new_token.title = 'Test'
+new_token.save
+
+new_token.destroy
 ```
 
 ## Testing
