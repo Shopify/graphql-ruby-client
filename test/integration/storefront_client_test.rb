@@ -54,7 +54,7 @@ class StorefrontClientTest < Minitest::Test
   def test_shop_and_products
     shop = @client.shop
     address = shop.billing_address(:city)
-    assert_equal('Toronto', address.city)
+    assert_equal 'Toronto', address.city
 
     products = shop.products(:title)
     assert_equal 5, products.length
@@ -64,10 +64,10 @@ class StorefrontClientTest < Minitest::Test
     assert_equal(id, found_product.id)
 
     variants = found_product.variants(:price)
-    assert_equal(2, variants.length)
+    assert_equal 2, variants.length
 
     variant = variants.first
-    assert_equal('12.00', variant.price)
+    assert_equal '12.00', variant.price
   end
 
   def test_product_tags
@@ -93,7 +93,7 @@ class StorefrontClientTest < Minitest::Test
 
     shop = client.shop
     address = shop.billing_address(:city)
-    assert_equal('Toronto', address.city)
+    assert_equal 'Toronto', address.city
 
     products = shop.products(:title)
     assert_equal 5, products.length

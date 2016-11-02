@@ -3,11 +3,10 @@
 module GraphQL
   module Client
     class Config
-      attr_accessor :debug, :fetch_all_pages, :headers, :per_page, :password, :username, :url
+      attr_accessor :debug, :headers, :per_page, :password, :username, :url
 
       DEFAULTS = {
         debug: false,
-        fetch_all_pages: true,
         headers: {},
         per_page: 100,
       }
@@ -15,7 +14,6 @@ module GraphQL
       def initialize(options = {})
         @options = DEFAULTS.merge(options)
         @debug = @options[:debug]
-        @fetch_all_pages = @options[:fetch_all_pages]
         @headers = @options[:headers]
         @per_page = @options[:per_page]
         @password = @options[:password]

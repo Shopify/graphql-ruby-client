@@ -3,19 +3,18 @@ module GraphQL
     class ConnectionProxy
       include Enumerable
 
-      attr_reader :arguments, :objects, :parent
+      attr_reader :arguments, :cursor, :parent
 
-      def initialize(*fields, field:, parent:, parent_field:, client:, data: {}, includes: {}, **arguments)
+      def initialize(*fields, field:, parent:, client:, data: {}, includes: {}, **arguments)
         @selection_set = fields.map(&:to_s)
         @field = field
         @parent = parent
-        @parent_field = parent_field
         @client = client
         @data = data
         @includes = includes
         @schema = @client.schema
         @type = @field.base_type
-        @objects = []
+        @nodes = build_nodes(data.fetch('edges', []))
         @loaded = false
         @arguments = arguments
       end
@@ -44,20 +43,19 @@ module GraphQL
         ObjectProxy.new(field: @field, data: attributes, client: @client)
       end
 
-      def cursor
-        connection_edges(@response.data).last.fetch('cursor')
-      end
+      def each(start = 0)
+        return to_enum(:each, start) unless block_given?
 
-      def each
-        load_page unless @loaded
+        Array(@nodes[start..-1]).each do |node|
+          yield node
+        end
 
-        @objects.each do |node|
-          yield ObjectProxy.new(
-            client: @client,
-            data: node,
-            field: @field,
-            includes: @includes,
-          )
+        unless last_page?
+          start = [@nodes.size, start].max
+
+          fetch_page
+
+          each(start, &Proc.new)
         end
       end
 
@@ -65,82 +63,26 @@ module GraphQL
         entries.length
       end
 
-      def next_page?
-        @response.data.dig(*parent.query_path, @field.name, 'pageInfo', 'hasNextPage')
+      def last_page?
+        @data.dig('pageInfo', 'hasNextPage') == false
       end
 
       def proxy_path
         [].tap do |parents|
-          parents << @parent.proxy_path if @parent
-          parents << @parent if @parent
+          parents << parent.proxy_path if parent
+          parents << parent if parent
         end.flatten
       end
 
       private
 
-      def rebuild_query(query = root)
-        proxy_path.each do |proxy|
-          query = query.add_field(proxy.field.name, proxy.arguments)
-        end
-
-        query
-      end
-
-      def connection_query(after: nil)
-        if @selection_set.empty? && @includes.empty?
-          raise %q(Connection field "#{@field.name}" requires a selection set)
-        end
-
-        args = {}
-
-        parent_type = if @parent.type.is_a? GraphQLSchema::Types::Connection
-          @parent.type.node_type
-        else
-          @parent.type
-        end
-
-        query = Query::QueryDocument.new(@schema)
-
-        if @parent.loaded && @parent.id && @schema.query_root.fields.fetch(parent_type.name.downcase).args.key?('id')
-          # We can shortcut this query and base it off of an already known node object
-          args[:id] = @parent.id
-
-          connection_args = { first: @arguments.fetch(:first, @client.config.per_page) }
-          connection_args[:after] = after if after
-
-          query.add_field(parent_type.name.downcase, **args) do |node|
-            node.add_connection(@field.name, **connection_args) do |connection|
-              connection.add_field('id') if @type.node_type.fields.field? 'id'
-              connection.add_fields(*@selection_set)
-
-              if @includes.any?
-                add_includes(connection, @includes)
-              end
-            end
-          end
-        else
-          connection_args = { first: @arguments.fetch(:first, @client.config.per_page) }
-          connection_args[:after] = after if after
-
-          query_leaf = rebuild_query(query)
-          query_leaf.add_connection(@field.name, **connection_args) do |connection|
-            connection.add_field('id') if @type.node_type.fields.field? 'id'
-            connection.add_fields(*@selection_set)
-
-            if @includes.any?
-              add_includes(connection, @includes)
-            end
-          end
-        end
-
-        query
-      end
-
-      def add_includes(connection, includes)
+      def add_includes(connection, includes = @includes)
         includes.each do |key, values|
-          if connection.resolver_type.fields[key.to_s].connection?
+          field_name = key.to_s
+
+          if connection.resolver_type.fields[field_name].connection?
             connection.add_connection(
-              key.to_s,
+              field_name,
               first: @arguments.fetch(:first, @client.config.per_page)
             ) do |subconnection|
               values.each do |field|
@@ -152,7 +94,7 @@ module GraphQL
               end
             end
           else
-            connection.add_field(key.to_s) do |subfield|
+            connection.add_field(field_name) do |subfield|
               values.each do |field|
                 if field.is_a? String
                   subfield.add_field(field)
@@ -165,42 +107,68 @@ module GraphQL
         end
       end
 
-      def connection_edges(response_data)
-        response_data.dig(*parent.query_path, @field.name, 'edges')
+      def build_nodes(edges_data)
+        edges_data.map do |edge|
+          ObjectProxy.new(
+            client: @client,
+            data: edge.fetch('node'),
+            field: @field,
+            includes: @includes,
+          )
+        end
+      end
+
+      def connection_query
+        if @selection_set.empty? && @includes.empty?
+          raise %q(Connection field "#{@field.name}" requires a selection set)
+        end
+
+        query = Query::QueryDocument.new(@schema)
+
+        connection_args = {}.tap do |args|
+          args[:first] = @arguments.fetch(:first, @client.config.per_page)
+          args[:after] = @cursor if @cursor
+          args[:after] = @arguments.fetch(:after) if @arguments.key?(:after)
+        end
+
+        query_field = if parent.loaded && parent_with_id?
+          # We can shortcut this query and base it off of an already known node object
+          query.add_field(parent.field_name, id: parent.id)
+        else
+          rebuild_query(query)
+        end
+
+        query_field.add_connection(@field.name, **connection_args) do |connection|
+          connection.add_field('id') if @type.node_type.fields.field? 'id'
+          connection.add_fields(*@selection_set)
+
+          add_includes(connection)
+        end
+
+        query
       end
 
       def fetch_page
-        @response = if arguments.key?(:after)
-          @client.query(connection_query(after: arguments[:after]))
-        else
-          @client.query(connection_query)
-        end
+        @response = @client.query(connection_query)
 
-        edges = connection_edges(@response.data)
-        @objects += nodes(edges)
-
-        if @client.config.fetch_all_pages
-          while next_page?
-            @response = @client.query(connection_query(after: cursor))
-
-            edges = connection_edges(@response.data)
-            @objects += nodes(edges)
-          end
-        end
-      end
-
-      def load_page
-        if @data.empty?
-          fetch_page
-        else
-          @objects += nodes(@data['edges'])
-        end
+        @data = @response.data.dig(*parent.query_path, @field.name)
+        edges = @data.fetch('edges')
+        @nodes += build_nodes(edges)
+        @cursor = edges.last.fetch('cursor')
 
         @loaded = true
       end
 
-      def nodes(edges_data)
-        edges_data.map { |edge| edge.fetch('node') }
+      def parent_with_id?
+        parent.id && @schema.query_root.fields.fetch(parent.field_name).args.key?('id')
+      end
+
+      def rebuild_query(query)
+        proxy_path.each do |proxy|
+          query = query.add_field(proxy.field.name, proxy.arguments)
+        end
+
+        query
       end
 
       def response_object(response)
