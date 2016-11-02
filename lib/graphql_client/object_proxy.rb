@@ -21,6 +21,11 @@ module GraphQL
         define_connections_accessors
       end
 
+      def add_nested_query_fields(query)
+        query = parent.add_nested_query_fields(query) if parent
+        query.add_field(@field.name)
+      end
+
       def destroy
         mutation = Query::MutationDocument.new(@client.schema) do |m|
           m.add_field("#{base_node_type_name}Delete", input: { id: id }) do |field|
@@ -31,11 +36,6 @@ module GraphQL
         end
 
         @client.query(mutation)
-      end
-
-      def add_nested_query_fields(query)
-        query = @parent.add_nested_query_fields(query) if @parent
-        query.add_field(@field.name)
       end
 
       def field_name
@@ -100,11 +100,6 @@ module GraphQL
       private
 
       # TODO: 💩
-      def connection?
-        type.respond_to?(:node_type)
-      end
-
-      # TODO: 💩
       def base_node_type
         @base_node_type ||= connection? ? type.node_type : type
       end
@@ -112,6 +107,11 @@ module GraphQL
       # TODO: 💩
       def base_node_type_name
         @base_node_type_name ||= base_node_type.name.dup.tap { |s| s[0] = s[0].downcase }
+      end
+
+      # TODO: 💩
+      def connection?
+        type.respond_to?(:node_type)
       end
 
       def define_connections_accessors
@@ -124,7 +124,6 @@ module GraphQL
                 field: field,
                 includes: @includes,
                 parent: self,
-                parent_field: @field,
                 **arguments
               )
             else
@@ -135,7 +134,6 @@ module GraphQL
                 field: field,
                 includes: @includes,
                 parent: self,
-                parent_field: @field,
                 **arguments
               )
             end
