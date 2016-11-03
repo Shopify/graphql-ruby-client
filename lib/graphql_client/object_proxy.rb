@@ -62,7 +62,7 @@ module GraphQL
           @client.query(query_root)
         end
 
-        @data = response_object(response)
+        @data = response.data.dig(*query_path)
         @loaded = true
       end
 
@@ -204,10 +204,6 @@ module GraphQL
             field.add_fields(*base_node_type.scalar_fields.names)
           end
         end
-      end
-
-      def response_object(response)
-        response.data.dig(*query_path)
       end
 
       def underscore(name)

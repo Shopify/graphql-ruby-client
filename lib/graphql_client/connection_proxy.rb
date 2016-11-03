@@ -25,8 +25,10 @@ module GraphQL
         type_name = type.name.dup
         type_name[0] = type_name[0].downcase
 
+        mutation_name = "#{type_name}Create"
+
         mutation = Query::MutationDocument.new(@client.schema) do |m|
-          m.add_field("#{type_name}Create", input: attributes) do |field|
+          m.add_field(mutation_name, input: attributes) do |field|
             field.add_field(type_name) do |connection_type|
               connection_type.add_fields(*type.scalar_fields.names)
             end
@@ -38,9 +40,9 @@ module GraphQL
         end
 
         response = @client.query(mutation)
-        attributes = response_object(response).fetch(type_name)
+        data = response.data.dig(mutation_name, type_name)
 
-        ObjectProxy.new(field: @field, data: attributes, client: @client)
+        ObjectProxy.new(field: @field, data: data, client: @client)
       end
 
       def each(start = 0)
@@ -169,11 +171,6 @@ module GraphQL
         end
 
         query
-      end
-
-      def response_object(response)
-        object = response.data.keys.first
-        response.data.fetch(object)
       end
     end
   end
