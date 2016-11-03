@@ -1,18 +1,19 @@
 module GraphQL
   module Client
     class Response
-      MalformedError = Class.new(StandardError)
+      ResponseError = Class.new(StandardError)
 
-      attr_reader :data
+      attr_reader :data, :errors, :extensions
 
       def initialize(response_body)
-        parsed_response = JSON.parse(response_body)
+        response = JSON.parse(response_body)
+        data, errors, extensions = response.values_at('data', 'errors', 'extensions')
 
-        if parsed_response.key?('errors')
-          raise MalformedError, "Malformed response: #{parsed_response['errors']}"
-        end
+        raise ResponseError, errors if !data && errors
 
-        @data = parsed_response.fetch('data')
+        @data = data
+        @errors = errors.to_a
+        @extensions = extensions.to_a
       end
     end
   end

@@ -25,7 +25,7 @@ module GraphQL
             puts "Response body: \n#{JSON.pretty_generate(JSON.parse(response.body))}" if debug?
             Response.new(response.body)
           else
-            raise NetworkError, "Response error: #{response.code}/#{response.message}"
+            raise NetworkError, "#{response.code}/#{response.message}"
           end
         end
 
