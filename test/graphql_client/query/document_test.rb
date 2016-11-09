@@ -229,6 +229,7 @@ module GraphQL
                     }
                   }
                   pageInfo {
+                    hasPreviousPage
                     hasNextPage
                   }
                 }

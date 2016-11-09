@@ -170,6 +170,42 @@ module GraphQL
                     }
                   }
                   pageInfo {
+                    hasPreviousPage
+                    hasNextPage
+                  }
+                }
+              }
+            }
+          QUERY
+
+          assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema
+        end
+
+        def test_to_query_adds_node_id_if_type_implements_node
+          document = Document.new(@schema)
+
+          query = QueryOperation.new(document) do |q|
+            q.add_field('product', id: 'gid://Product/1') do |product|
+              product.add_connection('variants', first: 10) do |connection|
+                connection.add_field('title')
+              end
+            end
+          end
+
+          query_string = <<~QUERY
+            query {
+              product(id: "gid://Product/1") {
+                variants(first: 10) {
+                  edges {
+                    cursor
+                    node {
+                      id
+                      title
+                    }
+                  }
+                  pageInfo {
+                    hasPreviousPage
                     hasNextPage
                   }
                 }

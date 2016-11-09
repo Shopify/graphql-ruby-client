@@ -10,11 +10,13 @@ module GraphQL
             connection.add_field('edges') do |edges|
               edges.add_field('cursor')
               edges.add_field('node') do |node|
+                node.add_field('id') if node.resolver_type.node?
                 yield node
               end
             end
 
             connection.add_field('pageInfo') do |page_info|
+              page_info.add_field('hasPreviousPage')
               page_info.add_field('hasNextPage')
             end
           end
