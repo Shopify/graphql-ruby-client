@@ -13,8 +13,8 @@ module GraphQL
           @config = config
         end
 
-        def request(query, operation_name: nil)
-          req = build_request(query, operation_name: operation_name)
+        def request(query, operation_name: nil, variables: {})
+          req = build_request(query, operation_name: operation_name, variables: variables)
 
           response = Net::HTTP.start(config.url.hostname, config.url.port, use_ssl: https?) do |http|
             http.request(req)
@@ -31,13 +31,18 @@ module GraphQL
 
         private
 
-        def build_request(query, operation_name: nil)
+        def build_request(query, operation_name: nil, variables: {})
           headers = DEFAULT_HEADERS.merge(config.headers)
 
           Net::HTTP::Post.new(config.url, headers).tap do |req|
             req.basic_auth(config.username, config.password)
             puts "Query: #{query}" if debug?
-            req.body = { query: query, variables: {}, operation_name: operation_name }.to_json
+
+            req.body = {
+              query: query,
+              variables: variables,
+              operation_name: operation_name,
+            }.to_json
           end
         end
 

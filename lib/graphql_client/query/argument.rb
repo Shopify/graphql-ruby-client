@@ -22,7 +22,11 @@ module GraphQL
         private
 
         def generate_query_value(value)
-          JSON.generate(value, quirks_mode: true)
+          if value.to_s.start_with?('$')
+            value
+          else
+            JSON.generate(value, quirks_mode: true)
+          end
         end
       end
     end

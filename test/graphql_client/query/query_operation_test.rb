@@ -180,6 +180,27 @@ module GraphQL
           assert_equal query_string, query.to_query
           assert_valid_query query_string, @graphql_schema
         end
+
+        def test_to_query_handles_variables
+          document = Document.new(@schema)
+
+          query = QueryOperation.new(document, variables: { productID: 'ID!' }) do |q|
+            q.add_field('product', id: '$productID') do |product|
+              product.add_field('title')
+            end
+          end
+
+          query_string = <<~QUERY
+            query($productID: ID!) {
+              product(id: $productID) {
+                title
+              }
+            }
+          QUERY
+
+          assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema, variables: { 'productID' => 'gid://Product/1' }
+        end
       end
     end
   end

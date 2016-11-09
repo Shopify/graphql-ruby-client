@@ -29,9 +29,9 @@ module GraphQL
         end
 
         def test_to_query_hash
-          arguments = Argument.new(name: 'Foo', ids: [1, 2])
+          arguments = Argument.new(name: 'Foo', ids: [1, 2], variable: '$variableName')
 
-          assert_equal '{ name: "Foo", ids: [1,2] }', arguments.to_query
+          assert_equal '{ name: "Foo", ids: [1,2], variable: $variableName }', arguments.to_query
         end
 
         def test_to_query_float
@@ -62,6 +62,12 @@ module GraphQL
           arguments = Argument.new("foo\"bar")
 
           assert_equal '"foo\"bar"', arguments.to_query
+        end
+
+        def test_to_query_passes_through_variables
+          arguments = Argument.new('$variableName')
+
+          assert_equal '$variableName', arguments.to_query
         end
       end
     end

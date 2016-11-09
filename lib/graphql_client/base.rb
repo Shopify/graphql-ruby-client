@@ -27,12 +27,12 @@ module GraphQL
         yield @config
       end
 
-      def query(query, operation_name: nil)
-        adapter.request(query.to_query, operation_name: operation_name)
+      def query(query, operation_name: nil, variables: {})
+        adapter.request(query.to_query, operation_name: operation_name, variables: variables)
       end
 
-      def raw_query(query_string, operation_name: nil)
-        adapter.request(query_string, operation_name: operation_name)
+      def raw_query(query_string, operation_name: nil, variables: {})
+        adapter.request(query_string, operation_name: operation_name, variables: variables)
       end
 
       private

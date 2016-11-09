@@ -59,6 +59,33 @@ module GraphQL
           assert_equal query_string, query.to_query
           assert_valid_query query_string, @graphql_schema
         end
+
+        def test_to_query_handles_variables
+          document = Document.new(@schema)
+
+          query = MutationOperation.new(document, variables: { tokenTitle: 'String' }) do |q|
+            q.add_field('publicAccessTokenCreate', input: { title: '$tokenTitle' }) do |mutation|
+              mutation.add_field('publicAccessToken') do |public_access_token|
+                public_access_token.add_field('title')
+                public_access_token.add_field('accessToken')
+              end
+            end
+          end
+
+          query_string = <<~QUERY
+            mutation($tokenTitle: String) {
+              publicAccessTokenCreate(input: { title: $tokenTitle }) {
+                publicAccessToken {
+                  title
+                  accessToken
+                }
+              }
+            }
+          QUERY
+
+          assert_equal query_string, query.to_query
+          assert_valid_query query_string, @graphql_schema, variables: { 'tokenTitle' => 'Title' }
+        end
       end
     end
   end

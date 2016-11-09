@@ -23,7 +23,7 @@ module GraphQL
         query.expect(:to_query, 'query shopQuery { shop }')
 
         adapter = Minitest::Mock.new
-        adapter.expect(:request, nil, ['query shopQuery { shop }', operation_name: 'shopQuery'])
+        adapter.expect(:request, nil, ['query shopQuery { shop }', operation_name: 'shopQuery', variables: {}])
 
         client = Base.new(schema, config: config, adapter: adapter)
         client.query(query, operation_name: 'shopQuery')
@@ -37,7 +37,7 @@ module GraphQL
         config = Config.new(url: 'http://example.com')
 
         adapter = Minitest::Mock.new
-        adapter.expect(:request, nil, ['query { shop }', operation_name: nil])
+        adapter.expect(:request, nil, ['query { shop }', operation_name: nil, variables: {}])
 
         client = Base.new(schema, config: config, adapter: adapter)
         client.raw_query('query { shop }')
