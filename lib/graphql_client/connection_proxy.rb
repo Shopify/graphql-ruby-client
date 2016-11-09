@@ -141,7 +141,6 @@ module GraphQL
         end
 
         query_field.add_connection(@field.name, **connection_args) do |connection|
-          connection.add_field('id') if @type.node_type.fields.field? 'id'
           connection.add_fields(*@selection_set)
 
           add_includes(connection)

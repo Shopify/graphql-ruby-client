@@ -97,10 +97,12 @@ module GraphQL
                 edges {
                   cursor
                   node {
+                    id
                     title
                   }
                 }
                 pageInfo {
+                  hasPreviousPage
                   hasNextPage
                 }
               }
