@@ -19,8 +19,8 @@ module GraphQL
           @selection_set = SelectionSet.new
         end
 
-        def resolver_type
-          field.base_type
+        def aliased?
+          name != field.name
         end
 
         def arguments=(arguments)
@@ -31,9 +31,13 @@ module GraphQL
           as || field.name
         end
 
+        def resolver_type
+          field.base_type
+        end
+
         def to_query(indent: '')
           indent.dup.tap do |query_string|
-            query_string << "#{as}: " if as
+            query_string << "#{as}: " if aliased?
             query_string << field.name
             query_string << "(#{arguments_string.join(', ')})" if arguments.any?
 
