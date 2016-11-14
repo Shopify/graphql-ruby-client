@@ -33,6 +33,8 @@ module GraphQL
         def to_query(indent: '')
           "#{indent}...#{name}"
         end
+
+        alias_method :to_s, :to_query
       end
     end
   end

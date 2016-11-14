@@ -45,6 +45,8 @@ module GraphQL
             field.to_query(indent: indent + '  ')
           end.join("\n")
         end
+
+        alias_method :to_s, :to_query
       end
     end
   end

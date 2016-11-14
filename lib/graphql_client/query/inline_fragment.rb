@@ -27,6 +27,8 @@ module GraphQL
             query_string << "\n#{indent}}"
           end
         end
+
+        alias_method :to_s, :to_query
       end
     end
   end
