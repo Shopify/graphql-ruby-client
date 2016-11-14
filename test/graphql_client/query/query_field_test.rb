@@ -22,9 +22,9 @@ module GraphQL
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, document: @document, arguments: {})
 
-          query_field.add_field('name')
+          name = query_field.add_field('name')
 
-          assert_equal 1, query_field.selection_set.size
+          assert_equal({ 'name' => name }, query_field.selection_set.fields)
         end
 
         def test_add_fields_creates_multiple_selection_set
@@ -33,7 +33,7 @@ module GraphQL
 
           query_field.add_fields('id', 'name')
 
-          assert_equal 2, query_field.selection_set.size
+          assert_equal %w(id name), query_field.selection_set.fields.keys
         end
 
         def test_add_field_uses_as_alias_name

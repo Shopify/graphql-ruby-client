@@ -8,7 +8,7 @@ module GraphQL
           target_type = validate_fragment_target(document.schema[type_name])
 
           inline_fragment = InlineFragment.new(target_type, document: document)
-          @selection_set << inline_fragment
+          selection_set.add_inline_fragment(inline_fragment)
 
           if block_given?
             yield inline_fragment

@@ -4,14 +4,14 @@ module GraphQL
   module Client
     module Query
       class Operation
-        include SelectionSet
+        include HasSelectionSet
 
         attr_reader :document, :name, :selection_set, :variables
 
         def initialize(document, name: nil, variables: {})
           @document = document
           @name = name
-          @selection_set = []
+          @selection_set = SelectionSet.new
           @variables = variables
 
           yield self if block_given?
@@ -26,7 +26,7 @@ module GraphQL
             query_string << " #{name}" if name
             query_string << "(#{variables_string.join(', ')})" if variables.any?
             query_string << " {\n"
-            query_string << selection_set_query
+            query_string << selection_set.to_query
             query_string << "\n}\n"
           end
         end

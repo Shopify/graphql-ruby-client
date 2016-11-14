@@ -5,15 +5,15 @@ module GraphQL
     module Query
       class Fragment
         include AddInlineFragment
-        include SelectionSet
+        include HasSelectionSet
 
-        attr_reader :document, :name, :type, :selection_set
+        attr_reader :document, :name, :type
 
         def initialize(name, type, document:)
           @name = name
           @type = type
           @document = document
-          @selection_set = []
+          @selection_set = SelectionSet.new
 
           yield self if block_given?
         end
@@ -25,7 +25,7 @@ module GraphQL
         def to_definition(indent: '')
           indent.dup.tap do |query_string|
             query_string << "fragment #{name} on #{type.name} {\n"
-            query_string << selection_set_query(indent)
+            query_string << selection_set.to_query(indent)
             query_string << "\n#{indent}}\n"
           end
         end
