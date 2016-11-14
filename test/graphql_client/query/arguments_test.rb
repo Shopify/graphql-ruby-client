@@ -69,6 +69,20 @@ module GraphQL
 
           assert_equal '$variableName', arguments.to_query
         end
+
+        def test_argument_instances_are_equal_for_same_value
+          argument = Argument.new('foo')
+          other_argument = Argument.new('foo')
+
+          assert_equal argument, other_argument
+        end
+
+        def test_argument_instances_are_not_equal_for_different_values
+          argument = Argument.new('foo')
+          other_argument = Argument.new('var')
+
+          refute_equal argument, other_argument
+        end
       end
     end
   end

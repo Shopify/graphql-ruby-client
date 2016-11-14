@@ -1,13 +1,7 @@
 module GraphQL
   module Client
     module Query
-      class Argument
-        attr_reader :value
-
-        def initialize(value)
-          @value = value
-        end
-
+      Argument = Struct.new(:value) do
         def to_query
           case value
           when FalseClass, Float, Integer, NilClass, String, TrueClass

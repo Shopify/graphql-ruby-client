@@ -19,6 +19,11 @@ module GraphQL
           @selection_set = SelectionSet.new
         end
 
+        def add_arguments(**arguments)
+          new_arguments = validate_arguments(arguments)
+          @arguments.merge!(new_arguments)
+        end
+
         def aliased?
           name != field.name
         end
@@ -64,7 +69,7 @@ module GraphQL
 
           arguments.each_with_object({}) do |(name, value), hash|
             if valid_args.include?(name.to_s)
-              hash[name] = Argument.new(value)
+              hash[name] = value.is_a?(Argument) ? value : Argument.new(value)
             else
               raise INVALID_ARGUMENTS, "#{name} is not a valid arg for #{field.name}"
             end
