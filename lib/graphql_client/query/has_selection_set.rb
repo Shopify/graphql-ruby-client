@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module GraphQL
   module Client
     module Query
       module HasSelectionSet
+        ID_FIELD_NAME = 'id'
         INVALID_FIELD = Class.new(StandardError)
         UNDEFINED_FRAGMENT = Class.new(StandardError)
 
@@ -14,7 +17,6 @@ module GraphQL
             connection.add_field('edges') do |edges|
               edges.add_field('cursor')
               edges.add_field('node') do |node|
-                node.add_field('id') if node.resolver_type.node?
                 node_field = node
                 yield node
               end
@@ -33,6 +35,8 @@ module GraphQL
           field = resolve(field_name)
           query_field = QueryField.new(field, arguments: arguments, as: as, document: document)
           selection_set.add_field(query_field)
+
+          query_field.add_field(ID_FIELD_NAME) if query_field.node?
 
           if block_given?
             yield query_field

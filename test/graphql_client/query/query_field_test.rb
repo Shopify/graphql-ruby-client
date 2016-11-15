@@ -60,7 +60,7 @@ module GraphQL
           assert_equal({ 'name' => name, 'myname' => myname }, query_field.selection_set.fields)
         end
 
-        def test_add_fields_creates_multiple_selection_set
+        def test_add_fields_creates_multiple_fields
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, document: @document, arguments: {})
 

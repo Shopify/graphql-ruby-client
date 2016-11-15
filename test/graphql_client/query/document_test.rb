@@ -158,6 +158,7 @@ module GraphQL
           query_string = <<~QUERY
             query shopQuery {
               shop {
+                id
                 name
               }
             }
@@ -165,6 +166,7 @@ module GraphQL
             mutation tokens {
               publicAccessTokenCreate(input: { title: "Token Title" }) {
                 publicAccessToken {
+                  id
                   title
                 }
               }
@@ -184,9 +186,7 @@ module GraphQL
 
             d.add_query('getShop') do |q|
               q.add_field('shop') do |shop|
-                shop.add_inline_fragment('Node') do |f|
-                  f.add_field('id')
-                end
+                shop.add_field('id')
               end
             end
 
@@ -210,14 +210,13 @@ module GraphQL
 
             query getShop {
               shop {
-                ... on Node {
-                  id
-                }
+                id
               }
             }
 
             query getProductImages {
               product(id: "gid://Product/1") {
+                id
                 images(first: 10) {
                   edges {
                     cursor

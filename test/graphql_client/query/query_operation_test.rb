@@ -45,6 +45,7 @@ module GraphQL
           query_string = <<~QUERY
             query {
               product(id: "2") {
+                id
                 title
               }
             }
@@ -66,6 +67,7 @@ module GraphQL
           query_string = <<~QUERY
             query {
               userProduct: product(id: "2") {
+                id
                 title
               }
             }
@@ -96,9 +98,11 @@ module GraphQL
           query_string = <<~QUERY
             query {
               product(id: "gid://Product/1") {
+                id
                 title
               }
               shop {
+                id
                 name
                 billingAddress {
                   city
@@ -132,9 +136,11 @@ module GraphQL
           query_string = <<~QUERY
             query {
               product(id: "gid://Product/1") {
+                id
                 title
               }
               shop {
+                id
                 name
                 billingAddress {
                   city
@@ -162,6 +168,7 @@ module GraphQL
           query_string = <<~QUERY
             query {
               product(id: "gid://Product/1") {
+                id
                 images(first: 10) {
                   edges {
                     cursor
@@ -196,6 +203,7 @@ module GraphQL
           query_string = <<~QUERY
             query {
               product(id: "gid://Product/1") {
+                id
                 variants(first: 10) {
                   edges {
                     cursor
@@ -229,6 +237,7 @@ module GraphQL
           query_string = <<~QUERY
             query($productID: ID!) {
               product(id: $productID) {
+                id
                 title
               }
             }

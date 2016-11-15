@@ -36,8 +36,18 @@ module GraphQL
           as || field.name
         end
 
+        # TODO: better way?
+        def node?
+          return true if field.name == 'Node'
+          resolver_type.is_a?(GraphQLSchema::Types::Object) && resolver_type.node?
+        end
+
         def resolver_type
           field.base_type
+        end
+
+        def schema
+          document.schema
         end
 
         def to_query(indent: '')
