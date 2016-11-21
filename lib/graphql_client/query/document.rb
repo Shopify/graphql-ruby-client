@@ -57,6 +57,8 @@ module GraphQL
           end
         end
 
+        alias_method :to_s, :to_query
+
         private
 
         def add_operation(operation_type, name)

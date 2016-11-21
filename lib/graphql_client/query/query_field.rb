@@ -45,6 +45,8 @@ module GraphQL
           end
         end
 
+        alias_method :to_s, :to_query
+
         private
 
         def arguments_string
