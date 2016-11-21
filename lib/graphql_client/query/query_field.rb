@@ -5,18 +5,18 @@ module GraphQL
     module Query
       class QueryField
         include AddInlineFragment
-        include SelectionSet
+        include HasSelectionSet
 
         INVALID_ARGUMENTS = Class.new(StandardError)
 
-        attr_reader :arguments, :as, :document, :field, :selection_set
+        attr_reader :arguments, :as, :document, :field
 
         def initialize(field, document:, arguments: {}, as: nil)
           @field = field
           @document = document
           @arguments = validate_arguments(arguments)
           @as = as
-          @selection_set = []
+          @selection_set = SelectionSet.new
         end
 
         def resolver_type
@@ -27,15 +27,19 @@ module GraphQL
           @arguments = validate_arguments(arguments)
         end
 
+        def name
+          as || field.name
+        end
+
         def to_query(indent: '')
           indent.dup.tap do |query_string|
             query_string << "#{as}: " if as
             query_string << field.name
             query_string << "(#{arguments_string.join(', ')})" if arguments.any?
 
-            if selection_set?
+            unless selection_set.empty?
               query_string << " {\n"
-              query_string << selection_set_query(indent)
+              query_string << selection_set.to_query(indent)
               query_string << "\n#{indent}}"
             end
           end

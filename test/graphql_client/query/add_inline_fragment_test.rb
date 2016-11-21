@@ -27,21 +27,21 @@ module GraphQL
           inline_fragment = @query_field.add_inline_fragment('Shop')
 
           assert_equal @schema['Shop'], inline_fragment.type
-          assert_equal [inline_fragment], @query_field.selection_set
+          assert_equal [inline_fragment], @query_field.selection_set.inline_fragments
         end
 
         def test_add_inline_fragment_creates_inline_fragment_with_explicit_interface_type
           inline_fragment = @query_field.add_inline_fragment('Node')
 
           assert_equal @schema['Node'], inline_fragment.type
-          assert_equal [inline_fragment], @query_field.selection_set
+          assert_equal [inline_fragment], @query_field.selection_set.inline_fragments
         end
 
         def test_add_inline_fragment_creates_inline_fragment_with_implicit_type
           inline_fragment = @query_field.add_inline_fragment
 
           assert_equal @schema['Shop'], inline_fragment.type
-          assert_equal [inline_fragment], @query_field.selection_set
+          assert_equal [inline_fragment], @query_field.selection_set.inline_fragments
         end
 
         def test_add_inline_fragment_raises_exception_for_invalid_target_type
