@@ -18,6 +18,19 @@ module GraphQL
           end
         end
 
+        def test_add_arguments_merges_new_arguments_with_existing_ones
+          shop = @schema.query_root.fields.fetch('shop')
+          field = shop.base_type.fields.fetch('products')
+          query_field = QueryField.new(field, document: @document, arguments: { first: 5 })
+
+          query_field.add_arguments(first: 10, after: 'cursor')
+
+          first_arg = Argument.new(10)
+          after_arg = Argument.new('cursor')
+
+          assert_equal({ first: first_arg, after: after_arg }, query_field.arguments)
+        end
+
         def test_add_field_creates_field_and_adds_to_selection_set
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, document: @document, arguments: {})
