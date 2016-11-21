@@ -51,6 +51,20 @@ module GraphQL
           assert_equal query_string.chomp, query_field.to_query
         end
 
+        def test_name_returns_alias_if_set
+          field = @schema.query_root.fields.fetch('shop')
+          query_field = QueryField.new(field, document: @document, as: 'myshop')
+
+          assert_equal 'myshop', query_field.name
+        end
+
+        def test_name_defaults_to_field_name
+          field = @schema.query_root.fields.fetch('shop')
+          query_field = QueryField.new(field, document: @document)
+
+          assert_equal 'shop', query_field.name
+        end
+
         def test_resolver_type_is_the_fields_base_type
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, document: @document, arguments: {})
