@@ -82,13 +82,32 @@ module GraphQL
           refute selection_set.empty?
         end
 
+        def test_selections_is_an_array_of_all_selections_in_the_set
+          selection_set = SelectionSet.new
+
+          document = Document.new(@schema)
+          field = @schema.query_root.fields.fetch('shop')
+          type = @schema.query_root.fields.fetch('shop').base_type
+
+          query_field = QueryField.new(field, document: document)
+          fragment = Fragment.new('shopFields', type, document: document)
+          inline_fragment = InlineFragment.new(type, document: document)
+
+          selection_set.add_field(query_field)
+          selection_set.add_fragment(fragment)
+          selection_set.add_inline_fragment(inline_fragment)
+
+          assert_equal [query_field, fragment, inline_fragment], selection_set.selections
+        end
+
         def test_to_query_builds_a_graphql_query_representation_of_the_selections
           selection_set = SelectionSet.new
 
-          mock_field = Minitest::Mock.new
+          mock_field = Minitest::Mock.new(name: 'foo')
+          mock_field.expect(:name, 'foo')
           mock_field.expect(:to_query, 'query string', [{ indent: '  ' }])
 
-          selection_set.selections << mock_field
+          selection_set.add_field(mock_field)
 
           assert_equal 'query string', selection_set.to_query
         end

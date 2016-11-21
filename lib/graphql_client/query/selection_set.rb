@@ -4,27 +4,23 @@ module GraphQL
   module Client
     module Query
       class SelectionSet
-        attr_reader :fields, :fragments, :fields, :inline_fragments, :selections
+        attr_reader :fields, :fragments, :fields, :inline_fragments
 
         def initialize
           @fragments = {}
           @fields = {}
           @inline_fragments = []
-          @selections = []
         end
 
         def add_field(query_field)
-          @selections << query_field
           @fields[query_field.name] = query_field
         end
 
         def add_fragment(fragment)
-          @selections << fragment
           @fragments[fragment.name] = fragment
         end
 
         def add_inline_fragment(inline_fragment)
-          @selections << inline_fragment
           @inline_fragments << inline_fragment
         end
 
@@ -38,6 +34,10 @@ module GraphQL
 
         def lookup(name)
           fields.fetch(name)
+        end
+
+        def selections
+          fields.values + fragments.values + inline_fragments
         end
 
         def to_query(indent = '')
