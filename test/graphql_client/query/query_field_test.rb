@@ -40,6 +40,26 @@ module GraphQL
           assert_equal({ 'name' => name }, query_field.selection_set.fields)
         end
 
+        def test_add_field_does_not_add_duplicate_fields
+          field = @schema.query_root.fields.fetch('shop')
+          query_field = QueryField.new(field, document: @document, arguments: {})
+
+          query_field.add_field('name')
+          new_name = query_field.add_field('name')
+
+          assert_equal({ 'name' => new_name }, query_field.selection_set.fields)
+        end
+
+        def test_add_field_allows_multiple_fields_of_same_type_with_aliases
+          field = @schema.query_root.fields.fetch('shop')
+          query_field = QueryField.new(field, document: @document, arguments: {})
+
+          name = query_field.add_field('name')
+          myname = query_field.add_field('name', as: 'myname')
+
+          assert_equal({ 'name' => name, 'myname' => myname }, query_field.selection_set.fields)
+        end
+
         def test_add_fields_creates_multiple_selection_set
           field = @schema.query_root.fields.fetch('shop')
           query_field = QueryField.new(field, document: @document, arguments: {})
