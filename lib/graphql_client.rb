@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'bundler/setup'
 require 'json'
 require 'graphql_schema'
@@ -19,12 +18,10 @@ require 'graphql_client/query/document.rb'
 require 'graphql_client/query/operation.rb'
 require 'graphql_client/query/operations/query_operation.rb'
 require 'graphql_client/query/operations/mutation_operation.rb'
-require 'graphql_client/connection_proxy.rb'
 require 'graphql_client/response.rb'
 require 'graphql_client/graph_object.rb'
 require 'graphql_client/graph_connection.rb'
 require 'graphql_client/graph_node.rb'
-require 'graphql_client/object_proxy.rb'
 require 'graphql_client/introspection_query.rb'
 
 module GraphQL

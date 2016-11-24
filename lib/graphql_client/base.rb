@@ -8,8 +8,6 @@ module GraphQL
         @schema = schema
         @adapter = adapter || Adapters::HTTPAdapter.new(@config)
 
-        define_field_accessors
-
         instance_eval(&block) if block_given?
       end
 
@@ -28,24 +26,12 @@ module GraphQL
       end
 
       def query(query, operation_name: nil, variables: {})
-        adapter.request(query.to_query, operation_name: operation_name, variables: variables)
+        response = adapter.request(query.to_query, operation_name: operation_name, variables: variables)
+        GraphObject.new(data: response.data, query: query)
       end
 
       def raw_query(query_string, operation_name: nil, variables: {})
         adapter.request(query_string, operation_name: operation_name, variables: variables)
-      end
-
-      private
-
-      def define_field_accessors
-        query_root = @schema.query_root
-        fields_to_define = query_root.fields.scalars + query_root.fields.objects
-
-        fields_to_define.each do |name, field|
-          define_singleton_method(name) do |*fields, **arguments|
-            ObjectProxy.new(*fields, field: field, client: self, **arguments)
-          end
-        end
       end
     end
   end
