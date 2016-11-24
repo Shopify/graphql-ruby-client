@@ -3,16 +3,16 @@
 module GraphQL
   module Client
     module Query
-      class QueryField
+      class Field
         include AddInlineFragment
         include HasSelectionSet
 
         INVALID_ARGUMENTS = Class.new(StandardError)
 
-        attr_reader :arguments, :as, :document, :field
+        attr_reader :arguments, :as, :document, :field_defn
 
-        def initialize(field, document:, arguments: {}, as: nil)
-          @field = field
+        def initialize(field_defn, document:, arguments: {}, as: nil)
+          @field_defn = field_defn
           @document = document
           @arguments = validate_arguments(arguments)
           @as = as
@@ -25,7 +25,7 @@ module GraphQL
         end
 
         def aliased?
-          name != field.name
+          name != field_defn.name
         end
 
         def arguments=(arguments)
@@ -33,17 +33,17 @@ module GraphQL
         end
 
         def name
-          as || field.name
+          as || field_defn.name
         end
 
         # TODO: better way?
         def node?
-          return true if field.name == 'Node'
+          return true if field_defn.name == 'Node'
           resolver_type.is_a?(GraphQLSchema::Types::Object) && resolver_type.node?
         end
 
         def resolver_type
-          field.base_type
+          field_defn.base_type
         end
 
         def schema
@@ -53,7 +53,7 @@ module GraphQL
         def to_query(indent: '')
           indent.dup.tap do |query_string|
             query_string << "#{as}: " if aliased?
-            query_string << field.name
+            query_string << field_defn.name
             query_string << "(#{arguments_string.join(', ')})" if arguments.any?
 
             unless selection_set.empty?
@@ -75,13 +75,13 @@ module GraphQL
         end
 
         def validate_arguments(arguments)
-          valid_args = field.args.keys
+          valid_args = field_defn.args.keys
 
-          arguments.each_with_object({}) do |(name, value), hash|
-            if valid_args.include?(name.to_s)
-              hash[name] = value.is_a?(Argument) ? value : Argument.new(value)
+          arguments.each_with_object({}) do |(arg_name, value), hash|
+            if valid_args.include?(arg_name.to_s)
+              hash[arg_name] = value.is_a?(Argument) ? value : Argument.new(value)
             else
-              raise INVALID_ARGUMENTS, "#{name} is not a valid arg for #{field.name}"
+              raise INVALID_ARGUMENTS, "#{arg_name} is not a valid arg for #{name}"
             end
           end
         end

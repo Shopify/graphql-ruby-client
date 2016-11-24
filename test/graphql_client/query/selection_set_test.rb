@@ -18,16 +18,16 @@ module GraphQL
           assert_equal [], selection_set.selections
         end
 
-        def test_add_field_adds_query_fields_to_fields_hash
+        def test_add_field_adds_fields_to_fields_hash
           selection_set = SelectionSet.new
           document = Document.new(@schema)
-          field = @schema.query_root.fields.fetch('shop')
-          query_field = QueryField.new(field, document: document)
+          field_defn = @schema.query_root.fields.fetch('shop')
+          field = Field.new(field_defn, document: document)
 
-          selection_set.add_field(query_field)
+          selection_set.add_field(field)
 
-          assert_equal({ 'shop' => query_field }, selection_set.fields)
-          assert_equal [query_field], selection_set.selections
+          assert_equal({ 'shop' => field }, selection_set.fields)
+          assert_equal [field], selection_set.selections
         end
 
         def test_add_fragment_adds_fragment_to_fragments_hash
@@ -57,10 +57,10 @@ module GraphQL
         def test_contains_checks_if_a_field_exists_by_name
           selection_set = SelectionSet.new
           document = Document.new(@schema)
-          field = @schema.query_root.fields.fetch('shop')
-          query_field = QueryField.new(field, document: document)
+          field_defn = @schema.query_root.fields.fetch('shop')
+          field = Field.new(field_defn, document: document)
 
-          selection_set.add_field(query_field)
+          selection_set.add_field(field)
 
           assert selection_set.contains?('shop')
         end
@@ -74,10 +74,10 @@ module GraphQL
         def test_empty_is_false_when_selections_exist
           selection_set = SelectionSet.new
           document = Document.new(@schema)
-          field = @schema.query_root.fields.fetch('shop')
-          query_field = QueryField.new(field, document: document)
+          field_defn = @schema.query_root.fields.fetch('shop')
+          field = Field.new(field_defn, document: document)
 
-          selection_set.add_field(query_field)
+          selection_set.add_field(field)
 
           refute selection_set.empty?
         end
@@ -86,18 +86,18 @@ module GraphQL
           selection_set = SelectionSet.new
 
           document = Document.new(@schema)
-          field = @schema.query_root.fields.fetch('shop')
+          field_defn = @schema.query_root.fields.fetch('shop')
           type = @schema.query_root.fields.fetch('shop').base_type
 
-          query_field = QueryField.new(field, document: document)
+          field = Field.new(field_defn, document: document)
           fragment = Fragment.new('shopFields', type, document: document)
           inline_fragment = InlineFragment.new(type, document: document)
 
-          selection_set.add_field(query_field)
+          selection_set.add_field(field)
           selection_set.add_fragment(fragment)
           selection_set.add_inline_fragment(inline_fragment)
 
-          assert_equal [query_field, fragment, inline_fragment], selection_set.selections
+          assert_equal [field, fragment, inline_fragment], selection_set.selections
         end
 
         def test_to_query_builds_a_graphql_query_representation_of_the_selections
