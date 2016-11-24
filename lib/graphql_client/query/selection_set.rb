@@ -12,8 +12,8 @@ module GraphQL
           @inline_fragments = []
         end
 
-        def add_field(query_field)
-          @fields[query_field.name] = query_field
+        def add_field(field)
+          @fields[field.name] = field
         end
 
         def add_fragment(fragment)
@@ -41,8 +41,8 @@ module GraphQL
         end
 
         def to_query(indent = '')
-          selections.map do |field|
-            field.to_query(indent: indent + '  ')
+          selections.map do |selection|
+            selection.to_query(indent: indent + '  ')
           end.join("\n")
         end
 

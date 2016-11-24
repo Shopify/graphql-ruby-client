@@ -63,7 +63,7 @@ module GraphQL
           'shop' => {}
         }
 
-        shop.field.stub(:connection?, true) do
+        shop.field_defn.stub(:connection?, true) do
           result = GraphObject.new(data: data, query: query)
           assert_instance_of GraphConnection, result.shop
         end

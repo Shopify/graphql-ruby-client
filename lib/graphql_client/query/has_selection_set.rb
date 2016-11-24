@@ -32,16 +32,16 @@ module GraphQL
         end
 
         def add_field(field_name, as: nil, **arguments)
-          field = resolve(field_name)
-          query_field = QueryField.new(field, arguments: arguments, as: as, document: document)
-          selection_set.add_field(query_field)
+          field_defn = resolve(field_name)
+          field = Field.new(field_defn, arguments: arguments, as: as, document: document)
+          selection_set.add_field(field)
 
-          query_field.add_field(ID_FIELD_NAME) if query_field.node?
+          field.add_field(ID_FIELD_NAME) if field.node?
 
           if block_given?
-            yield query_field
+            yield field
           else
-            query_field
+            field
           end
         end
 

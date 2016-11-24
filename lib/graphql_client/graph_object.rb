@@ -11,21 +11,21 @@ module GraphQL
         @parent = parent
 
         @data.each do |field_name, value|
-          query_field = query.selection_set.lookup(field_name)
+          field = query.selection_set.lookup(field_name)
 
           graph_object = case value
           when Hash
-            klass = if query_field.field.connection?
+            klass = if field.field_defn.connection?
               GraphConnection
-            elsif query_field.node?
+            elsif field.node?
               GraphNode
             else
               GraphObject
             end
 
-            klass.new(query: query_field, data: value, parent: self)
+            klass.new(query: field, data: value, parent: self)
           when Array
-            value.map { |v| self.class.new(query: query_field, data: v, parent: self) }
+            value.map { |v| self.class.new(query: field, data: v, parent: self) }
           else
             value
           end
@@ -37,7 +37,7 @@ module GraphQL
       def build_minimal_query
         if parent
           parent.build_minimal_query do |context|
-            yield context.add_field(query.field.name, as: query.name, **query.arguments)
+            yield context.add_field(query.field_defn.name, as: query.name, **query.arguments)
           end
         else
           Query::QueryDocument.new(query.schema) { |root| yield root }
