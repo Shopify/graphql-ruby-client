@@ -49,6 +49,7 @@ module GraphQL
             mutation {
               publicAccessTokenCreate(input: { title: "Token Title" }) {
                 publicAccessToken {
+                  id
                   title
                   accessToken
                 }
@@ -76,6 +77,7 @@ module GraphQL
             mutation($tokenTitle: String) {
               publicAccessTokenCreate(input: { title: $tokenTitle }) {
                 publicAccessToken {
+                  id
                   title
                   accessToken
                 }
