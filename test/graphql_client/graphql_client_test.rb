@@ -20,21 +20,15 @@ module GraphQL
       end
 
       def test_new_instantiates_base
-        schema_string = File.read(fixture_path('merchant_schema.json'))
-        schema = GraphQLSchema.new(schema_string)
-
-        client = Client.new(schema)
+        client = Client.new(fixture_path('merchant_schema.json'))
 
         assert_instance_of Base, client
       end
 
       def test_new_accepts_a_block_for_httpclient
-        schema_string = File.read(fixture_path('merchant_schema.json'))
-        schema = GraphQLSchema.new(schema_string)
-
         url = URI('http://example.com')
 
-        client = Client.new(schema) do
+        client = Client.new(fixture_path('merchant_schema.json')) do
           configure do |c|
             c.url = url
           end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphQL
   module Client
     INTROSPECTION_QUERY = '

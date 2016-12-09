@@ -4,8 +4,7 @@ module GraphQL
   module Client
     class GraphObjectTest < Minitest::Test
       def setup
-        schema_string = File.read(fixture_path('merchant_schema.json'))
-        @schema = GraphQLSchema.new(schema_string)
+        @schema = GraphQLSchema.load_schema(fixture_path('merchant_schema.json'))
       end
 
       def test_builds_graph_objects_from_hashes
@@ -123,8 +122,7 @@ module GraphQL
       end
 
       def test_build_minimal_query_creates_a_new_query_operation_for_the_root_object
-        schema_string = File.read(fixture_path('schema.json'))
-        @schema = GraphQLSchema.new(schema_string)
+        @schema = GraphQLSchema.load_schema(fixture_path('schema.json'))
 
         query = Query::QueryDocument.new(@schema) do |root|
           root.add_field('nonNode', name: 'Bar') do |non_node|
@@ -149,8 +147,7 @@ module GraphQL
       end
 
       def test_build_minimal_query_recursively_builds_a_query_by_adding_fields
-        schema_string = File.read(fixture_path('schema.json'))
-        @schema = GraphQLSchema.new(schema_string)
+        @schema = GraphQLSchema.load_schema(fixture_path('schema.json'))
 
         query = Query::QueryDocument.new(@schema) do |root|
           root.add_field('nonNode', name: 'Bar') do |non_node|
