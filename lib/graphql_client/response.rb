@@ -3,7 +3,7 @@ module GraphQL
     class Response
       ResponseError = Class.new(StandardError)
 
-      attr_reader :data, :errors, :extensions
+      attr_reader :body, :data, :errors, :extensions
 
       def initialize(response_body)
         response = JSON.parse(response_body)
@@ -11,6 +11,7 @@ module GraphQL
 
         raise ResponseError, errors if !data && errors
 
+        @body = response
         @data = data
         @errors = errors.to_a
         @extensions = extensions.to_a

@@ -27,6 +27,12 @@ require 'graphql_client/introspection_query.rb'
 module GraphQL
   module Client
     class << self
+      def dump_schema(file, config: Config.new, adapter: nil)
+        adapter ||= Adapters::HTTPAdapter.new(config)
+        response = adapter.request(INTROSPECTION_QUERY)
+        IO.write(file, JSON.pretty_generate(response.body))
+      end
+
       def new(schema, config: nil, adapter: nil, &block)
         Base.new(schema, config: config, adapter: adapter, &block)
       end
