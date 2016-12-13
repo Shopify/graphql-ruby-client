@@ -7,6 +7,7 @@ module GraphQL
         body = { data: { id: 1 } }
         response = Response.new(body.to_json)
 
+        assert_equal({ 'data' => { 'id' => 1 } }, response.body)
         assert_equal({ 'id' => 1 }, response.data)
       end
 
