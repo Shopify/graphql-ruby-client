@@ -58,9 +58,8 @@ module GraphQL
       }
 
       def setup
-        schema_string = File.read(fixture_path('schema.json'))
-        @schema = GraphQLSchema.new(schema_string)
-        @graphql_schema = GraphQL::Schema::Loader.load(JSON.parse(schema_string))
+        @schema = GraphQLSchema.load_schema(fixture_path('schema.json'))
+        @graphql_schema = GraphQL::Schema::Loader.load(@schema.schema)
 
         @base_query = Query::QueryDocument.new(@schema) do |root|
           root.add_field('shop') do |shop|

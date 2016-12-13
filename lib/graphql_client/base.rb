@@ -5,7 +5,7 @@ module GraphQL
 
       def initialize(schema, config: nil, adapter: nil, &block)
         @config = config || Config.new
-        @schema = schema
+        @schema = GraphQLSchema.load_schema(schema)
         @adapter = adapter || Adapters::HTTPAdapter.new(@config)
 
         instance_eval(&block) if block_given?

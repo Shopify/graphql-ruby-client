@@ -5,9 +5,8 @@ module GraphQL
     module Query
       class DocumentTest < Minitest::Test
         def setup
-          schema_string = File.read(fixture_path('merchant_schema.json'))
-          @schema = GraphQLSchema.new(schema_string)
-          @graphql_schema = GraphQL::Schema::Loader.load(JSON.parse(schema_string))
+          @schema = GraphQLSchema.load_schema(fixture_path('merchant_schema.json'))
+          @graphql_schema = GraphQL::Schema::Loader.load(@schema.schema)
         end
 
         def test_initialize_yields_self
