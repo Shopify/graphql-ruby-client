@@ -40,7 +40,7 @@ module GraphQL
         config = Config.new(url: 'http://example.com')
 
         adapter = Minitest::Mock.new
-        adapter.expect(:request, nil, ['query { shop }', operation_name: nil, variables: {}])
+        adapter.expect(:request, Response.new('{}'), ['query { shop }', operation_name: nil, variables: {}])
 
         client = Base.new(fixture_path('merchant_schema.json'), config: config, adapter: adapter)
         client.raw_query('query { shop }')
