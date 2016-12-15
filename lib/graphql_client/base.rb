@@ -31,7 +31,8 @@ module GraphQL
       end
 
       def raw_query(query_string, operation_name: nil, variables: {})
-        adapter.request(query_string, operation_name: operation_name, variables: variables)
+        response = adapter.request(query_string, operation_name: operation_name, variables: variables)
+        ResponseObject.new(response.data)
       end
     end
   end
