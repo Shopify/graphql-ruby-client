@@ -2,6 +2,7 @@ require 'bundler/setup'
 require 'json'
 require 'graphql_schema'
 
+require 'graphql_client/error.rb'
 require 'graphql_client/config.rb'
 require 'graphql_client/adapters/http_adapter.rb'
 require 'graphql_client/base.rb'

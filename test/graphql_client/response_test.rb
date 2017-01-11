@@ -52,12 +52,12 @@ module GraphQL
       end
 
       def test_initialize_raises_error_if_response_contains_errors_without_data
-        assert_raises Response::ResponseError do
+        assert_raises ResponseError do
           body = { errors: [{}] }
           Response.new(body.to_json)
         end
 
-        assert_raises Response::ResponseError do
+        assert_raises ResponseError do
           body = { data: nil, errors: [{}] }
           Response.new(body.to_json)
         end

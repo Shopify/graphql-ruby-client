@@ -1,8 +1,6 @@
 module GraphQL
   module Client
     class Response
-      ResponseError = Class.new(StandardError)
-
       attr_reader :body, :data, :errors, :extensions
 
       def initialize(response_body)
