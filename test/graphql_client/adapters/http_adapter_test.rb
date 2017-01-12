@@ -73,11 +73,15 @@ module GraphQL
               }.to_json,
               headers: { 'Accept' => 'application/json' }
             )
-            .to_return(status: 400)
+            .to_return(status: [401, 'Unauthorized'])
 
-          assert_raises HTTPAdapter::NetworkError do
+          exception = assert_raises ClientError do
             adapter.request('query { shop }')
           end
+
+          assert_equal '401 Unauthorized', exception.message
+          assert_equal '401', exception.response.code
+          assert_nil exception.response.body
         end
       end
     end

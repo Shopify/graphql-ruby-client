@@ -5,8 +5,6 @@ module GraphQL
         JSON_MIME_TYPE = 'application/json'.freeze
         DEFAULT_HEADERS = { 'Accept' => JSON_MIME_TYPE, 'Content-Type' => JSON_MIME_TYPE }
 
-        NetworkError = Class.new(StandardError)
-
         attr_reader :config
 
         def initialize(config)
@@ -25,7 +23,7 @@ module GraphQL
             puts "Response body: \n#{JSON.pretty_generate(JSON.parse(response.body))}" if debug?
             Response.new(response.body)
           else
-            raise NetworkError, "#{response.code}/#{response.message}"
+            raise ClientError, response
           end
         end
 
