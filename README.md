@@ -1,8 +1,15 @@
 # A Ruby GraphQL Client
 
-**Note: do not use this yet. It's experimental and changes frequently**
-
 This is an early stage attempt at a *generic* GraphQL client in Ruby.
+
+This client offers two APIs:
+
+1. Query Builder
+2. Raw Queries
+
+The Query Builder is considered unstable and should be used with caution.
+
+We recommend start with raw queries since it offers an easy migration path to another API or library. With the raw queries, you are just writing plain GraphQL queries as strings.
 
 Below you'll find some usage examples.
 
@@ -11,12 +18,12 @@ Below you'll find some usage examples.
 Create a client:
 
 ```ruby
-schema_string = File.read('path/to/schema.json')
-schema = GraphQLSchema.new(schema_string)
-
-client = GraphQL::Client.new do
+client = GraphQL::Client.new('path/to/schema.json') do
   configure do |c|
-    c.url = 'http://example.com'
+    c.url = "https://#{shopify_domain}/admin/api/graphql.json"
+    c.headers = {
+      'X-Shopify-Access-Token' => shopify_token
+    }
   end
 end
 ```
@@ -65,4 +72,22 @@ query = client.build_query do |q|
 end
 
 client.query(query)
+```
+
+## Responses
+
+Both `query` and `raw_query` methods return a response object that converts the JSON to Ruby objects offering easy method access instead of via a Hash.
+
+Example:
+
+```ruby
+response = client.raw_query('
+  query {
+    shop {
+       name
+      }
+    }
+')
+
+puts response.shop.name
 ```
