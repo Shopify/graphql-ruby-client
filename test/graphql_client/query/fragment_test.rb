@@ -5,19 +5,19 @@ module GraphQL
     module Query
       class FragmentTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.load_schema(fixture_path('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
           @document = Document.new(@schema)
         end
 
         def test_resolver_type_is_the_type
-          shop = @schema['Shop']
+          shop = @schema.type('Shop')
           fragment = Fragment.new('shopFields', shop, document: @document)
 
           assert_equal shop, fragment.resolver_type
         end
 
         def test_to_definition
-          shop = @schema['Shop']
+          shop = @schema.type('Shop')
           fragment = Fragment.new('shopFields', shop, document: @document)
           fragment.add_field('name')
 
@@ -31,7 +31,7 @@ module GraphQL
         end
 
         def test_to_query_is_the_fragment_spread
-          shop = @schema['Shop']
+          shop = @schema.type('Shop')
 
           fragment = Fragment.new('shopFields', shop, document: @document) do |f|
             f.add_field('name')

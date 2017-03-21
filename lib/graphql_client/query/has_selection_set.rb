@@ -62,7 +62,7 @@ module GraphQL
         private
 
         def resolve(field_name)
-          resolver_type.fields.fetch(field_name) do
+          resolver_type.field(field_name) do
             raise INVALID_FIELD, "#{field_name} is not a valid field for #{resolver_type}"
           end
         end

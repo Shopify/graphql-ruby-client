@@ -5,8 +5,8 @@ module GraphQL
     module Query
       class DocumentTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.load_schema(fixture_path('merchant_schema.json'))
-          @graphql_schema = GraphQL::Schema::Loader.load(@schema.schema)
+          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
+          @graphql_schema = GraphQL::Schema::Loader.load(schema_fixture('merchant_schema.json'))
         end
 
         def test_initialize_yields_self
@@ -89,7 +89,7 @@ module GraphQL
           fragment = document.define_fragment('imageFields', on: 'Image')
 
           assert_equal 'imageFields', fragment.name
-          assert_equal @schema['Image'], fragment.type
+          assert_equal @schema.type('Image'), fragment.type
           assert_equal document, fragment.document
           assert_equal({ 'imageFields' => fragment }, document.fragments)
         end

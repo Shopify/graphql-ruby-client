@@ -13,6 +13,14 @@ def fixture_path(name)
   File.join(__dir__, '/support/fixtures', name)
 end
 
+def schema_fixture(name)
+  JSON.parse(File.read(fixture_path(name)))
+end
+
+def schema_type(type)
+  @schema.type(type.unwrap.name)
+end
+
 class Minitest::Test
   def assert_valid_query(query_string, schema, operation_name: nil, variables: {})
     query = GraphQL::Query.new(

@@ -17,7 +17,7 @@ module GraphQL
 
           graph_object = case value
           when Hash
-            klass = if field.field_defn.connection?
+            klass = if field.connection?
               GraphConnection
             elsif field.node?
               GraphNode

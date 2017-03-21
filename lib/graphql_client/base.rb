@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphQL
   module Client
     class Base
@@ -5,7 +7,7 @@ module GraphQL
 
       def initialize(schema, config: nil, adapter: nil, &block)
         @config = config || Config.new
-        @schema = GraphQLSchema.load_schema(schema)
+        @schema = load_schema(schema)
         @adapter = adapter || Adapters::HTTPAdapter.new(@config)
 
         instance_eval(&block) if block_given?
@@ -33,6 +35,18 @@ module GraphQL
       def raw_query(query_string, operation_name: nil, variables: {})
         response = adapter.request(query_string, operation_name: operation_name, variables: variables)
         ResponseObject.new(response.data)
+      end
+
+      private
+
+      def load_schema(schema)
+        case schema
+        when Pathname
+          schema_string = JSON.parse(File.read(schema))
+          GraphQLSchema.new(schema_string)
+        else
+          GraphQLSchema.new(schema)
+        end
       end
     end
   end
