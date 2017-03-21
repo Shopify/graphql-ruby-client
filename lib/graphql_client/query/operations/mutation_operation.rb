@@ -9,7 +9,7 @@ module GraphQL
         end
 
         def resolver_type
-          schema.mutation_root
+          schema.type(schema.mutation_root_name)
         end
       end
     end

@@ -29,15 +29,14 @@ module GraphQL
         end
 
         def define_fragment(name, on:)
-          type = schema[on]
+          type = schema.type(on)
 
-          case type
-          when GraphQLSchema::Types::Object
-            fragment = Fragment.new(name, type, document: self)
-            @fragments[name] = fragment
-          else
+          unless type.object? || type.interface? || type.union?
             raise INVALID_FRAGMENT_TARGET, "invalid target type (#{type.kind}) for fragment #{name}"
           end
+
+          fragment = Fragment.new(name, type, document: self)
+          @fragments[name] = fragment
 
           if block_given?
             yield fragment

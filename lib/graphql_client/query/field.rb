@@ -32,18 +32,20 @@ module GraphQL
           @arguments = validate_arguments(arguments)
         end
 
+        def connection?
+          resolver_type.name.to_s.end_with?('Connection')
+        end
+
         def name
           as || field_defn.name
         end
 
-        # TODO: better way?
         def node?
-          return true if field_defn.name == 'Node'
-          resolver_type.is_a?(GraphQLSchema::Types::Object) && resolver_type.node?
+          field_defn.name == 'Node' || (resolver_type.object? && resolver_type.implement?('Node'))
         end
 
         def resolver_type
-          field_defn.base_type
+          @resolver_type ||= schema.type(field_defn.type.unwrap.name)
         end
 
         def schema
@@ -75,10 +77,8 @@ module GraphQL
         end
 
         def validate_arguments(arguments)
-          valid_args = field_defn.args.keys
-
           arguments.each_with_object({}) do |(arg_name, value), hash|
-            if valid_args.include?(arg_name.to_s)
+            if field_defn.args.any? { |arg| arg.name == arg_name.to_s }
               hash[arg_name] = value.is_a?(Argument) ? value : Argument.new(value)
             else
               raise INVALID_ARGUMENTS, "#{arg_name} is not a valid arg for #{name}"

@@ -5,8 +5,8 @@ module GraphQL
     module Query
       class QueryOperationTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.load_schema(fixture_path('merchant_schema.json'))
-          @graphql_schema = GraphQL::Schema::Loader.load(@schema.schema)
+          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
+          @graphql_schema = GraphQL::Schema::Loader.load(schema_fixture('merchant_schema.json'))
         end
 
         def test_initialize_yields_self
@@ -25,7 +25,9 @@ module GraphQL
           document = Document.new(mock_schema)
           query = QueryOperation.new(document)
 
-          mock_schema.expect(:query_root, nil)
+          mock_schema.expect(:query_root_name, 'queryRoot')
+          mock_schema.expect(:type, nil, ['queryRoot'])
+
           query.resolver_type
 
           assert mock_schema.verify

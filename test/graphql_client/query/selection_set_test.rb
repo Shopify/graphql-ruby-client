@@ -5,7 +5,7 @@ module GraphQL
     module Query
       class SelectionSetTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.load_schema(fixture_path('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
         end
 
         def test_initializes_creates_empty_structures
@@ -20,7 +20,7 @@ module GraphQL
         def test_add_field_adds_fields_to_fields_hash
           selection_set = SelectionSet.new
           document = Document.new(@schema)
-          field_defn = @schema.query_root.fields.fetch('shop')
+          field_defn = @schema.query_root.field('shop')
           field = Field.new(field_defn, document: document)
 
           selection_set.add_field(field)
@@ -32,7 +32,7 @@ module GraphQL
         def test_add_fragment_adds_fragment_to_fragments_hash
           selection_set = SelectionSet.new
           document = Document.new(@schema)
-          type = @schema.query_root.fields.fetch('shop').base_type
+          type = @schema.type('Shop')
           fragment = Fragment.new('shopFields', type, document: document)
 
           selection_set.add_fragment(fragment)
@@ -44,7 +44,7 @@ module GraphQL
         def test_add_inline_fragment_adds_inline_fragment_to_array
           selection_set = SelectionSet.new
           document = Document.new(@schema)
-          type = @schema.query_root.fields.fetch('shop').base_type
+          type = @schema.type('Shop')
           inline_fragment = InlineFragment.new(type, document: document)
 
           selection_set.add_inline_fragment(inline_fragment)
@@ -56,7 +56,7 @@ module GraphQL
         def test_contains_checks_if_a_field_exists_by_name
           selection_set = SelectionSet.new
           document = Document.new(@schema)
-          field_defn = @schema.query_root.fields.fetch('shop')
+          field_defn = @schema.query_root.field('shop')
           field = Field.new(field_defn, document: document)
 
           selection_set.add_field(field)
@@ -73,7 +73,7 @@ module GraphQL
         def test_empty_is_false_when_selections_exist
           selection_set = SelectionSet.new
           document = Document.new(@schema)
-          field_defn = @schema.query_root.fields.fetch('shop')
+          field_defn = @schema.query_root.field('shop')
           field = Field.new(field_defn, document: document)
 
           selection_set.add_field(field)
@@ -85,8 +85,8 @@ module GraphQL
           selection_set = SelectionSet.new
 
           document = Document.new(@schema)
-          field_defn = @schema.query_root.fields.fetch('shop')
-          type = @schema.query_root.fields.fetch('shop').base_type
+          field_defn = @schema.query_root.field('shop')
+          type = @schema.type('Shop')
 
           field = Field.new(field_defn, document: document)
           fragment = Fragment.new('shopFields', type, document: document)

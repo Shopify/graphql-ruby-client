@@ -4,7 +4,7 @@ module GraphQL
   module Client
     class BaseTest < Minitest::Test
       def test_configure_yields_the_config
-        client = Base.new(fixture_path('merchant_schema.json'))
+        client = Base.new(schema_fixture('merchant_schema.json'))
 
         client.configure do |c|
           assert_equal c, client.config
@@ -28,7 +28,7 @@ module GraphQL
         mock.expect(:call, nil, [data: nil, query: query])
 
         GraphObject.stub(:new, mock) do
-          client = Base.new(fixture_path('merchant_schema.json'), config: config, adapter: adapter)
+          client = Base.new(schema_fixture('merchant_schema.json'), config: config, adapter: adapter)
           client.query(query, operation_name: 'shopQuery')
 
           mock.verify
@@ -42,7 +42,7 @@ module GraphQL
         adapter = Minitest::Mock.new
         adapter.expect(:request, Response.new('{}'), ['query { shop }', operation_name: nil, variables: {}])
 
-        client = Base.new(fixture_path('merchant_schema.json'), config: config, adapter: adapter)
+        client = Base.new(schema_fixture('merchant_schema.json'), config: config, adapter: adapter)
         client.raw_query('query { shop }')
 
         adapter.verify

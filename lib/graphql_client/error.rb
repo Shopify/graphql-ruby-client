@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphQL
   module Client
     Error = Class.new(StandardError)
