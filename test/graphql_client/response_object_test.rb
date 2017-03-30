@@ -31,6 +31,25 @@ module GraphQL
         assert_equal({ 'serviceName' => 'service 2' }, service2.data)
       end
 
+      def test_builds_response_objects_from_arrays_of_strings
+        result = ResponseObject.new(
+          "productPublish" => {
+            "userErrors" => [
+              {
+                "field" => ["id"],
+                "message" => "Product does not exist"
+              }
+            ]
+          }
+        )
+
+        assert_equal 1, result.productPublish.user_errors.size
+        assert_equal 1, result.productPublish.user_errors.first.field.size
+
+        assert_equal(['id'], result.productPublish.user_errors.first.field)
+        assert_equal('Product does not exist', result.productPublish.user_errors.first.message)
+      end
+
       def test_builds_response_connections_based_on_edges_existence
         result = ResponseObject.new(
           'products' => {
