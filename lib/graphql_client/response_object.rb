@@ -16,21 +16,16 @@ module GraphQL
             if value.key?('edges')
               ResponseConnection.new(value)
             else
-              wrap(value)
+              self.class.new(value)
             end
           when Array
-            value.map { |v| wrap(v) }
+            value.map { |v| v.is_a?(Hash) ? self.class.new(v) : v }
           else
             value
           end
 
           create_accessor_methods(field_name, response_object)
         end
-      end
-
-      def wrap(data)
-        data = self.class.new(data) if data.is_a?(Hash)
-        data
       end
     end
   end
