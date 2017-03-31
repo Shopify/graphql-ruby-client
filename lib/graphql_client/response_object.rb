@@ -19,7 +19,7 @@ module GraphQL
               self.class.new(value)
             end
           when Array
-            value.map { |v| self.class.new(v) }
+            value.map { |v| v.is_a?(Hash) ? self.class.new(v) : v }
           else
             value
           end
