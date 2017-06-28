@@ -5,7 +5,7 @@ module GraphQL
     module Query
       class QueryDocumentTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('schema.json'))
         end
 
         def test_new_creates_a_document_with_a_mutation_operation

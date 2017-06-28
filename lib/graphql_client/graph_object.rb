@@ -27,7 +27,13 @@ module GraphQL
 
             klass.new(query: field, data: value, parent: self)
           when Array
-            value.map { |v| self.class.new(query: field, data: v, parent: self) }
+            value.map do |v|
+              if v.is_a? Hash
+                self.class.new(query: field, data: v, parent: self)
+              else
+                v
+              end
+            end
           else
             value
           end

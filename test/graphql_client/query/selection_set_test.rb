@@ -5,7 +5,7 @@ module GraphQL
     module Query
       class SelectionSetTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('schema.json'))
         end
 
         def test_initializes_creates_empty_structures

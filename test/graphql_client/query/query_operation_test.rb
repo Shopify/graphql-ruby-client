@@ -5,8 +5,8 @@ module GraphQL
     module Query
       class QueryOperationTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
-          @graphql_schema = GraphQL::Schema::Loader.load(schema_fixture('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('schema.json'))
+          @graphql_schema = GraphQL::Schema::Loader.load(schema_fixture('schema.json'))
         end
 
         def test_initialize_yields_self
@@ -37,16 +37,20 @@ module GraphQL
           document = Document.new(@schema)
 
           query = QueryOperation.new(document) do |q|
-            q.add_field('product', id: '2') do |product|
-              product.add_field('title')
+            q.add_field('shop') do |s|
+              s.add_field('productByHandle', handle: "test") do |product|
+                product.add_field('title')
+              end
             end
           end
 
           query_string = <<~QUERY
             query {
-              product(id: "2") {
-                id
-                title
+              shop {
+                productByHandle(handle: "test") {
+                  id
+                  title
+                }
               }
             }
           QUERY
@@ -59,16 +63,20 @@ module GraphQL
           document = Document.new(@schema)
 
           query = QueryOperation.new(document) do |q|
-            q.add_field('product', id: '2', as: 'userProduct') do |product|
-              product.add_field('title')
+            q.add_field('shop') do |s|
+              s.add_field('productByHandle', handle: 'test', as: 'userProduct') do |product|
+                product.add_field('title')
+              end
             end
           end
 
           query_string = <<~QUERY
             query {
-              userProduct: product(id: "2") {
-                id
-                title
+              shop {
+                userProduct: productByHandle(handle: \"test\") {
+                  id
+                  title
+                }
               }
             }
           QUERY
@@ -81,32 +89,31 @@ module GraphQL
           document = Document.new(@schema)
 
           query = QueryOperation.new(document) do |q|
-            q.add_field('product', id: 'gid://Product/1') do |product|
-              product.add_field('title')
-            end
 
             q.add_field('shop') do |shop|
               shop.add_field('name')
 
-              shop.add_field('billingAddress') do |billing_address|
-                billing_address.add_field('city')
-                billing_address.add_field('country')
+              shop.add_field('privacyPolicy') do |policy|
+                policy.add_field('body')
+              end
+
+              shop.add_field('productByHandle', handle: 'test') do |product|
+                product.add_field('title')
               end
             end
           end
 
           query_string = <<~QUERY
             query {
-              product(id: "gid://Product/1") {
-                id
-                title
-              }
               shop {
-                id
                 name
-                billingAddress {
-                  city
-                  country
+                privacyPolicy {
+                  id
+                  body
+                }
+                productByHandle(handle: "test") {
+                  id
+                  title
                 }
               }
             }
@@ -120,31 +127,22 @@ module GraphQL
           document = Document.new(@schema)
 
           query = QueryOperation.new(document) do |q|
-            q.add_field('product', id: 'gid://Product/1') do |product|
-              product.add_field('title')
-            end
-
             q.add_field('shop') do |shop|
               shop.add_field('name')
 
-              shop.add_field('billingAddress') do |billing_address|
-                billing_address.add_fields('city', 'country')
+              shop.add_field('productByHandle', handle: 'test') do |product|
+                product.add_field('title')
               end
             end
           end
 
           query_string = <<~QUERY
             query {
-              product(id: "gid://Product/1") {
-                id
-                title
-              }
               shop {
-                id
                 name
-                billingAddress {
-                  city
-                  country
+                productByHandle(handle: "test") {
+                  id
+                  title
                 }
               }
             }
@@ -158,27 +156,31 @@ module GraphQL
           document = Document.new(@schema)
 
           query = QueryOperation.new(document) do |q|
-            q.add_field('product', id: 'gid://Product/1') do |product|
-              product.add_connection('images', first: 10) do |connection|
-                connection.add_field('src')
+            q.add_field('shop') do |s|
+              s.add_field('productByHandle', handle: 'test') do |product|
+                product.add_connection('images', first: 10) do |connection|
+                  connection.add_field('src')
+                end
               end
             end
           end
 
           query_string = <<~QUERY
             query {
-              product(id: "gid://Product/1") {
-                id
-                images(first: 10) {
-                  edges {
-                    cursor
-                    node {
-                      src
+              shop {
+                productByHandle(handle: \"test\") {
+                  id
+                  images(first: 10) {
+                    edges {
+                      cursor
+                      node {
+                        src
+                      }
                     }
-                  }
-                  pageInfo {
-                    hasPreviousPage
-                    hasNextPage
+                    pageInfo {
+                      hasPreviousPage
+                      hasNextPage
+                    }
                   }
                 }
               }
@@ -193,28 +195,32 @@ module GraphQL
           document = Document.new(@schema)
 
           query = QueryOperation.new(document) do |q|
-            q.add_field('product', id: 'gid://Product/1') do |product|
-              product.add_connection('variants', first: 10) do |connection|
-                connection.add_field('title')
+            q.add_field('shop') do |s|
+              s.add_field('productByHandle', handle: 'test') do |product|
+                product.add_connection('variants', first: 10) do |connection|
+                  connection.add_field('title')
+                end
               end
             end
           end
 
           query_string = <<~QUERY
             query {
-              product(id: "gid://Product/1") {
-                id
-                variants(first: 10) {
-                  edges {
-                    cursor
-                    node {
-                      id
-                      title
+              shop {
+                productByHandle(handle: \"test\") {
+                  id
+                  variants(first: 10) {
+                    edges {
+                      cursor
+                      node {
+                        id
+                        title
+                      }
                     }
-                  }
-                  pageInfo {
-                    hasPreviousPage
-                    hasNextPage
+                    pageInfo {
+                      hasPreviousPage
+                      hasNextPage
+                    }
                   }
                 }
               }
@@ -228,23 +234,27 @@ module GraphQL
         def test_to_query_handles_variables
           document = Document.new(@schema)
 
-          query = QueryOperation.new(document, variables: { productID: 'ID!' }) do |q|
-            q.add_field('product', id: '$productID') do |product|
-              product.add_field('title')
+          query = QueryOperation.new(document, variables: { productHandle: 'String!' }) do |q|
+            q.add_field('shop') do |shop|
+              shop.add_field('productByHandle', handle: '$productHandle') do |product|
+                product.add_field('title')
+              end
             end
           end
 
           query_string = <<~QUERY
-            query($productID: ID!) {
-              product(id: $productID) {
-                id
-                title
+            query($productHandle: String!) {
+              shop {
+                productByHandle(handle: $productHandle) {
+                  id
+                  title
+                }
               }
             }
           QUERY
 
           assert_equal query_string, query.to_query
-          assert_valid_query query_string, @graphql_schema, variables: { 'productID' => 'gid://Product/1' }
+          assert_valid_query query_string, @graphql_schema, variables: { 'productHandle' => 'test' }
         end
       end
     end

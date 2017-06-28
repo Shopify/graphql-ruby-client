@@ -5,7 +5,7 @@ module GraphQL
     module Query
       class FieldTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('schema.json'))
           @document = Document.new(@schema)
         end
 
@@ -63,9 +63,9 @@ module GraphQL
           field_defn = @schema.query_root.field('shop')
           field = Field.new(field_defn, document: @document, arguments: {})
 
-          field.add_fields('id', 'name')
+          field.add_fields('name', 'termsOfService')
 
-          assert_equal %w(id name), field.selection_set.fields.keys
+          assert_equal %w(name termsOfService), field.selection_set.fields.keys
         end
 
         def test_add_field_uses_as_alias_name

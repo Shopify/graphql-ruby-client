@@ -11,8 +11,8 @@ module GraphQL
         data: {
           shop: {
             name: 'my-shop',
-            billingAddress: {
-              city: 'Toronto'
+            privacyPolicy: {
+              body: 'Text'
             },
             collections: {
               pageInfo: {
@@ -64,8 +64,8 @@ module GraphQL
         @base_query = Query::QueryDocument.new(@schema) do |root|
           root.add_field('shop') do |shop|
             shop.add_field('name')
-            shop.add_field('billingAddress') do |address|
-              address.add_field('city')
+            shop.add_field('privacyPolicy') do |address|
+              address.add_field('body')
             end
             shop.add_connection('collections', first: 1) do |collections|
               collections.add_field('handle')
@@ -149,83 +149,6 @@ module GraphQL
         QUERY
 
         assert_equal query_string, @graph.shop.products.to_a[0].variants.next_page_query.to_query
-        assert_valid_query query_string, @graphql_schema
-      end
-
-      def test_it_can_generate_a_query_off_of_a_node_with_intermediate_objects
-        query = Query::QueryDocument.new(@schema) do |root|
-          root.add_field('arbitraryViewer') do |viewer|
-            viewer.add_field('aNode') do |node|
-              node.add_field('hostObject') do |host|
-                host.add_field('anotherHost') do |another_host|
-                  another_host.add_connection('products', first: 1) do |products|
-                    products.add_field('handle')
-                  end
-                end
-              end
-            end
-          end
-        end
-
-        cursor = 'product-cursor'
-
-        data = {
-          arbitraryViewer: {
-            aNode: {
-              id: 'gid://shopify/ArbitraryNode/12345',
-              hostObject: {
-                anotherHost: {
-                  products: {
-                    edges: [{
-                      cursor: cursor,
-                      node: {
-                        id: PRODUCT_ID,
-                        handle: 'some-product'
-                      }
-                    }],
-                    pageInfo: {
-                      hasPreviousPage: false,
-                      hasNextPage: true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }.to_json
-
-        graph = GraphObject.new(data: JSON.parse(data), query: query)
-
-        query_string = <<~QUERY
-          query {
-            node(id: "gid://shopify/ArbitraryNode/12345") {
-              ... on ArbitraryNode {
-                id
-                hostObject {
-                  anotherHost {
-                    products(first: 1, after: "#{cursor}") {
-                      edges {
-                        cursor
-                        node {
-                          id
-                          handle
-                        }
-                      }
-                      pageInfo {
-                        hasPreviousPage
-                        hasNextPage
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        QUERY
-
-        next_page_query = graph.arbitrary_viewer.a_node.host_object.another_host.products.next_page_query
-
-        assert_equal query_string, next_page_query.to_query
         assert_valid_query query_string, @graphql_schema
       end
     end

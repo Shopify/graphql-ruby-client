@@ -4,7 +4,7 @@ module GraphQL
   module Client
     class GraphObjectTest < Minitest::Test
       def setup
-        @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
+        @schema = GraphQLSchema.new(schema_fixture('schema.json'))
       end
 
       def test_builds_graph_objects_from_hashes
@@ -29,29 +29,23 @@ module GraphQL
       def test_builds_graph_objects_from_arrays
         query = Query::QueryDocument.new(@schema)
         shop = query.add_field('shop')
-        fulfillment_services = shop.add_field('fulfillmentServices')
-        fulfillment_services.add_field('serviceName')
+        product = shop.add_field('productByHandle', handle: 'handle')
+        product.add_field('tags')
 
         data = {
           'shop' => {
-            'fulfillmentServices' => [
-              { 'serviceName' => 'service 1' },
-              { 'serviceName' => 'service 2' },
-            ]
+            'productByHandle' => {
+              'tags' => [
+                'tag1',
+                'tag2',
+              ]
+            }
           }
         }
 
         result = GraphObject.new(data: data, query: query)
-        assert_equal 2, result.shop.fulfillment_services.size
 
-        service1, service2 = result.shop.fulfillment_services
-
-        assert_equal result.shop, service1.parent
-        assert_equal result.shop, service2.parent
-        assert_equal fulfillment_services, service1.query
-        assert_equal fulfillment_services, service2.query
-        assert_equal({ 'serviceName' => 'service 1' }, service1.data)
-        assert_equal({ 'serviceName' => 'service 2' }, service2.data)
+        assert_equal ['tag1', 'tag2'], result.shop.product_by_handle.tags
       end
 
       def test_instantiates_a_graph_connection_for_connection_fields
@@ -85,12 +79,12 @@ module GraphQL
       def test_defines_methods_from_data
         query = Query::QueryDocument.new(@schema)
         shop = query.add_field('shop', as: 'myshop')
-        shop.add_fields('name', 'setupRequired')
+        shop.add_fields('name', 'termsOfService')
 
         data = {
           'myshop' => {
             'name' => 'My Shop',
-            'setupRequired' => false,
+            'termsOfService' => false,
           }
         }
 
@@ -98,8 +92,8 @@ module GraphQL
         myshop = result.myshop
 
         assert_equal 'My Shop', myshop.name
-        assert_equal false, myshop.setup_required
-        assert_equal false, myshop.setupRequired
+        assert_equal false, myshop.terms_of_service
+        assert_equal false, myshop.termsOfService
       end
 
       def test_defines_instance_variable_during_method_access
@@ -122,16 +116,14 @@ module GraphQL
       end
 
       def test_build_minimal_query_creates_a_new_query_operation_for_the_root_object
-        @schema = GraphQLSchema.new(schema_fixture('schema.json'))
-
         query = Query::QueryDocument.new(@schema) do |root|
-          root.add_field('nonNode', name: 'Bar') do |non_node|
+          root.add_field('shop') do |non_node|
             non_node.add_field('name')
           end
         end
 
         data = {
-          'nonNode' => {
+          'shop' => {
             'name' => 'Foo'
           }
         }
@@ -144,34 +136,6 @@ module GraphQL
         end
 
         assert_instance_of Query::QueryOperation, root
-      end
-
-      def test_build_minimal_query_recursively_builds_a_query_by_adding_fields
-        @schema = GraphQLSchema.new(schema_fixture('schema.json'))
-
-        query = Query::QueryDocument.new(@schema) do |root|
-          root.add_field('nonNode', name: 'Bar') do |non_node|
-            non_node.add_field('name')
-          end
-        end
-
-        data = {
-          'nonNode' => {
-            'name' => 'Foo'
-          }
-        }
-
-        graph = GraphObject.new(data: data, query: query)
-        non_node = nil
-
-        graph.non_node.build_minimal_query do |context|
-          non_node = context
-        end
-
-        arg = Query::Argument.new('Bar')
-
-        assert_equal 'nonNode', non_node.name
-        assert_equal({ name: arg }, non_node.arguments)
       end
     end
   end
