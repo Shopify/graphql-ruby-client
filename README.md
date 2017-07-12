@@ -18,7 +18,7 @@ Below you'll find some usage examples.
 Create a client:
 
 ```ruby
-client = GraphQL::Client.new('path/to/schema.json') do
+client = GraphQL::Client.new(Pathname.new('path/to/schema.json')) do
   configure do |c|
     c.url = "https://#{shopify_domain}/admin/api/graphql.json"
     c.headers = {
