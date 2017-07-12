@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'graphql_schema', '~> 0.1.5'
 
-  s.add_development_dependency 'graphql', '~> 1.2.4'
+  s.add_development_dependency 'graphql', '~> 1.6.4'
   s.add_development_dependency 'minitest', '~> 5.8'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'rake'
