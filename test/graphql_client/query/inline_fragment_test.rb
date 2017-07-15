@@ -5,7 +5,7 @@ module GraphQL
     module Query
       class InlineFragmentTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('schema.json'))
           @document = Document.new(@schema)
         end
 

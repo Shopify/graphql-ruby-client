@@ -5,8 +5,8 @@ module GraphQL
     module Query
       class MutationOperationTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
-          @graphql_schema = GraphQL::Schema::Loader.load(schema_fixture('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('schema.json'))
+          @graphql_schema = GraphQL::Schema::Loader.load(schema_fixture('schema.json'))
         end
 
         def test_initialize_yields_self
@@ -38,21 +38,18 @@ module GraphQL
           document = Document.new(@schema)
 
           query = MutationOperation.new(document) do |q|
-            q.add_field('publicAccessTokenCreate', input: { title: 'Token Title' }) do |mutation|
-              mutation.add_field('publicAccessToken') do |public_access_token|
-                public_access_token.add_field('title')
-                public_access_token.add_field('accessToken')
+            q.add_field('customerCreate', input: { email: 'email', password: 'password' }) do |mutation|
+              mutation.add_field('customer') do |customer|
+                customer.add_field('email')
               end
             end
           end
 
           query_string = <<~QUERY
             mutation {
-              publicAccessTokenCreate(input: { title: "Token Title" }) {
-                publicAccessToken {
-                  id
-                  title
-                  accessToken
+              customerCreate(input: { email: "email", password: "password" }) {
+                customer {
+                  email
                 }
               }
             }
@@ -65,29 +62,26 @@ module GraphQL
         def test_to_query_handles_variables
           document = Document.new(@schema)
 
-          query = MutationOperation.new(document, variables: { tokenTitle: 'String' }) do |q|
-            q.add_field('publicAccessTokenCreate', input: { title: '$tokenTitle' }) do |mutation|
-              mutation.add_field('publicAccessToken') do |public_access_token|
-                public_access_token.add_field('title')
-                public_access_token.add_field('accessToken')
+          query = MutationOperation.new(document, variables: { email: 'String!' }) do |q|
+            q.add_field('customerCreate', input: { email: '$email', password: 'password' }) do |mutation|
+              mutation.add_field('customer') do |customer|
+                customer.add_field('email')
               end
             end
           end
 
           query_string = <<~QUERY
-            mutation($tokenTitle: String) {
-              publicAccessTokenCreate(input: { title: $tokenTitle }) {
-                publicAccessToken {
-                  id
-                  title
-                  accessToken
+            mutation($email: String!) {
+              customerCreate(input: { email: $email, password: \"password\" }) {
+                customer {
+                  email
                 }
               }
             }
           QUERY
 
           assert_equal query_string, query.to_query
-          assert_valid_query query_string, @graphql_schema, variables: { 'tokenTitle' => 'Title' }
+          assert_valid_query query_string, @graphql_schema, variables: { 'email' => 'email' }
         end
       end
     end

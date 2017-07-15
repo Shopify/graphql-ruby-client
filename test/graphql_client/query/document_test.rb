@@ -5,8 +5,8 @@ module GraphQL
     module Query
       class DocumentTest < Minitest::Test
         def setup
-          @schema = GraphQLSchema.new(schema_fixture('merchant_schema.json'))
-          @graphql_schema = GraphQL::Schema::Loader.load(schema_fixture('merchant_schema.json'))
+          @schema = GraphQLSchema.new(schema_fixture('schema.json'))
+          @graphql_schema = GraphQL::Schema::Loader.load(schema_fixture('schema.json'))
         end
 
         def test_initialize_yields_self
@@ -145,10 +145,10 @@ module GraphQL
               end
             end
 
-            d.add_mutation('tokens') do |m|
-              m.add_field('publicAccessTokenCreate', input: { title: 'Token Title' }) do |create|
-                create.add_field('publicAccessToken') do |public_access_token|
-                  public_access_token.add_field('title')
+            d.add_mutation('customers') do |c|
+              c.add_field('customerCreate', input: { email: 'email', password: 'password' }) do |create|
+                create.add_field('customer') do |customer|
+                  customer.add_field('email')
                 end
               end
             end
@@ -157,16 +157,14 @@ module GraphQL
           query_string = <<~QUERY
             query shopQuery {
               shop {
-                id
                 name
               }
             }
 
-            mutation tokens {
-              publicAccessTokenCreate(input: { title: "Token Title" }) {
-                publicAccessToken {
-                  id
-                  title
+            mutation customers {
+              customerCreate(input: { email: \"email\", password: \"password\" }) {
+                customer {
+                  email
                 }
               }
             }
@@ -174,7 +172,7 @@ module GraphQL
 
           assert_equal query_string, document.to_query
           assert_valid_query query_string, @graphql_schema, operation_name: 'shopQuery'
-          assert_valid_query query_string, @graphql_schema, operation_name: 'tokens'
+          assert_valid_query query_string, @graphql_schema, operation_name: 'customers'
         end
 
         def test_to_query_includes_fragment_definitions
@@ -185,17 +183,19 @@ module GraphQL
 
             d.add_query('getShop') do |q|
               q.add_field('shop') do |shop|
-                shop.add_field('id')
+                shop.add_field('name')
               end
             end
 
             d.add_query('getProductImages') do |q|
-              q.add_field('product', id: 'gid://Product/1') do |product|
-                product.add_connection('images', first: 10) do |connection|
-                  connection.add_fragment('imageFields')
+              q.add_field('shop') do |shop|
+                shop.add_field('productByHandle', handle: 'test') do |product|
+                  product.add_connection('images', first: 10) do |connection|
+                    connection.add_fragment('imageFields')
 
-                  connection.add_inline_fragment do |f|
-                    f.add_field('altText')
+                    connection.add_inline_fragment do |f|
+                      f.add_field('altText')
+                    end
                   end
                 end
               end
@@ -209,26 +209,28 @@ module GraphQL
 
             query getShop {
               shop {
-                id
+                name
               }
             }
 
             query getProductImages {
-              product(id: "gid://Product/1") {
-                id
-                images(first: 10) {
-                  edges {
-                    cursor
-                    node {
-                      ...imageFields
-                      ... on Image {
-                        altText
+              shop {
+                productByHandle(handle: \"test\") {
+                  id
+                  images(first: 10) {
+                    edges {
+                      cursor
+                      node {
+                        ...imageFields
+                        ... on Image {
+                          altText
+                        }
                       }
                     }
-                  }
-                  pageInfo {
-                    hasPreviousPage
-                    hasNextPage
+                    pageInfo {
+                      hasPreviousPage
+                      hasNextPage
+                    }
                   }
                 }
               }
