@@ -4,3 +4,4 @@ up:
  - bundler
 commands:
  test: 'bin/rake test'
+ build: 'gem build graphql_ruby_client.gemspec'
