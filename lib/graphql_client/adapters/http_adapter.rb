@@ -17,6 +17,9 @@ module GraphQL
           req = build_request(query, operation_name: operation_name, variables: variables)
 
           response = Net::HTTP.start(config.url.hostname, config.url.port, use_ssl: https?) do |http|
+            http.open_timeout = config.open_timeout if config.open_timeout
+            http.read_timeout = config.read_timeout if config.read_timeout
+
             http.request(req)
           end
 
