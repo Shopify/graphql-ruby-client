@@ -6,6 +6,7 @@ Bundler.require
 require 'irb'
 require 'irb/completion'
 require 'optparse'
+require 'net/http'
 require_relative '../lib/graphql_client'
 
 JSON_MIME_TYPE = 'application/json'.freeze
@@ -58,10 +59,10 @@ end
 
 case response
 when Net::HTTPOK then
-  schema = GraphQLSchema.new(response.body)
+  schema = JSON.parse(response.body)
   config = GraphQL::Client::Config.new(options)
 else
-  exit "Error: #{response.code}"
+  abort("Error fetching the schema: server responded with #{response.code}")
 end
 
 client = GraphQL::Client.new(schema, config: config) do
