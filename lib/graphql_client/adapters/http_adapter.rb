@@ -16,10 +16,15 @@ module GraphQL
         def request(query, operation_name: nil, variables: {})
           req = build_request(query, operation_name: operation_name, variables: variables)
 
-          response = Net::HTTP.start(config.url.hostname, config.url.port, use_ssl: https?) do |http|
-            http.open_timeout = config.open_timeout if config.open_timeout
-            http.read_timeout = config.read_timeout if config.read_timeout
+          http_options = { use_ssl: https? }.tap do |options|
+            options[:open_timeout] = config.open_timeout if config.open_timeout
+            options[:read_timeout] = config.read_timeout if config.read_timeout
+          end
 
+          # IMPORTANT: open_timeout is only respected when it's supplied as part of the options
+          # when you call Net::HTTP.start. It is not respected when it's set inside the block of
+          # Net::HTTP.start (i.e. http.open_timeout = 1)
+          response = Net::HTTP.start(config.url.hostname, config.url.port, http_options) do |http|
             http.request(req)
           end
 
