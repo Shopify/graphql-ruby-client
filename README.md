@@ -21,7 +21,7 @@ Create a client:
 client = GraphQL::Client.new(Pathname.new('path/to/schema.json')) do
   configure do |c|
     c.url = "https://#{shopify_domain}/admin/api/graphql.json"
-    c.read_timeout = 1
+    c.read_timeout = 1 # 5 seconds is the default
     c.headers = {
       'X-Shopify-Access-Token' => shopify_token
     }
