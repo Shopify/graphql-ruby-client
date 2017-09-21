@@ -47,6 +47,16 @@ module GraphQL
         assert_equal 5, config.read_timeout
       end
 
+      def test_opent_timeout_is_5_seconds_when_not_set
+        config = Config.new
+        assert_equal 5, config.open_timeout
+      end
+
+      def test_read_timeout_is_5_seconds_when_not_set
+        config = Config.new
+        assert_equal 5, config.read_timeout
+      end
+
       def test_url_writer_coerces_to_uri
         config = Config.new
         config.url = 'http://example.com'

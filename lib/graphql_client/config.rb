@@ -18,6 +18,8 @@ module GraphQL
         debug: false,
         headers: {},
         per_page: 100,
+        open_timeout: 5,
+        read_timeout: 5
       }
 
       def initialize(options = {})
