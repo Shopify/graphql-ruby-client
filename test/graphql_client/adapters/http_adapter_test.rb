@@ -83,6 +83,28 @@ module GraphQL
           assert_equal '401', exception.response.code
           assert_nil exception.response.body
         end
+
+        def test_send_request_raises_an_exception_on_net_http_open_timeout_error
+          config = Config.new(url: 'http://example.org')
+          adapter = HTTPAdapter.new(config)
+
+          stub_request(:post, 'http://example.org').to_raise(Net::OpenTimeout)
+
+          assert_raises OpenTimeoutError do
+            adapter.request('query { shop }')
+          end
+        end
+
+        def test_send_request_raises_an_exception_on_net_http_read_timeout_error
+          config = Config.new(url: 'http://example.org')
+          adapter = HTTPAdapter.new(config)
+
+          stub_request(:post, 'http://example.org').to_raise(Net::ReadTimeout)
+
+          assert_raises ReadTimeoutError do
+            adapter.request('query { shop }')
+          end
+        end
       end
     end
   end
