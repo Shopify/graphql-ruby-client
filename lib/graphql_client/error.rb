@@ -3,6 +3,8 @@
 module GraphQL
   module Client
     Error = Class.new(StandardError)
+    OpenTimeoutError = Class.new(Error)
+    ReadTimeoutError = Class.new(Error)
     ResponseError = Class.new(Error)
 
     class ClientError < Error

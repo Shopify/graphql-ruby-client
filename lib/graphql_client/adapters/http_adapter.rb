@@ -30,12 +30,16 @@ module GraphQL
           end
 
           case response
-          when Net::HTTPOK then
+          when Net::HTTPOK
             puts "Response body: \n#{JSON.pretty_generate(JSON.parse(response.body))}" if debug?
             Response.new(response.body)
           else
             raise ClientError, response
           end
+        rescue Net::OpenTimeout
+          raise OpenTimeoutError, "timeout while waiting for a connection"
+        rescue Net::ReadTimeout
+          raise ReadTimeoutError, "timeout while waiting for a response"
         end
 
         private
