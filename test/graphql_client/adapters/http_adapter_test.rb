@@ -81,7 +81,7 @@ module GraphQL
 
           assert_equal '401 Unauthorized', exception.message
           assert_equal '401', exception.response.code
-          assert_nil exception.response.body
+          assert(exception.response.body.nil? || exception.response.body == '')
         end
 
         def test_send_request_raises_an_exception_on_net_http_open_timeout_error
