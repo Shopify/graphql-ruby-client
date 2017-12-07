@@ -1,5 +1,7 @@
 # A Ruby GraphQL Client
 
+[![Build Status](https://travis-ci.org/Shopify/graphql-ruby-client.svg?branch=master)](https://travis-ci.org/Shopify/graphql-ruby-client)
+
 This is an early stage attempt at a *generic* GraphQL client in Ruby.
 
 This client offers two APIs:
