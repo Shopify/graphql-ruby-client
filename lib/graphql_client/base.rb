@@ -33,8 +33,12 @@ module GraphQL
       end
 
       def raw_query(query_string, operation_name: nil, variables: {})
+        raw_query_with_extensions(query_string, operation_name: operation_name, variables: variables)[0]
+      end
+
+      def raw_query_with_extensions(query_string, operation_name: nil, variables: {})
         response = adapter.request(query_string, operation_name: operation_name, variables: variables)
-        ResponseObject.new(response.data)
+        [ResponseObject.new(response.data), ResponseObject.new(response.extensions)]
       end
 
       private

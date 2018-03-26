@@ -34,21 +34,19 @@ module GraphQL
       def test_initialize_sets_extensions
         body = {
           data: { id: 1 },
-          extensions: [
-            { foo: 'bar' }
-          ]
+          extensions: { foo: 'bar' }
         }
 
         response = Response.new(body.to_json)
 
-        assert_equal [{ 'foo' => 'bar' }], response.extensions
+        assert_equal({ 'foo' => 'bar' }, response.extensions)
       end
 
-      def test_initialize_sets_extensions_default
+      def test_initialize_with_no_extensions_sets_it_to_nil
         body = { data: { id: 1 } }
         response = Response.new(body.to_json)
 
-        assert_equal [], response.extensions
+        assert_nil response.extensions
       end
 
       def test_initialize_raises_error_if_response_contains_errors_without_data
