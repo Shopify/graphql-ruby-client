@@ -3,6 +3,12 @@ require 'test_helper'
 module GraphQL
   module Client
     class ResponseObjectTest < Minitest::Test
+      def test_builds_response_objects_from_nil
+        result = ResponseObject.new(nil)
+
+        assert_equal({}, result.data)
+      end
+
       def test_builds_response_objects_from_hashes
         result = ResponseObject.new(
           'myshop' => {
