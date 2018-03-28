@@ -94,3 +94,17 @@ response = client.raw_query('
 
 puts response.shop.name
 ```
+
+### Extensions
+
+The GraphQL specification allows for an [`extensions` key](http://facebook.github.io/graphql/October2016/#sec-Response-Format) in the response. To access this data use the `raw_query_with_extensions` method instead. It will return a tuple of response objects, one for the `data` key and one for the `extensions` key.
+
+```ruby
+data, extensions = client.raw_query_with_extensions('
+  query {
+    shop {
+       name
+      }
+    }
+')
+```
