@@ -47,6 +47,43 @@ module GraphQL
 
         adapter.verify
       end
+
+      def test_raw_query_with_extensions_calls_adapter_request_with_query_string
+        config = Config.new(url: 'http://example.com')
+
+        adapter = Minitest::Mock.new
+        adapter.expect(:request, Response.new('{}'), ['query { shop }', operation_name: nil, variables: {}])
+
+        client = Base.new(schema_fixture('schema.json'), config: config, adapter: adapter)
+        client.raw_query_with_extensions('query { shop }')
+
+        adapter.verify
+      end
+
+      def test_raw_query_with_extensions_returns_response_objects_for_data_and_extensions
+        config = Config.new(url: 'http://example.com')
+
+        response = Minitest::Mock.new
+        response.expect(:data, { 'name' => 'shop' })
+        response.expect(:extensions, { 'foo' => 'bar' })
+
+        client = Base.new(schema_fixture('schema.json'), config: config, adapter: AdapterStub.new(response))
+        data, extensions = client.raw_query_with_extensions('query { shop }')
+
+        assert_equal 'shop', data.name
+        assert_equal 'bar', extensions.foo
+        response.verify
+      end
+    end
+
+    class AdapterStub
+      def initialize(request)
+        @request = request
+      end
+
+      def request(*)
+        @request
+      end
     end
   end
 end

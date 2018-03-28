@@ -14,7 +14,7 @@ module GraphQL
         @body = response
         @data = data
         @errors = errors.to_a
-        @extensions = extensions.to_a
+        @extensions = extensions
       end
     end
   end
