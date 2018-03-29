@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.summary = ''
   s.test_files = `git ls-files -- {test}/*`.split("\n")
   s.version = GraphQL::Client::VERSION
-  s.executables << 'graphql-client'
+  s.executables = 'graphql-client'
 
   s.add_runtime_dependency 'graphql_schema', '~> 0.1.5'
 
